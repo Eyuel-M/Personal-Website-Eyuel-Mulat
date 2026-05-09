@@ -18,15 +18,16 @@ const path = window.location.pathname
 
 document.querySelectorAll('[data-nav]').forEach((link) => {
   const page = link.dataset.nav
-  const isHome    = page === 'home'    && (path === '/' || path.endsWith('/index.html'))
-  const isAbout   = page === 'about'   && path.includes('/about')
-  const isWork    = page === 'work'    && path.includes('/work') && !path.endsWith('/index.html')
-  const isContact = page === 'contact' && path.includes('/contact')
+  const isHome     = page === 'home'     && (path === '/' || path.endsWith('/index.html'))
+  const isAbout    = page === 'about'    && path.includes('/about')
+  const isWork     = page === 'work'     && path.includes('/work') && !path.endsWith('/index.html')
+  const isContact  = page === 'contact'  && path.includes('/contact')
+  const isInsights = page === 'insights' && path.includes('/insights')
 
-  if (isHome || isAbout || isWork || isContact) link.classList.add('is-active')
+  if (isHome || isAbout || isWork || isContact || isInsights) link.classList.add('is-active')
 })
 
-// ─── Hero image: scroll-expand (small box → full width, completes at 500px) ──
+// ─── Hero image: scroll-expand (completes after 500px of scroll) ──────────────
 const expandWrapper = document.querySelector('.scroll-expand-wrapper')
 if (expandWrapper) {
   let rafId = null

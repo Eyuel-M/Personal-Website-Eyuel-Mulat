@@ -8,17 +8,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        background:              '#0c0c0c',
-        surface:                 '#0c0c0c',
-        'surface-container':     '#201f1f',
-        'surface-container-low': '#1c1b1b',
-        'surface-container-high':'#2a2a2a',
-        'on-surface':            '#e5e2e1',
-        'on-surface-variant':    '#c4c7c8',
-        primary:                 '#ffffff',
+        background:              '#F5F2EE',
+        surface:                 '#F5F2EE',
+        'surface-container':     '#E1DFD9',
+        'surface-container-low': '#EAE8E3',
+        'surface-container-high':'#D5D3CD',
+        'on-surface':            '#1C1B1B',
+        'on-surface-variant':    '#6B6868',
+        primary:                 '#0F0F0F',
         accent:                  '#FF4F00',
-        outline:                 '#8e9192',
-        'outline-variant':       '#444748',
+        outline:                 '#9E9E9E',
+        'outline-variant':       '#C8C6C0',
       },
       fontFamily: {
         display: ['Anton', 'sans-serif'],

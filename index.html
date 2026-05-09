@@ -21,6 +21,7 @@
         <a href="/"           class="nav-link" data-nav="home">Home</a>
         <a href="/about.html" class="nav-link" data-nav="about">About</a>
         <a href="/work.html"  class="nav-link" data-nav="work">Work</a>
+        <a href="/insights.html" class="nav-link" data-nav="insights">Insights</a>
       </div>
       <a href="/contact.html" class="nav-cta" data-nav="contact">Contact</a>
     </div>
@@ -56,7 +57,7 @@
 
     <!-- ── Hero Image (starts small, expands to full width as you scroll) ─── -->
     <section class="px-10 md:px-[80px] mb-40 bg-background">
-      <div class="w-full overflow-hidden aspect-[21/9] border-l border-white/10 scroll-expand-wrapper">
+      <div class="w-full overflow-hidden aspect-[21/9] border-l border-black/10 scroll-expand-wrapper">
         <img
           src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOWQNwCA_Sy3BPn64hPnpoO02uP_2_I6oW5rpYeyhmhbJcwdODE21QCKmNBnLYpjNRQvkZI7H-37UsPWD4dPdVF7KLHyKL4fMT6LjMz1R1Riqe4PDbEd8ECAxfvke5UBMQ2RnMElW_xDtjq2oan1PCWh863-eSkEa-k_8ihQV0Ww3edsCB43nZJJJqts4HseBRGEvomTagI29z3PqwNDUNQddqSueZb4rURX2KArszCjq8N-BVQXNl1h9vIjUAO0ihvRIynh-y3AM"
           alt="Architectural visual"
@@ -77,7 +78,7 @@
 
         <!-- Project 01 -->
         <div class="group reveal">
-          <div class="border-t border-white/10 pt-10 mb-10 flex justify-between items-end">
+          <div class="border-t border-black/10 pt-10 mb-10 flex justify-between items-end">
             <div class="badge-circle text-primary">01</div>
             <span class="label-caps text-[10px] text-accent tracking-[0.3em]">Branding &amp; UI</span>
           </div>
@@ -98,7 +99,7 @@
 
         <!-- Project 02 — staggered down slightly on desktop -->
         <div class="group md:mt-24 reveal reveal-delay-2">
-          <div class="border-t border-white/10 pt-10 mb-10 flex justify-between items-end">
+          <div class="border-t border-black/10 pt-10 mb-10 flex justify-between items-end">
             <div class="badge-circle text-primary">02</div>
             <span class="label-caps text-[10px] text-accent tracking-[0.3em]">Identity System</span>
           </div>
@@ -177,7 +178,7 @@
     </section>
 
     <!-- ── CTA ────────────────────────────────────────────────────────────── -->
-    <section class="py-40 px-10 md:px-[80px] border-t border-white/10 text-center bg-background dot-grid">
+    <section class="py-40 px-10 md:px-[80px] border-t border-black/10 text-center bg-background dot-grid">
       <p class="label-caps text-on-surface-variant tracking-[0.4em] mb-10 reveal">Ready to build something lasting?</p>
       <h2 class="font-display text-[48px] md:text-[80px] uppercase leading-[0.9] mb-16 max-w-4xl mx-auto reveal reveal-delay-1">
         Define your<br><span class="text-accent">visual authority.</span>
@@ -191,29 +192,39 @@
   </main>
 
   <!-- Footer -->
-  <footer class="px-10 md:px-[80px] py-24 border-t border-white/10 bg-background">
-    <div class="flex flex-col md:flex-row justify-between items-start gap-16">
-      <div>
-        <div class="font-display text-3xl text-primary mb-6 uppercase">EYUEL MULAT</div>
-        <p class="text-base text-on-surface-variant max-w-xs leading-relaxed">Dedicated to structural clarity, visual systems, and architectural editorial principles.</p>
+  <footer class="bg-primary text-background">
+    <div class="px-10 md:px-[80px] pt-20 pb-16 grid grid-cols-12 gap-8 border-b border-background/10">
+      <div class="col-span-12 md:col-span-3 flex flex-col gap-3">
+        <a href="mailto:hello@eyuelmulat.com" class="label-caps text-[11px] tracking-[0.25em] text-background/70 hover:text-background transition-colors">hello@eyuelmulat.com</a>
+        <span class="label-caps text-[11px] tracking-[0.25em] text-background/40">+251 913 688 494</span>
       </div>
-      <div class="grid grid-cols-2 gap-24">
-        <div class="flex flex-col gap-6">
-          <span class="label-caps text-accent">Follow</span>
-          <div class="flex flex-col gap-3">
-            <a href="#" class="text-base text-on-surface-variant hover:text-primary transition-colors">Instagram</a>
-            <a href="#" class="text-base text-on-surface-variant hover:text-primary transition-colors">LinkedIn</a>
-            <a href="#" class="text-base text-on-surface-variant hover:text-primary transition-colors">Behance</a>
-          </div>
-        </div>
-        <div class="flex flex-col gap-6">
-          <span class="label-caps text-accent">Connect</span>
-          <div class="flex flex-col gap-3">
-            <a href="mailto:hello@eyuelmulat.com" class="text-base text-on-surface hover:text-accent transition-colors underline decoration-accent underline-offset-8">hello@eyuelmulat.com</a>
-            <span class="text-[10px] text-on-surface-variant/40 mt-6 uppercase tracking-widest">© 2024 Eyuel Mulat</span>
-          </div>
-        </div>
+      <div class="col-span-12 md:col-span-3 flex flex-col gap-4">
+        <span class="label-caps text-[11px] tracking-[0.25em] text-background/40">Addis Ababa, Ethiopia</span>
+        <a href="/contact.html" class="inline-flex items-center gap-3 label-caps text-[11px] tracking-[0.25em] text-background hover:text-accent transition-colors">
+          Get in Touch
+          <span class="material-symbols-outlined text-accent" style="font-size:14px;line-height:1">arrow_forward</span>
+        </a>
       </div>
+      <div class="col-span-6 md:col-span-3 flex flex-col gap-3">
+        <span class="label-caps text-[10px] tracking-[0.3em] text-background/30 mb-3 block">Pages</span>
+        <a href="/" class="label-caps text-[11px] tracking-[0.2em] text-background/60 hover:text-background transition-colors">Home</a>
+        <a href="/about.html" class="label-caps text-[11px] tracking-[0.2em] text-background/60 hover:text-background transition-colors">About</a>
+        <a href="/work.html" class="label-caps text-[11px] tracking-[0.2em] text-background/60 hover:text-background transition-colors">Work</a>
+        <a href="/insights.html" class="label-caps text-[11px] tracking-[0.2em] text-background/60 hover:text-background transition-colors">Insights</a>
+        <a href="/contact.html" class="label-caps text-[11px] tracking-[0.2em] text-background/60 hover:text-background transition-colors">Contact</a>
+      </div>
+      <div class="col-span-6 md:col-span-3 flex flex-col gap-3">
+        <span class="label-caps text-[10px] tracking-[0.3em] text-background/30 mb-3 block">Follow</span>
+        <a href="#" class="label-caps text-[11px] tracking-[0.2em] text-background/60 hover:text-background transition-colors">Instagram</a>
+        <a href="#" class="label-caps text-[11px] tracking-[0.2em] text-background/60 hover:text-background transition-colors">LinkedIn</a>
+        <a href="#" class="label-caps text-[11px] tracking-[0.2em] text-background/60 hover:text-background transition-colors">Behance</a>
+      </div>
+    </div>
+    <div class="px-10 md:px-[80px] overflow-hidden">
+      <div class="font-display uppercase leading-none text-background/90" style="font-size: 17vw">EYUEL MULAT</div>
+    </div>
+    <div class="px-10 md:px-[80px] py-6 border-t border-background/10">
+      <span class="text-[10px] text-background/30 uppercase tracking-widest">© 2024 Eyuel Mulat</span>
     </div>
   </footer>
 

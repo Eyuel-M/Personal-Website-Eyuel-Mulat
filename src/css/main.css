@@ -48,7 +48,7 @@
   content: '';
   position: fixed;
   inset: 0;
-  opacity: 0.055;
+  opacity: 0.035;
   pointer-events: none;
   z-index: 9999;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
@@ -62,16 +62,16 @@
   transition: --dot-x 120ms ease-out, --dot-y 120ms ease-out, --dot-glow 300ms ease-out;
   background-image:
     radial-gradient(
-      circle 280px at var(--dot-x) var(--dot-y),
-      rgba(255, 79, 0, calc(var(--dot-glow) * 0.12)) 0%,
-      rgba(255, 79, 0, calc(var(--dot-glow) * 0.05)) 40%,
+      circle 300px at var(--dot-x) var(--dot-y),
+      rgba(255, 79, 0, calc(var(--dot-glow) * 0.15)) 0%,
+      rgba(255, 79, 0, calc(var(--dot-glow) * 0.06)) 45%,
       transparent 70%
     ),
-    radial-gradient(rgba(255, 255, 255, 0.18) 1.5px, transparent 0);
+    radial-gradient(rgba(0, 0, 0, 0.12) 1.5px, transparent 0);
   background-size: 100% 100%, 36px 36px;
 }
 
-/* ─── Scroll reveal — 2× slower than original ────────────────────────────── */
+/* ─── Scroll reveal ──────────────────────────────────────────────────────── */
 .reveal {
   opacity: 0;
   transform: translateY(24px);
@@ -91,7 +91,7 @@
 .reveal-delay-4 { transition-delay: 640ms; }
 .reveal-delay-5 { transition-delay: 800ms; }
 
-/* ─── Hero entrance — 2× slower ─────────────────────────────────────────── */
+/* ─── Hero entrance ──────────────────────────────────────────────────────── */
 .reveal-hero {
   animation: hero-in 1.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
@@ -104,7 +104,7 @@
   to   { opacity: 1; transform: translateY(0);    }
 }
 
-/* ─── Hero image: scroll-expand (starts as small box, grows to full width) ── */
+/* ─── Hero image: scroll-expand ──────────────────────────────────────────── */
 .scroll-expand-wrapper {
   clip-path: inset(10% 22% round 16px);
   will-change: clip-path;
@@ -115,7 +115,7 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -132,10 +132,10 @@
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #c4c7c8;
+  color: #6B6868;
   transition: color 0.2s ease;
 }
-.nav-link:hover     { color: #ffffff; }
+.nav-link:hover     { color: #0F0F0F; }
 .nav-link.is-active { color: #FF4F00; }
 
 .nav-cta {
@@ -152,7 +152,7 @@
 
 /* ─── Section header rule ────────────────────────────────────────────────── */
 .section-header {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
   padding-top: 4rem;
   margin-bottom: 6rem;
   display: flex;
@@ -167,7 +167,7 @@
   font-weight: 600;
   letter-spacing: 0.4em;
   text-transform: uppercase;
-  color: #c4c7c8;
+  color: #6B6868;
 }
 
 /* ─── CTA link button ────────────────────────────────────────────────────── */
@@ -180,7 +180,7 @@
   font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: #ffffff;
+  color: #0F0F0F;
   border-bottom: 1px solid #FF4F00;
   padding-bottom: 4px;
   transition: color 0.2s ease;
@@ -193,14 +193,14 @@
   width: 100%;
   background: transparent;
   border: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
   padding: 16px 0;
-  color: #e5e2e1;
+  color: #1C1B1B;
   font-family: 'Hanken Grotesk', sans-serif;
   font-size: 16px;
   outline: none;
   transition: border-color 0.25s ease;
   resize: none;
 }
-.form-field::placeholder { color: rgba(196, 199, 200, 0.4); }
+.form-field::placeholder { color: rgba(107, 104, 104, 0.5); }
 .form-field:focus         { border-bottom-color: #FF4F00; }
