@@ -2,6 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Animatable CSS custom properties for cursor glow ───────────────────── */
+@property --dot-x {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 50%;
+}
+@property --dot-y {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 50%;
+}
+@property --dot-glow {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
 /* ─── Native page transitions (View Transitions API) ─────────────────────── */
 @view-transition {
   navigation: auto;
@@ -37,10 +54,21 @@
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
 }
 
-/* ─── Dot grid (hero sections + methodology) ─────────────────────────────── */
+/* ─── Dot grid with cursor glow wave ─────────────────────────────────────── */
 .dot-grid {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 0);
-  background-size: 36px 36px;
+  --dot-x: 50%;
+  --dot-y: 50%;
+  --dot-glow: 0;
+  transition: --dot-x 120ms ease-out, --dot-y 120ms ease-out, --dot-glow 300ms ease-out;
+  background-image:
+    radial-gradient(
+      circle 280px at var(--dot-x) var(--dot-y),
+      rgba(255, 79, 0, calc(var(--dot-glow) * 0.12)) 0%,
+      rgba(255, 79, 0, calc(var(--dot-glow) * 0.05)) 40%,
+      transparent 70%
+    ),
+    radial-gradient(rgba(255, 255, 255, 0.18) 1.5px, transparent 0);
+  background-size: 100% 100%, 36px 36px;
 }
 
 /* ─── Scroll reveal — 2× slower than original ────────────────────────────── */
@@ -79,12 +107,6 @@
 /* ─── Hero image: scroll-expand (starts as small box, grows to full width) ── */
 .scroll-expand-wrapper {
   clip-path: inset(10% 22% round 16px);
-  will-change: clip-path;
-}
-
-/* ─── Methodology cards: bottom-to-top scroll reveal ─────────────────────── */
-.method-reveal {
-  clip-path: inset(100% 0 0 0);
   will-change: clip-path;
 }
 
