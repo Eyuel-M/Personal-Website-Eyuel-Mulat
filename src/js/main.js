@@ -62,7 +62,8 @@ function fitFooterBrand() {
   el.style.fontSize = (10 * ratio) + 'px'
 }
 
-fitFooterBrand()
+// Wait for Anton to finish loading before measuring — otherwise fallback font gives wrong width
+document.fonts.ready.then(fitFooterBrand)
 
 window.addEventListener('resize', () => {
   if (fitBrandRaf) return
