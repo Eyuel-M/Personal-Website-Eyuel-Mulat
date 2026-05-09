@@ -110,6 +110,13 @@
   will-change: clip-path;
 }
 
+/* ─── Footer brand: full-width scaled text ───────────────────────────────── */
+.footer-brand {
+  white-space: nowrap;
+  line-height: 0.88;
+  display: block;
+}
+
 /* ─── Badge circle ────────────────────────────────────────────────────────── */
 .badge-circle {
   width: 44px;

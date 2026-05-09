@@ -51,7 +51,24 @@ if (expandWrapper) {
   updateExpand()
 }
 
-// ─── Dot grid: cursor glow wave effect ───────────────────────────────────────
+// ─── Footer brand: scale text to exactly fill container width ─────────────────
+let fitBrandRaf = null
+
+function fitFooterBrand() {
+  const el = document.querySelector('.footer-brand')
+  if (!el) return
+  el.style.fontSize = '10px'
+  const ratio = el.parentElement.offsetWidth / el.scrollWidth
+  el.style.fontSize = (10 * ratio) + 'px'
+}
+
+fitFooterBrand()
+
+window.addEventListener('resize', () => {
+  if (fitBrandRaf) return
+  fitBrandRaf = requestAnimationFrame(() => { fitBrandRaf = null; fitFooterBrand() })
+}, { passive: true })
+
 document.querySelectorAll('.dot-grid').forEach((section) => {
   section.addEventListener('mousemove', (e) => {
     const rect = section.getBoundingClientRect()
