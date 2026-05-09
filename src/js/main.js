@@ -57,12 +57,17 @@ let fitBrandRaf = null
 function fitFooterBrand() {
   const el = document.querySelector('.footer-brand')
   if (!el) return
-  el.style.fontSize = '10px'
-  const ratio = el.parentElement.offsetWidth / el.scrollWidth
-  el.style.fontSize = (10 * ratio) + 'px'
+  // Reset to known size, then measure actual text width via inline-block getBoundingClientRect
+  el.style.fontSize = '100px'
+  const textWidth  = el.getBoundingClientRect().width
+  const boxWidth   = el.parentElement.getBoundingClientRect().width
+  if (textWidth > 0 && boxWidth > 0) {
+    el.style.fontSize = (boxWidth / textWidth * 100) + 'px'
+  }
 }
 
-// Wait for Anton to finish loading before measuring — otherwise fallback font gives wrong width
+// Run immediately (cached fonts) AND after font load (fresh load)
+fitFooterBrand()
 document.fonts.ready.then(fitFooterBrand)
 
 window.addEventListener('resize', () => {

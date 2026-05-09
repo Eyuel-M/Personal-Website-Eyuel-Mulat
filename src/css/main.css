@@ -114,7 +114,7 @@
 .footer-brand {
   white-space: nowrap;
   line-height: 0.88;
-  display: block;
+  display: inline-block; /* shrinks to text width so getBoundingClientRect is accurate */
 }
 
 /* ─── Badge circle ────────────────────────────────────────────────────────── */
