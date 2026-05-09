@@ -211,3 +211,59 @@
 }
 .form-field::placeholder { color: rgba(107, 104, 104, 0.5); }
 .form-field:focus         { border-bottom-color: #FF4F00; }
+
+/* ─── Contact: service checkboxes ────────────────────────────────────────── */
+.service-check {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+}
+.service-box {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.service-check:has(input:checked) .service-box {
+  background: #FF4F00;
+  border-color: #FF4F00;
+  color: #F5F2EE;
+}
+.service-text {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #6B6868;
+  transition: color 0.15s ease;
+}
+.service-check:hover .service-text    { color: #1C1B1B; }
+.service-check:has(input:checked) .service-text { color: #1C1B1B; }
+
+/* ─── Contact: timeline pills ────────────────────────────────────────────── */
+.timeline-pill { cursor: pointer; }
+.timeline-pill-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 14px 20px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.timeline-pill:hover .timeline-pill-inner { border-color: rgba(0, 0, 0, 0.4); }
+
+/* ─── Contact: file upload zone ──────────────────────────────────────────── */
+.upload-zone {
+  border: 1px dashed rgba(0, 0, 0, 0.2);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.upload-zone:hover      { border-color: #FF4F00; }
+.upload-zone.has-file   { border-color: #FF4F00; border-style: solid; background: rgba(255, 79, 0, 0.03); }

@@ -18,8 +18,8 @@
     <div class="flex justify-between items-center px-10 md:px-[80px] py-8">
       <a href="/" class="font-display text-2xl text-primary uppercase tracking-wide">EYUEL MULAT</a>
       <div class="hidden md:flex gap-12 items-center">
-        <a href="/about.html" class="nav-link" data-nav="about">About</a>
-        <a href="/work.html"  class="nav-link" data-nav="work">Work</a>
+        <a href="/about.html"    class="nav-link" data-nav="about">About</a>
+        <a href="/work.html"     class="nav-link" data-nav="work">Work</a>
         <a href="/insights.html" class="nav-link" data-nav="insights">Insights</a>
       </div>
       <a href="/contact.html" class="nav-cta" data-nav="contact">Contact</a>
@@ -38,34 +38,32 @@
 
     <!-- ── Contact content ───────────────────────────────────────────────── -->
     <section class="px-10 md:px-[80px] py-24 mb-20">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-24 items-start">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-24 items-start">
 
         <!-- Left: Info -->
-        <div class="reveal">
-          <p class="text-base text-on-surface-variant leading-relaxed mb-12 max-w-sm">
-            Available for brand strategy, visual identity, and digital build projects. Based globally, working with forward-thinking brands worldwide.
+        <div class="lg:col-span-4 reveal">
+          <p class="text-base text-on-surface-variant leading-relaxed mb-14 max-w-sm">
+            Available for brand strategy, visual identity, and digital build projects. Working with forward-thinking brands worldwide.
           </p>
 
-          <div class="mb-16">
-            <span class="label-caps text-on-surface-variant/60 tracking-[0.3em] block mb-4">Direct</span>
-            <a
-              href="mailto:hello@eyuelmulat.com"
-              class="font-display text-[28px] md:text-[36px] uppercase text-primary hover:text-accent transition-colors duration-300 block leading-tight"
-            >hello@eyuelmulat.com</a>
+          <div class="mb-14">
+            <span class="label-caps text-[10px] text-on-surface-variant/50 tracking-[0.3em] block mb-5">Direct</span>
+            <a href="mailto:hello@eyuelmulat.com" class="font-display text-[24px] md:text-[28px] uppercase text-primary hover:text-accent transition-colors duration-300 block leading-tight mb-3">hello@eyuelmulat.com</a>
+            <span class="label-caps text-[11px] tracking-[0.2em] text-on-surface-variant">+251 95 355 3856</span>
           </div>
 
           <div>
-            <span class="label-caps text-on-surface-variant/60 tracking-[0.3em] block mb-6">Follow</span>
-            <div class="flex flex-col gap-4">
-              <a href="#" class="flex items-center justify-between border-b border-black/10 pb-4 group">
+            <span class="label-caps text-[10px] text-on-surface-variant/50 tracking-[0.3em] block mb-5">Follow</span>
+            <div class="flex flex-col gap-0">
+              <a href="#" class="flex items-center justify-between border-b border-black/10 py-4 group">
                 <span class="text-base text-on-surface-variant group-hover:text-primary transition-colors">Instagram</span>
                 <span class="material-symbols-outlined text-accent opacity-0 group-hover:opacity-100 transition-opacity" style="font-size:14px;line-height:1">north_east</span>
               </a>
-              <a href="#" class="flex items-center justify-between border-b border-black/10 pb-4 group">
+              <a href="#" class="flex items-center justify-between border-b border-black/10 py-4 group">
                 <span class="text-base text-on-surface-variant group-hover:text-primary transition-colors">LinkedIn</span>
                 <span class="material-symbols-outlined text-accent opacity-0 group-hover:opacity-100 transition-opacity" style="font-size:14px;line-height:1">north_east</span>
               </a>
-              <a href="#" class="flex items-center justify-between border-b border-black/10 pb-4 group">
+              <a href="#" class="flex items-center justify-between border-b border-black/10 py-4 group">
                 <span class="text-base text-on-surface-variant group-hover:text-primary transition-colors">Behance</span>
                 <span class="material-symbols-outlined text-accent opacity-0 group-hover:opacity-100 transition-opacity" style="font-size:14px;line-height:1">north_east</span>
               </a>
@@ -73,42 +71,231 @@
           </div>
         </div>
 
-        <!-- Right: Form -->
-        <!-- Connect action to FormSpree (https://formspree.io) or Netlify Forms when ready -->
-        <form class="reveal reveal-delay-2" action="#" onsubmit="return false" novalidate>
-          <div class="mb-12">
-            <label class="label-caps text-[10px] text-on-surface-variant/60 tracking-[0.3em] block mb-3">Name</label>
-            <input
-              type="text"
-              name="name"
-              class="form-field"
-              placeholder="Your full name"
-              autocomplete="name"
-            />
-          </div>
-          <div class="mb-12">
-            <label class="label-caps text-[10px] text-on-surface-variant/60 tracking-[0.3em] block mb-3">Email</label>
-            <input
-              type="email"
-              name="email"
-              class="form-field"
-              placeholder="your@email.com"
-              autocomplete="email"
-            />
-          </div>
+        <!-- Right: Full Form -->
+        <form class="lg:col-span-8 reveal reveal-delay-2" action="#" onsubmit="return false" novalidate>
+
+          <!-- ── 01 / Your Details ──────────────────────────────────────── -->
           <div class="mb-16">
-            <label class="label-caps text-[10px] text-on-surface-variant/60 tracking-[0.3em] block mb-3">Project Brief</label>
-            <textarea
-              name="message"
-              class="form-field"
-              rows="6"
-              placeholder="Tell me about your brand, your goals, and what you're building..."
-            ></textarea>
+            <div class="flex items-center gap-6 mb-10 pb-5 border-b border-black/10">
+              <span class="label-caps text-[10px] text-accent tracking-[0.3em]">01 / Your Details</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10">
+              <div class="mb-10">
+                <label class="label-caps text-[10px] text-on-surface-variant/50 tracking-[0.3em] block mb-3">
+                  Full Name <span class="text-accent">*</span>
+                </label>
+                <input type="text" name="full_name" required class="form-field" placeholder="Your full name" autocomplete="name"/>
+              </div>
+              <div class="mb-10">
+                <label class="label-caps text-[10px] text-on-surface-variant/50 tracking-[0.3em] block mb-3">
+                  Company / Studio Name <span class="text-accent">*</span>
+                </label>
+                <input type="text" name="company" required class="form-field" placeholder="Your company or studio"/>
+              </div>
+            </div>
+
+            <div class="mb-10">
+              <label class="label-caps text-[10px] text-on-surface-variant/50 tracking-[0.3em] block mb-3">
+                Email Address <span class="text-accent">*</span>
+              </label>
+              <input type="email" name="email" required class="form-field" placeholder="your@email.com" autocomplete="email"/>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10">
+              <div class="mb-10">
+                <label class="label-caps text-[10px] text-on-surface-variant/50 tracking-[0.3em] block mb-3">Phone Number</label>
+                <input type="tel" name="phone" class="form-field" placeholder="+251 9__ ___ ____" autocomplete="tel"/>
+              </div>
+              <div class="mb-10">
+                <label class="label-caps text-[10px] text-on-surface-variant/50 tracking-[0.3em] block mb-3">Alternative Phone</label>
+                <input type="tel" name="phone_alt" class="form-field" placeholder="+251 9__ ___ ____"/>
+              </div>
+            </div>
           </div>
-          <button type="submit" class="btn-link">
-            Send Message
-            <span class="material-symbols-outlined text-accent" style="font-size:16px;line-height:1">north_east</span>
-          </button>
+
+          <!-- ── 02 / Services Needed ───────────────────────────────────── -->
+          <div class="mb-16">
+            <div class="flex items-center gap-6 mb-10 pb-5 border-b border-black/10">
+              <span class="label-caps text-[10px] text-accent tracking-[0.3em]">02 / Services Needed</span>
+            </div>
+            <p class="text-sm text-on-surface-variant mb-8">Select all that apply.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-0">
+
+              <label class="service-check">
+                <input type="checkbox" name="services[]" value="brand-strategy" class="peer sr-only"/>
+                <span class="service-box"><span class="material-symbols-outlined" style="font-size:11px;line-height:1">check</span></span>
+                <span class="service-text">Brand Strategy</span>
+              </label>
+
+              <label class="service-check">
+                <input type="checkbox" name="services[]" value="visual-identity" class="peer sr-only"/>
+                <span class="service-box"><span class="material-symbols-outlined" style="font-size:11px;line-height:1">check</span></span>
+                <span class="service-text">Visual Identity</span>
+              </label>
+
+              <label class="service-check">
+                <input type="checkbox" name="services[]" value="brand-guidelines" class="peer sr-only"/>
+                <span class="service-box"><span class="material-symbols-outlined" style="font-size:11px;line-height:1">check</span></span>
+                <span class="service-text">Brand Guidelines</span>
+              </label>
+
+              <label class="service-check">
+                <input type="checkbox" name="services[]" value="logo-design" class="peer sr-only"/>
+                <span class="service-box"><span class="material-symbols-outlined" style="font-size:11px;line-height:1">check</span></span>
+                <span class="service-text">Logo Design</span>
+              </label>
+
+              <label class="service-check">
+                <input type="checkbox" name="services[]" value="website-design" class="peer sr-only"/>
+                <span class="service-box"><span class="material-symbols-outlined" style="font-size:11px;line-height:1">check</span></span>
+                <span class="service-text">Website Design</span>
+              </label>
+
+              <label class="service-check">
+                <input type="checkbox" name="services[]" value="ui-ux" class="peer sr-only"/>
+                <span class="service-box"><span class="material-symbols-outlined" style="font-size:11px;line-height:1">check</span></span>
+                <span class="service-text">UI / UX Design</span>
+              </label>
+
+              <label class="service-check">
+                <input type="checkbox" name="services[]" value="system-design" class="peer sr-only"/>
+                <span class="service-box"><span class="material-symbols-outlined" style="font-size:11px;line-height:1">check</span></span>
+                <span class="service-text">Design System</span>
+              </label>
+
+              <label class="service-check">
+                <input type="checkbox" name="services[]" value="creative-direction" class="peer sr-only"/>
+                <span class="service-box"><span class="material-symbols-outlined" style="font-size:11px;line-height:1">check</span></span>
+                <span class="service-text">Creative Direction</span>
+              </label>
+
+              <label class="service-check">
+                <input type="checkbox" name="services[]" value="print-collateral" class="peer sr-only"/>
+                <span class="service-box"><span class="material-symbols-outlined" style="font-size:11px;line-height:1">check</span></span>
+                <span class="service-text">Print &amp; Collateral</span>
+              </label>
+
+              <label class="service-check">
+                <input type="checkbox" name="services[]" value="art-direction" class="peer sr-only"/>
+                <span class="service-box"><span class="material-symbols-outlined" style="font-size:11px;line-height:1">check</span></span>
+                <span class="service-text">Art Direction</span>
+              </label>
+
+              <label class="service-check">
+                <input type="checkbox" name="services[]" value="social-media" class="peer sr-only"/>
+                <span class="service-box"><span class="material-symbols-outlined" style="font-size:11px;line-height:1">check</span></span>
+                <span class="service-text">Social Media Design</span>
+              </label>
+
+              <label class="service-check">
+                <input type="checkbox" name="services[]" value="motion" class="peer sr-only"/>
+                <span class="service-box"><span class="material-symbols-outlined" style="font-size:11px;line-height:1">check</span></span>
+                <span class="service-text">Motion &amp; Animation</span>
+              </label>
+
+            </div>
+          </div>
+
+          <!-- ── 03 / Delivery Timeline ─────────────────────────────────── -->
+          <div class="mb-16">
+            <div class="flex items-center gap-6 mb-10 pb-5 border-b border-black/10">
+              <span class="label-caps text-[10px] text-accent tracking-[0.3em]">03 / Delivery Timeline</span>
+            </div>
+            <p class="text-sm text-on-surface-variant mb-8">When do you need this delivered?</p>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+
+              <label class="timeline-pill">
+                <input type="radio" name="timeline" value="rush" class="sr-only peer"/>
+                <span class="timeline-pill-inner peer-checked:border-accent peer-checked:bg-accent/5">
+                  <span class="label-caps text-[10px] tracking-[0.2em]">Rush</span>
+                  <span class="text-[11px] text-on-surface-variant/60 mt-0.5">ASAP</span>
+                </span>
+              </label>
+
+              <label class="timeline-pill">
+                <input type="radio" name="timeline" value="2-4-weeks" class="sr-only peer"/>
+                <span class="timeline-pill-inner peer-checked:border-accent peer-checked:bg-accent/5">
+                  <span class="label-caps text-[10px] tracking-[0.2em]">2–4 Weeks</span>
+                  <span class="text-[11px] text-on-surface-variant/60 mt-0.5">Short sprint</span>
+                </span>
+              </label>
+
+              <label class="timeline-pill">
+                <input type="radio" name="timeline" value="1-2-months" class="sr-only peer"/>
+                <span class="timeline-pill-inner peer-checked:border-accent peer-checked:bg-accent/5">
+                  <span class="label-caps text-[10px] tracking-[0.2em]">1–2 Months</span>
+                  <span class="text-[11px] text-on-surface-variant/60 mt-0.5">Standard</span>
+                </span>
+              </label>
+
+              <label class="timeline-pill">
+                <input type="radio" name="timeline" value="2-3-months" class="sr-only peer"/>
+                <span class="timeline-pill-inner peer-checked:border-accent peer-checked:bg-accent/5">
+                  <span class="label-caps text-[10px] tracking-[0.2em]">2–3 Months</span>
+                  <span class="text-[11px] text-on-surface-variant/60 mt-0.5">Full project</span>
+                </span>
+              </label>
+
+              <label class="timeline-pill">
+                <input type="radio" name="timeline" value="3-6-months" class="sr-only peer"/>
+                <span class="timeline-pill-inner peer-checked:border-accent peer-checked:bg-accent/5">
+                  <span class="label-caps text-[10px] tracking-[0.2em]">3–6 Months</span>
+                  <span class="text-[11px] text-on-surface-variant/60 mt-0.5">Extended</span>
+                </span>
+              </label>
+
+              <label class="timeline-pill">
+                <input type="radio" name="timeline" value="flexible" class="sr-only peer"/>
+                <span class="timeline-pill-inner peer-checked:border-accent peer-checked:bg-accent/5">
+                  <span class="label-caps text-[10px] tracking-[0.2em]">Flexible</span>
+                  <span class="text-[11px] text-on-surface-variant/60 mt-0.5">Open timeline</span>
+                </span>
+              </label>
+
+            </div>
+          </div>
+
+          <!-- ── 04 / Project Brief ─────────────────────────────────────── -->
+          <div class="mb-16">
+            <div class="flex items-center gap-6 mb-10 pb-5 border-b border-black/10">
+              <span class="label-caps text-[10px] text-accent tracking-[0.3em]">04 / Project Brief</span>
+            </div>
+
+            <div class="mb-10">
+              <label class="label-caps text-[10px] text-on-surface-variant/50 tracking-[0.3em] block mb-3">Describe your project</label>
+              <textarea
+                name="message"
+                class="form-field"
+                rows="7"
+                placeholder="Tell me about your brand, your goals, what problem you're solving, and what success looks like for this project..."
+              ></textarea>
+            </div>
+
+            <!-- File Upload -->
+            <div>
+              <label class="label-caps text-[10px] text-on-surface-variant/50 tracking-[0.3em] block mb-3">Attach Brief <span class="text-on-surface-variant/30 normal-case tracking-normal font-sans font-normal text-[11px]">— PDF or Word · Max 6 MB</span></label>
+              <label id="file-upload-zone" class="upload-zone flex flex-col items-center justify-center gap-3 py-10 cursor-pointer text-center">
+                <input type="file" id="brief-file" name="brief" class="sr-only" accept=".pdf,.doc,.docx"/>
+                <span class="material-symbols-outlined text-on-surface-variant/30 group-hover:text-accent transition-colors" style="font-size:36px">upload_file</span>
+                <div>
+                  <p id="file-label-text" class="label-caps text-[11px] tracking-[0.25em] text-on-surface-variant">Click to upload or drag &amp; drop</p>
+                  <p class="text-[11px] text-on-surface-variant/40 mt-1">PDF · DOC · DOCX — maximum 6 MB</p>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <div class="pt-4">
+            <button type="submit" class="btn-link text-base">
+              Send Enquiry
+              <span class="material-symbols-outlined text-accent" style="font-size:16px;line-height:1">north_east</span>
+            </button>
+          </div>
+
         </form>
 
       </div>

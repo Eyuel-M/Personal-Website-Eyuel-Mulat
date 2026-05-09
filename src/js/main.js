@@ -75,6 +75,40 @@ window.addEventListener('resize', () => {
   fitBrandRaf = requestAnimationFrame(() => { fitBrandRaf = null; fitFooterBrand() })
 }, { passive: true })
 
+// ─── Contact: file upload UI ─────────────────────────────────────────────────
+const fileInput = document.querySelector('#brief-file')
+const fileZone  = document.querySelector('#file-upload-zone')
+const fileLabel = document.querySelector('#file-label-text')
+
+if (fileInput && fileZone && fileLabel) {
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files[0]
+    if (!file) return
+    if (file.size > 6 * 1024 * 1024) {
+      alert('File exceeds 6 MB. Please choose a smaller file.')
+      fileInput.value = ''
+      return
+    }
+    fileLabel.textContent = file.name
+    fileZone.classList.add('has-file')
+  })
+
+  fileZone.addEventListener('dragover', (e) => { e.preventDefault(); fileZone.style.borderColor = '#FF4F00' })
+  fileZone.addEventListener('dragleave', () => { if (!fileInput.files.length) fileZone.style.borderColor = '' })
+  fileZone.addEventListener('drop', (e) => {
+    e.preventDefault()
+    const file = e.dataTransfer.files[0]
+    if (!file) return
+    if (file.size > 6 * 1024 * 1024) { alert('File exceeds 6 MB.'); return }
+    const dt = new DataTransfer()
+    dt.items.add(file)
+    fileInput.files = dt.files
+    fileLabel.textContent = file.name
+    fileZone.classList.add('has-file')
+  })
+}
+
+// ─── Dot grid: cursor glow wave effect ───────────────────────────────────────
 document.querySelectorAll('.dot-grid').forEach((section) => {
   section.addEventListener('mousemove', (e) => {
     const rect = section.getBoundingClientRect()
