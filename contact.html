@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact — Eyuel Mulat</title>
+  <meta name="description" content="Get in touch to discuss brand strategy, visual identity, and creative direction projects."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/src/css/main.css"/>
+</head>
+<body class="bg-background text-on-surface grain-overlay min-h-screen">
+
+  <!-- Nav -->
+  <nav class="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-sm">
+    <div class="flex justify-between items-center px-10 md:px-[80px] py-8">
+      <a href="/" class="font-display text-2xl text-primary uppercase tracking-wide">EYUEL MULAT</a>
+      <div class="hidden md:flex gap-12 items-center">
+        <a href="/"           class="nav-link" data-nav="home">Home</a>
+        <a href="/about.html" class="nav-link" data-nav="about">About</a>
+        <a href="/work.html"  class="nav-link" data-nav="work">Work</a>
+      </div>
+      <a href="/contact.html" class="nav-cta" data-nav="contact">Contact</a>
+    </div>
+  </nav>
+
+  <main>
+
+    <!-- ── Hero ──────────────────────────────────────────────────────────── -->
+    <section class="px-10 md:px-[80px] pt-48 pb-24 dot-grid">
+      <span class="label-caps text-accent tracking-[0.4em] mb-8 block reveal-hero">Get in Touch</span>
+      <h1 class="font-display text-[64px] md:text-[120px] leading-[0.88] uppercase reveal-hero delay-1">
+        Let's work<br><span class="text-accent">together.</span>
+      </h1>
+    </section>
+
+    <!-- ── Contact content ───────────────────────────────────────────────── -->
+    <section class="px-10 md:px-[80px] py-24 mb-20">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-24 items-start">
+
+        <!-- Left: Info -->
+        <div class="reveal">
+          <p class="text-base text-on-surface-variant leading-relaxed mb-12 max-w-sm">
+            Available for brand strategy, visual identity, and digital build projects. Based globally, working with forward-thinking brands worldwide.
+          </p>
+
+          <div class="mb-16">
+            <span class="label-caps text-on-surface-variant/60 tracking-[0.3em] block mb-4">Direct</span>
+            <a
+              href="mailto:hello@eyuelmulat.com"
+              class="font-display text-[28px] md:text-[36px] uppercase text-primary hover:text-accent transition-colors duration-300 block leading-tight"
+            >hello@eyuelmulat.com</a>
+          </div>
+
+          <div>
+            <span class="label-caps text-on-surface-variant/60 tracking-[0.3em] block mb-6">Follow</span>
+            <div class="flex flex-col gap-4">
+              <a href="#" class="flex items-center justify-between border-b border-white/10 pb-4 group">
+                <span class="text-base text-on-surface-variant group-hover:text-primary transition-colors">Instagram</span>
+                <span class="material-symbols-outlined text-accent opacity-0 group-hover:opacity-100 transition-opacity" style="font-size:14px;line-height:1">north_east</span>
+              </a>
+              <a href="#" class="flex items-center justify-between border-b border-white/10 pb-4 group">
+                <span class="text-base text-on-surface-variant group-hover:text-primary transition-colors">LinkedIn</span>
+                <span class="material-symbols-outlined text-accent opacity-0 group-hover:opacity-100 transition-opacity" style="font-size:14px;line-height:1">north_east</span>
+              </a>
+              <a href="#" class="flex items-center justify-between border-b border-white/10 pb-4 group">
+                <span class="text-base text-on-surface-variant group-hover:text-primary transition-colors">Behance</span>
+                <span class="material-symbols-outlined text-accent opacity-0 group-hover:opacity-100 transition-opacity" style="font-size:14px;line-height:1">north_east</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Form -->
+        <!-- Connect action to FormSpree (https://formspree.io) or Netlify Forms when ready -->
+        <form class="reveal reveal-delay-2" action="#" onsubmit="return false" novalidate>
+          <div class="mb-12">
+            <label class="label-caps text-[10px] text-on-surface-variant/60 tracking-[0.3em] block mb-3">Name</label>
+            <input
+              type="text"
+              name="name"
+              class="form-field"
+              placeholder="Your full name"
+              autocomplete="name"
+            />
+          </div>
+          <div class="mb-12">
+            <label class="label-caps text-[10px] text-on-surface-variant/60 tracking-[0.3em] block mb-3">Email</label>
+            <input
+              type="email"
+              name="email"
+              class="form-field"
+              placeholder="your@email.com"
+              autocomplete="email"
+            />
+          </div>
+          <div class="mb-16">
+            <label class="label-caps text-[10px] text-on-surface-variant/60 tracking-[0.3em] block mb-3">Project Brief</label>
+            <textarea
+              name="message"
+              class="form-field"
+              rows="6"
+              placeholder="Tell me about your brand, your goals, and what you're building..."
+            ></textarea>
+          </div>
+          <button type="submit" class="btn-link">
+            Send Message
+            <span class="material-symbols-outlined text-accent" style="font-size:16px;line-height:1">north_east</span>
+          </button>
+        </form>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="px-10 md:px-[80px] py-24 border-t border-white/10 bg-background">
+    <div class="flex flex-col md:flex-row justify-between items-start gap-16">
+      <div>
+        <div class="font-display text-3xl text-primary mb-6 uppercase">EYUEL MULAT</div>
+        <p class="text-base text-on-surface-variant max-w-xs leading-relaxed">Dedicated to structural clarity, visual systems, and architectural editorial principles.</p>
+      </div>
+      <div class="grid grid-cols-2 gap-24">
+        <div class="flex flex-col gap-6">
+          <span class="label-caps text-accent">Follow</span>
+          <div class="flex flex-col gap-3">
+            <a href="#" class="text-base text-on-surface-variant hover:text-primary transition-colors">Instagram</a>
+            <a href="#" class="text-base text-on-surface-variant hover:text-primary transition-colors">LinkedIn</a>
+            <a href="#" class="text-base text-on-surface-variant hover:text-primary transition-colors">Behance</a>
+          </div>
+        </div>
+        <div class="flex flex-col gap-6">
+          <span class="label-caps text-accent">Connect</span>
+          <div class="flex flex-col gap-3">
+            <a href="mailto:hello@eyuelmulat.com" class="text-base text-on-surface hover:text-accent transition-colors underline decoration-accent underline-offset-8">hello@eyuelmulat.com</a>
+            <span class="text-[10px] text-on-surface-variant/40 mt-6 uppercase tracking-widest">© 2024 Eyuel Mulat</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="/src/js/main.js"></script>
+</body>
+</html>
