@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: #0c0c0c;
+        }
+        .bg-grain {
+            position: relative;
+        }
+        .bg-grain::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.15;
+            pointer-events: none;
+            /* Fixed broken SVG URL: %3E was encoded as %3 missing the E */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            z-index: 0;
+        }
+        .badge-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .bg-dots {
+            background-image: radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-tint": "#c6c6c7",
+                        "inverse-surface": "#e5e2e1",
+                        "surface-container-low": "#1c1b1b",
+                        "surface-container-lowest": "#0e0e0e",
+                        "secondary-container": "#464747",
+                        "secondary": "#c7c6c6",
+                        "on-secondary-container": "#b5b5b5",
+                        "primary": "#ffffff",
+                        "on-tertiary": "#2f3131",
+                        "on-primary-fixed-variant": "#454747",
+                        "on-surface": "#e5e2e1",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "tertiary-fixed": "#e2e2e2",
+                        "surface-bright": "#3a3939",
+                        "on-surface-variant": "#c4c7c8",
+                        "on-primary": "#2f3131",
+                        "on-error": "#690005",
+                        "on-secondary-fixed": "#1b1c1c",
+                        "on-tertiary-container": "#636565",
+                        "on-secondary-fixed-variant": "#464747",
+                        "tertiary-container": "#e2e2e2",
+                        "error-container": "#93000a",
+                        "primary-container": "#e2e2e2",
+                        "secondary-fixed-dim": "#c7c6c6",
+                        "background": "#0c0c0c",
+                        "on-primary-container": "#636565",
+                        "surface-container-highest": "#353434",
+                        "tertiary": "#ffffff",
+                        "surface-dim": "#141313",
+                        "surface-container": "#201f1f",
+                        "secondary-fixed": "#e3e2e2",
+                        "on-secondary": "#303031",
+                        "outline-variant": "#444748",
+                        "primary-fixed-dim": "#c6c6c7",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "surface-container-high": "#2a2a2a",
+                        "surface": "#0c0c0c",
+                        "on-primary-fixed": "#1a1c1c",
+                        "inverse-on-surface": "#313030",
+                        "primary-fixed": "#e2e2e2",
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "outline": "#8e9192",
+                        "error": "#FF4F00",
+                        "on-background": "#e5e2e1",
+                        "inverse-primary": "#5d5f5f",
+                        "surface-variant": "#353434",
+                        "accent": "#FF4F00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "section-padding": "160px",
+                        "margin-lg": "80px",
+                        "container-max": "1440px",
+                        "unit": "8px",
+                        "gutter": "32px"
+                    },
+                    "fontFamily": {
+                        "display-xl-mobile": ["Anton"],
+                        "display-lg": ["Anton"],
+                        "display-xl": ["Anton"],
+                        "label-caps": ["Hanken Grotesk"],
+                        "headline-lg": ["Anton"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "body-md": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "display-xl-mobile": ["64px", {"lineHeight": "60px", "fontWeight": "400"}],
+                        "display-lg": ["80px", {"lineHeight": "80px", "letterSpacing": "0.01em", "fontWeight": "400"}],
+                        "display-xl": ["120px", {"lineHeight": "110px", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600"}],
+                        "headline-lg": ["48px", {"lineHeight": "52px", "fontWeight": "400"}],
+                        "body-lg": ["20px", {"lineHeight": "32px", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface bg-grain min-h-screen bg-dots">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-10 md:px-margin-lg py-8 bg-background/80 backdrop-blur-sm">
+<div class="font-display-lg text-2xl text-primary uppercase tracking-normal">EYUEL MULAT</div>
+<div class="hidden md:flex gap-12"><a class="font-label-caps text-label-caps text-accent tracking-widest uppercase" href="#">Home</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors tracking-widest uppercase" href="#">About</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors tracking-widest uppercase" href="#">Portfolio</a></div>
+<button class="text-accent hover:text-accent/70 font-label-caps text-label-caps transition-all uppercase tracking-widest font-bold">Contact</button>
+</nav>
+<main class="relative z-10 pt-32">
+<!-- Hero Section -->
+<section class="px-10 md:px-margin-lg mb-32 grid grid-cols-12 gap-gutter">
+<div class="col-span-12 lg:col-span-8">
+<span class="text-accent font-display-lg text-xl mb-6 block tracking-widest">STRATEGY &amp; DESIGN</span>
+<h1 class="font-display-xl text-[64px] md:text-[120px] uppercase leading-[0.9] mb-12 tracking-normal">
+                DESIGN AS <span class="text-on-surface/40">STRATEGY.</span><br/>
+                IDENTITY AS <span class="text-accent">SYSTEM.</span>
+</h1>
+<div class="w-12 h-[2px] bg-primary mb-12"></div>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl">
+                Creative Direction &amp; Brand Identity for forward-thinking brands. We build architectural visual systems that transcend temporary trends through geometric precision.
+            </p>
+</div>
+<div class="col-span-12 lg:col-span-4 flex items-end justify-end">
+<div class="hidden lg:flex flex-col items-end gap-2 text-right">
+<span class="font-label-caps text-[10px] text-on-surface-variant uppercase tracking-widest transform rotate-90 origin-right translate-y-24">BRANDING AND WEBSITE</span>
+</div>
+</div>
+</section>
+<!-- Hero Image Section: solid bg prevents dots from showing in the padded margins around the image -->
+<section class="px-10 md:px-margin-lg mb-40 bg-background">
+<div class="aspect-[21/9] w-full overflow-hidden grayscale hover:grayscale-0 transition-all duration-1000 border-l border-on-surface/10">
+<img alt="Architectural visual" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOWQNwCA_Sy3BPn64hPnpoO02uP_2_I6oW5rpYeyhmhbJcwdODE21QCKmNBnLYpjNRQvkZI7H-37UsPWD4dPdVF7KLHyKL4fMT6LjMz1R1Riqe4PDbEd8ECAxfvke5UBMQ2RnMElW_xDtjq2oan1PCWh863-eSkEa-k_8ihQV0Ww3edsCB43nZJJJqts4HseBRGEvomTagI29z3PqwNDUNQddqSueZb4rURX2KArszCjq8N-BVQXNl1h9vIjUAO0ihvRIynh-y3AM"/>
+</div>
+</section>
+<!-- Services Section (Redesigned Capabilities) -->
+<section class="px-10 md:px-margin-lg mb-40">
+<div class="border-t border-on-surface/10 pt-16 flex justify-between items-start mb-24">
+<span class="font-label-caps text-label-caps text-on-surface-variant tracking-[0.4em] uppercase">01 / Capabilities</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant/40 tracking-widest uppercase">Expertise</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-24">
+<!-- Service 1: Brand Strategy -->
+<div class="flex flex-col items-start gap-10 group">
+<!-- Architectural Icon 1 -->
+<div class="relative w-20 h-20 flex items-center justify-center text-on-surface/40 group-hover:text-accent transition-colors duration-500">
+<!-- Fixed: viewbox → viewBox (SVG attribute is case-sensitive) -->
+<svg class="w-full h-full stroke-current fill-none stroke-1" viewBox="0 0 100 100">
+<circle cx="50" cy="50" r="40"></circle>
+<circle cx="50" cy="50" r="30"></circle>
+<circle cx="50" cy="50" r="20"></circle>
+<line x1="50" x2="50" y1="10" y2="90"></line>
+<line x1="10" x2="90" y1="50" y2="50"></line>
+</svg>
+</div>
+<div class="flex flex-col gap-4">
+<h3 class="font-display-lg text-4xl uppercase tracking-tight">Brand Strategy</h3>
+<p class="font-body-md text-on-surface-variant leading-relaxed max-w-sm">Defining the core essence, positioning, and architectural narrative of your brand through rigorous analysis.</p>
+</div>
+</div>
+<!-- Service 2: Identity Design -->
+<div class="flex flex-col items-start gap-10 group">
+<!-- Architectural Icon 2 -->
+<div class="relative w-20 h-20 flex items-center justify-center text-on-surface/40 group-hover:text-accent transition-colors duration-500">
+<svg class="w-full h-full stroke-current fill-none stroke-1" viewBox="0 0 100 100">
+<rect height="60" width="60" x="20" y="20"></rect>
+<rect class="opacity-30" height="80" width="80" x="10" y="10"></rect>
+<path d="M20 20 L80 80"></path>
+<path d="M80 20 L20 80"></path>
+</svg>
+</div>
+<div class="flex flex-col gap-4">
+<h3 class="font-display-lg text-4xl uppercase tracking-tight">Identity Design</h3>
+<p class="font-body-md text-on-surface-variant leading-relaxed max-w-sm">Visual systems built on grid-based precision and timeless modernist principles for lasting impact.</p>
+</div>
+</div>
+<!-- Service 3: Digital Build -->
+<div class="flex flex-col items-start gap-10 group">
+<!-- Architectural Icon 3 -->
+<div class="relative w-20 h-20 flex items-center justify-center text-on-surface/40 group-hover:text-accent transition-colors duration-500">
+<svg class="w-full h-full stroke-current fill-none stroke-1" viewBox="0 0 100 100">
+<path d="M50 10 L90 80 H10 Z"></path>
+<path class="opacity-50" d="M50 30 L75 70 H25 Z"></path>
+<circle cx="50" cy="55" r="5"></circle>
+</svg>
+</div>
+<div class="flex flex-col gap-4">
+<h3 class="font-display-lg text-4xl uppercase tracking-tight">Digital Build</h3>
+<p class="font-body-md text-on-surface-variant leading-relaxed max-w-sm">High-performance digital experiences that prioritize clarity, structural integrity, and user flow.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Featured Works Section -->
+<section class="px-10 md:px-margin-lg pb-40">
+<div class="border-t border-on-surface/10 pt-16 mb-24 flex justify-between items-start">
+<span class="font-label-caps text-label-caps text-on-surface-variant tracking-[0.4em] uppercase">02 / Selected Works</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant/40 tracking-widest uppercase">Projects</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-gutter gap-y-32">
+<!-- Project 1 (Nexus Dashboard) -->
+<div class="group cursor-pointer">
+<div class="border-t border-on-surface/10 pt-10 mb-10 flex justify-between items-end">
+<div class="badge-circle text-primary">01</div>
+<span class="font-label-caps text-[10px] text-accent tracking-[0.3em] uppercase">Branding &amp; UI</span>
+</div>
+<div class="overflow-hidden bg-surface-container-low aspect-[4/5] mb-8">
+<!-- Added grayscale so hover:grayscale-0 transition is meaningful -->
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBga90sr654rVPGPEaB3kJeifl98bSDxlZBsKWfUjsSFqSEteMcDzxZ2X8DI9wNnkiRQXmSPw2yPmztXBYxqj0GuDwUG1Acgtf8ZsPJYMCoHKuPOAdAK38hAzLpvGLwdL5W3U-6cG6Sc8hV6n30pgK_smwSP8kievA0z2dr8GJOsyctxdUC5RCqkfCnoZM-gaS6sG0aXQwWmbDLjY9nGrNFCRA_fLcJJEN4pNxaLHdDkwIZkpTEijUa6bP7s3cbA-WYecL_HK6Yg_0"/>
+</div>
+<div>
+<h2 class="font-display-xl text-[56px] uppercase leading-none mb-4 group-hover:text-accent transition-colors">Nexus<br/>Dashboard</h2>
+<p class="font-body-md text-on-surface-variant max-w-sm mb-6">A high-performance SaaS interface designed for complex data visualization and seamless user workflows.</p>
+<a class="inline-flex items-center gap-4 group/btn" href="#">
+<span class="font-label-caps text-label-caps text-primary border-b border-accent pb-1 tracking-widest uppercase">View Project</span>
+<span class="material-symbols-outlined text-accent text-sm">north_east</span>
+</a>
+</div>
+</div>
+<!-- Project 2 (Vanguard Capital) -->
+<div class="group cursor-pointer md:mt-48">
+<div class="border-t border-on-surface/10 pt-10 mb-10 flex justify-between items-end">
+<div class="badge-circle text-primary">02</div>
+<span class="font-label-caps text-[10px] text-accent tracking-[0.3em] uppercase">Identity System</span>
+</div>
+<div class="overflow-hidden bg-surface-container-low aspect-[1/1] mb-8">
+<!-- Added grayscale so hover:grayscale-0 transition is meaningful -->
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000" src="https://lh3.googleusercontent.com/aida-public/AB6AXuApiyh_3aaVjPbYqtnEYBYYCxdU270rhO_lQ0MlcPYGhxDlpPR1GJwvBolsdfXepO0m06UPWAFYvjKsHqwNyFnFZ8UzBq5qUYEMMzTm-PNLwhrRHkmHx-0UsTIVuo9CyfbyQq9j_TjkVdQJRQWNO7S__j6X-y8v3yxbf9p0MDfFO-3s9aIJzbpP4pDagWdhgpBHAFHN_BxkoMOkfgk9ur5yvt6DpaCaGorEo70Rhca1Zi8Pwd7VKUoRiXpeOMhV3pwXoZA8xxFUikw"/>
+</div>
+<div>
+<h2 class="font-display-xl text-[56px] uppercase leading-none mb-4 group-hover:text-accent transition-colors">Vanguard<br/>Capital</h2>
+<p class="font-body-md text-on-surface-variant max-w-sm mb-6">A comprehensive visual identity system for a category-defining brand. Structural rigour meets modern expression.</p>
+<a class="inline-flex items-center gap-4 group/btn" href="#">
+<span class="font-label-caps text-label-caps text-primary border-b border-accent pb-1 tracking-widest uppercase">View Project</span>
+<span class="material-symbols-outlined text-accent text-sm">north_east</span>
+</a>
+</div>
+</div>
+</div>
+</section>
+<!-- Methodology / Process Section -->
+<section class="px-10 md:px-margin-lg pb-40">
+<div class="border-t border-on-surface/10 pt-16 mb-24 flex justify-between items-start">
+<span class="font-label-caps text-label-caps text-on-surface-variant tracking-[0.4em] uppercase">03 / Methodology</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant/40 tracking-widest uppercase">Process</span>
+</div>
+<div class="space-y-12">
+<!-- Card 01 -->
+<div class="relative bg-surface-container-low border border-on-surface/10 rounded-[48px] p-8 md:p-16 flex flex-col md:flex-row items-center gap-12 group hover:bg-surface-container transition-colors overflow-hidden">
+<div class="relative z-10 w-full md:w-1/2 flex justify-center md:justify-start">
+<span class="font-display-xl text-[120px] md:text-[240px] leading-none text-primary opacity-90 select-none">01</span>
+</div>
+<div class="relative z-10 w-full md:w-1/2">
+<div class="flex flex-col gap-6">
+<div class="flex items-center gap-4">
+<span class="font-label-caps text-[10px] text-accent tracking-widest">00-1 STEP</span>
+<div class="h-px flex-grow bg-on-surface/10"></div>
+</div>
+<h3 class="font-display-lg text-4xl md:text-6xl uppercase leading-none">CHOOSE THE <span class="text-accent">STRATEGY</span></h3>
+<p class="font-body-md text-on-surface-variant max-w-md">Selecting the optimal path for brand growth through intensive research and structural auditing of market landscapes.</p>
+<div class="flex justify-end mt-4">
+<span class="material-symbols-outlined text-accent text-4xl transform group-hover:translate-x-2 group-hover:-translate-y-2 transition-transform">north_east</span>
+</div>
+</div>
+</div>
+<div class="absolute inset-0 pointer-events-none opacity-20 flex items-center justify-center -translate-x-1/4">
+<div class="w-[500px] h-[500px] border-[2px] border-on-surface rounded-full"></div>
+</div>
+</div>
+<!-- Card 02: matched card styling to prevent dots from bleeding through the open layout -->
+<div class="relative bg-surface-container-low border border-on-surface/10 rounded-[48px] p-8 md:p-16 flex flex-col md:flex-row items-center gap-12 group hover:bg-surface-container transition-colors overflow-hidden">
+<div class="relative z-10 w-full md:w-1/2 order-2 md:order-1">
+<div class="flex flex-col gap-6">
+<div class="flex items-center gap-4">
+<span class="font-label-caps text-[10px] text-accent tracking-widest">00-2 STEP</span>
+<div class="h-px flex-grow bg-on-surface/10"></div>
+</div>
+<h3 class="font-display-lg text-4xl md:text-6xl uppercase leading-none">DEFINE THE <span class="text-accent">IDENTITY</span></h3>
+<p class="font-body-md text-on-surface-variant max-w-md">Developing the core visual grammar and systemic logic that will underpin every future brand touchpoint.</p>
+<div class="flex justify-start mt-4">
+<span class="material-symbols-outlined text-accent text-4xl transform group-hover:-translate-x-2 group-hover:-translate-y-2 transition-transform">north_west</span>
+</div>
+</div>
+</div>
+<div class="relative z-10 w-full md:w-1/2 order-1 md:order-2 flex justify-center md:justify-end">
+<div class="absolute inset-0 flex items-center justify-center opacity-40">
+<div class="w-64 h-64 border-[4px] border-on-surface/20 rounded-full border-t-transparent border-r-transparent -rotate-45"></div>
+</div>
+<span class="font-display-xl text-[120px] md:text-[240px] leading-none text-on-surface/10 select-none">02</span>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section: solid bg suppresses dots so centered text reads cleanly -->
+<section class="py-40 px-10 md:px-margin-lg border-t border-on-surface/10 text-center bg-background">
+<h2 class="font-display-xl text-[48px] md:text-[80px] uppercase leading-none mb-16 max-w-4xl mx-auto tracking-normal">
+            Ready to <span class="text-accent">define</span> your visual authority?
+        </h2>
+<a class="inline-block font-label-caps text-xl text-primary border-b-2 border-accent pb-2 tracking-[0.3em] uppercase hover:text-accent transition-colors" href="#">Start a Project</a>
+</section>
+</main>
+<!-- Footer: solid bg keeps it clean and grounded -->
+<footer class="px-10 md:px-margin-lg py-24 border-t border-on-surface/10 bg-background">
+<div class="flex flex-col md:flex-row justify-between items-start gap-16">
+<div>
+<div class="font-display-lg text-3xl text-primary mb-6 uppercase tracking-normal">EYUEL MULAT</div>
+<p class="font-body-md text-on-surface-variant max-w-xs">Dedicated to structural clarity, visual systems, and architectural editorial principles.</p>
+</div>
+<div class="grid grid-cols-2 gap-24">
+<div class="flex flex-col gap-6">
+<span class="font-label-caps text-xs text-accent tracking-widest uppercase">Follow</span>
+<div class="flex flex-col gap-3">
+<a class="font-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Instagram</a>
+<a class="font-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">LinkedIn</a>
+<a class="font-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Behance</a>
+</div>
+</div>
+<div class="flex flex-col gap-6">
+<span class="font-label-caps text-xs text-accent tracking-widest uppercase">Connect</span>
+<div class="flex flex-col gap-3">
+<a class="font-body-md text-on-surface hover:text-accent transition-colors underline decoration-accent underline-offset-8" href="mailto:hello@eyuelmulat.com">hello@eyuelmulat.com</a>
+<span class="font-label-caps text-[10px] text-on-surface-variant/40 mt-6 uppercase">© 2024 EYUEL MULAT</span>
+</div>
+</div>
+</div>
+</div>
+</footer>
+</body></html>
