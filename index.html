@@ -54,14 +54,14 @@
       </div>
     </section>
 
-    <!-- ── Hero Image (starts small, expands to full width as you scroll) ─── -->
+    <!-- ── Hero Image: fast-cycling montage slideshow ──────────────────── -->
     <section class="px-10 md:px-[80px] mb-40 bg-background">
       <div class="w-full overflow-hidden aspect-[21/9] border-l border-black/10 scroll-expand-wrapper">
-        <img
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOWQNwCA_Sy3BPn64hPnpoO02uP_2_I6oW5rpYeyhmhbJcwdODE21QCKmNBnLYpjNRQvkZI7H-37UsPWD4dPdVF7KLHyKL4fMT6LjMz1R1Riqe4PDbEd8ECAxfvke5UBMQ2RnMElW_xDtjq2oan1PCWh863-eSkEa-k_8ihQV0Ww3edsCB43nZJJJqts4HseBRGEvomTagI29z3PqwNDUNQddqSueZb4rURX2KArszCjq8N-BVQXNl1h9vIjUAO0ihvRIynh-y3AM"
-          alt="Architectural visual"
-          class="w-full h-full object-cover"
-        />
+        <div class="hero-slideshow w-full h-full">
+          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOWQNwCA_Sy3BPn64hPnpoO02uP_2_I6oW5rpYeyhmhbJcwdODE21QCKmNBnLYpjNRQvkZI7H-37UsPWD4dPdVF7KLHyKL4fMT6LjMz1R1Riqe4PDbEd8ECAxfvke5UBMQ2RnMElW_xDtjq2oan1PCWh863-eSkEa-k_8ihQV0Ww3edsCB43nZJJJqts4HseBRGEvomTagI29z3PqwNDUNQddqSueZb4rURX2KArszCjq8N-BVQXNl1h9vIjUAO0ihvRIynh-y3AM" alt="" class="hero-slide hero-slide-1 w-full h-full object-cover"/>
+          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBga90sr654rVPGPEaB3kJeifl98bSDxlZBsKWfUjsSFqSEteMcDzxZ2X8DI9wNnkiRQXmSPw2yPmztXBYxqj0GuDwUG1Acgtf8ZsPJYMCoHKuPOAdAK38hAzLpvGLwdL5W3U-6cG6Sc8hV6n30pgK_smwSP8kievA0z2dr8GJOsyctxdUC5RCqkfCnoZM-gaS6sG0aXQwWmbDLjY9nGrNFCRA_fLcJJEN4pNxaLHdDkwIZkpTEijUa6bP7s3cbA-WYecL_HK6Yg_0" alt="" class="hero-slide hero-slide-2 w-full h-full object-cover"/>
+          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuApiyh_3aaVjPbYqtnEYBYYCxdU270rhO_lQ0MlcPYGhxDlpPR1GJwvBolsdfXepO0m06UPWAFYvjKsHqwNyFnFZ8UzBq5qUYEMMzTm-PNLwhrRHkmHx-0UsTIVuo9CyfbyQq9j_TjkVdQJRQWNO7S__j6X-y8v3yxbf9p0MDfFO-3s9aIJzbpP4pDagWdhgpBHAFHN_BxkoMOkfgk9ur5yvt6DpaCaGorEo70Rhca1Zi8Pwd7VKUoRiXpeOMhV3pwXoZA8xxFUikw" alt="" class="hero-slide hero-slide-3 w-full h-full object-cover"/>
+        </div>
       </div>
     </section>
 
@@ -70,6 +70,31 @@
       <div class="section-header reveal">
         <span class="label-caps tracking-[0.4em]">01 / Selected Works</span>
         <span class="label-caps opacity-40">Projects</span>
+      </div>
+
+      <!-- Featured project — full width landscape -->
+      <div class="group mb-16 reveal">
+        <div class="border-t border-black/10 pt-10 mb-10 flex justify-between items-end">
+          <div class="badge-circle text-primary">F</div>
+          <span class="label-caps text-[10px] text-accent tracking-[0.3em]">Featured Project</span>
+        </div>
+        <a href="/work/nexus-dashboard.html" class="block overflow-hidden bg-surface-container-low aspect-[21/9] mb-8">
+          <img
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOWQNwCA_Sy3BPn64hPnpoO02uP_2_I6oW5rpYeyhmhbJcwdODE21QCKmNBnLYpjNRQvkZI7H-37UsPWD4dPdVF7KLHyKL4fMT6LjMz1R1Riqe4PDbEd8ECAxfvke5UBMQ2RnMElW_xDtjq2oan1PCWh863-eSkEa-k_8ihQV0Ww3edsCB43nZJJJqts4HseBRGEvomTagI29z3PqwNDUNQddqSueZb4rURX2KArszCjq8N-BVQXNl1h9vIjUAO0ihvRIynh-y3AM"
+            alt="Nexus Dashboard — Featured"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
+          />
+        </a>
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <h2 class="font-display text-[56px] md:text-[80px] uppercase leading-none mb-4 group-hover:text-accent transition-colors duration-300">Nexus Dashboard</h2>
+            <p class="text-base text-on-surface-variant max-w-xl leading-relaxed">A high-performance SaaS interface designed for complex data visualization and seamless user workflows — precision at enterprise scale.</p>
+          </div>
+          <a href="/work/nexus-dashboard.html" class="btn-link flex-shrink-0">
+            View Project
+            <span class="material-symbols-outlined text-accent" style="font-size:14px;line-height:1">north_east</span>
+          </a>
+        </div>
       </div>
 
       <!-- Reduced aspect ratios and stagger offset for better proportions -->
@@ -227,7 +252,7 @@
 
   <!-- Footer -->
   <footer class="bg-primary text-background px-10 md:px-[80px]">
-    <div class="pt-20 pb-16 grid grid-cols-12 gap-8 border-b border-background/10">
+    <div class="pt-20 pb-16 grid grid-cols-12 gap-8">
       <div class="col-span-12 md:col-span-3 flex flex-col gap-3">
         <a href="mailto:hello@eyuelmulat.com" class="label-caps text-[11px] tracking-[0.25em] text-background/90 hover:text-background transition-colors">hello@eyuelmulat.com</a>
         <span class="label-caps text-[11px] tracking-[0.25em] text-background/60">+251 95 355 3856</span>
@@ -256,7 +281,7 @@
     <div class="overflow-hidden">
       <div class="footer-brand font-display uppercase leading-none text-background">EYUEL MULAT</div>
     </div>
-    <div class="py-6 border-t border-background/10">
+    <div class="py-6">
       <span class="text-[10px] text-background/50 uppercase tracking-widest">© 2024 Eyuel Mulat</span>
     </div>
   </footer>

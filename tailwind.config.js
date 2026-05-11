@@ -3,6 +3,7 @@ export default {
   content: [
     './*.html',
     './work/*.html',
+    './insights/*.html',
     './src/**/*.js',
   ],
   theme: {

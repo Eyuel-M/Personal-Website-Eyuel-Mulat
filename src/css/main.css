@@ -110,6 +110,26 @@
   will-change: clip-path;
 }
 
+/* ─── Hero slideshow: fast-cycling montage ───────────────────────────────── */
+.hero-slideshow {
+  position: relative;
+}
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+.hero-slide-1 { animation: slide-flash 1.8s 0s   infinite; }
+.hero-slide-2 { animation: slide-flash 1.8s 0.6s infinite; }
+.hero-slide-3 { animation: slide-flash 1.8s 1.2s infinite; }
+
+@keyframes slide-flash {
+  0%   { opacity: 1; }
+  30%  { opacity: 1; }
+  40%  { opacity: 0; }
+  100% { opacity: 0; }
+}
+
 /* ─── Footer brand: full-width scaled text ───────────────────────────────── */
 .footer-brand {
   white-space: nowrap;
