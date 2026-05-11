@@ -280,6 +280,23 @@
 }
 .timeline-pill:hover .timeline-pill-inner { border-color: rgba(0, 0, 0, 0.4); }
 
+/* ─── Work: pagination number buttons ───────────────────────────────────────── */
+.work-page-btn {
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #6B6868;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.work-page-btn:hover     { border-color: #0F0F0F; color: #0F0F0F; }
+.work-page-btn.is-active { background: #0F0F0F; color: #F5F2EE; border-color: #0F0F0F; }
+
 /* ─── Contact: file upload zone ──────────────────────────────────────────── */
 .upload-zone {
   border: 1px dashed rgba(0, 0, 0, 0.2);

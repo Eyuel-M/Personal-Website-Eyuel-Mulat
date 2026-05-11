@@ -108,6 +108,69 @@ if (fileInput && fileZone && fileLabel) {
   })
 }
 
+// ─── Home: limit to 3 visible projects, "Show More" reveals the rest ─────────
+;(function () {
+  const HOME_LIMIT = 3
+  const items = [...document.querySelectorAll('[data-home-project]')]
+  const wrap  = document.getElementById('show-more-wrap')
+  const btn   = document.getElementById('show-more-projects')
+  if (!items.length) return
+
+  items.forEach((el, i) => { if (i >= HOME_LIMIT) el.classList.add('hidden') })
+
+  if (!wrap || items.length <= HOME_LIMIT) { wrap?.classList.add('hidden'); return }
+
+  btn.addEventListener('click', () => {
+    items.slice(HOME_LIMIT).forEach((el, i) => {
+      el.classList.remove('hidden')
+      void el.offsetWidth
+      setTimeout(() => el.classList.add('is-visible'), i * 100)
+    })
+    wrap.classList.add('hidden')
+  })
+})()
+
+// ─── Work: paginate at 5 per page with numbered buttons ──────────────────────
+;(function () {
+  const PER_PAGE = 5
+  const items  = [...document.querySelectorAll('[data-work-item]')]
+  const pagDiv = document.getElementById('work-pagination')
+  if (!items.length || !pagDiv) return
+
+  function goTo(page) {
+    items.forEach((el, i) => {
+      const on = i >= (page - 1) * PER_PAGE && i < page * PER_PAGE
+      if (on) {
+        el.classList.remove('hidden', 'is-visible')
+        void el.offsetWidth
+        setTimeout(() => el.classList.add('is-visible'), (i % PER_PAGE) * 80)
+      } else {
+        el.classList.add('hidden')
+        el.classList.remove('is-visible')
+      }
+    })
+    pagDiv.querySelectorAll('.work-page-btn').forEach(b => {
+      b.classList.toggle('is-active', Number(b.dataset.page) === page)
+    })
+    if (page > 1) items[0].closest('section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  const totalPages = Math.ceil(items.length / PER_PAGE)
+  if (totalPages > 1) {
+    for (let p = 1; p <= totalPages; p++) {
+      const b = document.createElement('button')
+      b.className = 'work-page-btn'
+      b.dataset.page = p
+      b.textContent = String(p).padStart(2, '0')
+      b.addEventListener('click', () => goTo(p))
+      pagDiv.appendChild(b)
+    }
+    pagDiv.classList.remove('hidden')
+  }
+
+  goTo(1)
+})()
+
 // ─── Dot grid: cursor glow wave effect ───────────────────────────────────────
 document.querySelectorAll('.dot-grid').forEach((section) => {
   section.addEventListener('mousemove', (e) => {
