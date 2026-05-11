@@ -1,1538 +1,1209 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EM Admin</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — Eyuel Mulat</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #0F0F0F;
-      --surface: #1A1A1A;
-      --surface2: #222222;
-      --border: #2A2A2A;
+      --bg: #F5F5F4;
+      --white: #FFFFFF;
+      --border: #E5E5E4;
+      --border2: #D6D5D3;
+      --text: #1C1B1A;
+      --muted: #78716C;
+      --muted2: #A8A29E;
       --accent: #FF4F00;
-      --accent-dim: rgba(255,79,0,0.15);
-      --text: #E8E8E8;
-      --muted: #666666;
-      --muted2: #444444;
-      --success: #22C55E;
-      --danger: #EF4444;
-      --topbar-h: 48px;
-      --sidebar-w: 220px;
-      --props-w: 300px;
+      --accent-bg: #FFF4F0;
+      --success: #16A34A;
+      --success-bg: #F0FDF4;
+      --danger: #DC2626;
+      --danger-bg: #FEF2F2;
+      --sidebar-w: 240px;
     }
 
-    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 13px; line-height: 1.5; }
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.5; }
 
-    /* ─── TYPOGRAPHY ─── */
-    .label-caps { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
-    .label-caps.accent { color: var(--accent); }
-
-    /* ─── SCROLLBARS ─── */
-    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--muted2); }
 
-    /* ─── LOGIN ─── */
-    #login-view {
+    /* ── LOGIN ── */
+    #login-screen {
       display: flex; align-items: center; justify-content: center;
-      height: 100%; background: var(--bg);
+      min-height: 100vh; background: var(--bg);
     }
-    .login-card {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
-      padding: 40px; width: 360px;
+    .login-box {
+      background: var(--white); border: 1px solid var(--border); border-radius: 12px;
+      padding: 40px; width: 380px; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
     }
-    .login-card .logo { font-size: 11px; font-weight: 700; letter-spacing: 0.2em; color: var(--accent); margin-bottom: 32px; }
-    .login-card h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 8px; }
-    .login-card p { color: var(--muted); font-size: 12px; margin-bottom: 28px; }
-    .login-card .error-msg { color: var(--danger); font-size: 12px; margin-top: 12px; min-height: 18px; }
-
-    /* ─── DASHBOARD ─── */
-    #dashboard-view { display: flex; flex-direction: column; height: 100%; }
-
-    /* TOP BAR */
-    #topbar {
-      height: var(--topbar-h); min-height: var(--topbar-h);
-      background: var(--surface); border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; padding: 0 16px; gap: 16px; z-index: 100;
+    .login-brand {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 28px;
     }
-    #topbar .logo { font-size: 11px; font-weight: 800; letter-spacing: 0.2em; color: var(--accent); white-space: nowrap; }
-    #topbar .save-status { flex: 1; text-align: center; font-size: 11px; color: var(--muted); letter-spacing: 0.05em; }
-    #topbar .save-status.saved { color: var(--success); }
-    #topbar .save-status.error { color: var(--danger); }
-    #topbar .tb-actions { display: flex; gap: 8px; align-items: center; }
+    .login-box h1 { font-size: 20px; font-weight: 600; color: var(--text); margin-bottom: 6px; letter-spacing: -0.02em; }
+    .login-box p { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+    .login-error { font-size: 12px; color: var(--danger); background: var(--danger-bg); border: 1px solid #FECACA; border-radius: 6px; padding: 8px 12px; margin-bottom: 16px; display: none; }
+    .login-error.show { display: block; }
 
-    /* MAIN LAYOUT */
-    #main {
-      display: flex; flex: 1; overflow: hidden;
+    /* ── FORMS ── */
+    .field-group { margin-bottom: 16px; }
+    label.field-label { display: block; font-size: 12px; font-weight: 500; color: var(--muted); margin-bottom: 6px; letter-spacing: 0.01em; }
+    input[type="text"], input[type="password"], input[type="url"], input[type="date"], textarea, select {
+      width: 100%; padding: 9px 12px; font-size: 14px; font-family: inherit;
+      border: 1px solid var(--border2); border-radius: 7px; background: var(--white);
+      color: var(--text); outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+      resize: vertical;
     }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255,79,0,0.08);
+    }
+    textarea { min-height: 100px; }
+    select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%2378716C'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; cursor: pointer; }
 
-    /* SIDEBAR */
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 8px 16px; border-radius: 7px; font-size: 13px; font-weight: 500;
+      cursor: pointer; border: none; transition: all 0.15s; letter-spacing: 0.01em; white-space: nowrap;
+    }
+    .btn-primary { background: var(--text); color: #fff; }
+    .btn-primary:hover { background: #333; }
+    .btn-accent { background: var(--accent); color: #fff; }
+    .btn-accent:hover { background: #e04400; }
+    .btn-outline { background: var(--white); color: var(--text); border: 1px solid var(--border2); }
+    .btn-outline:hover { background: var(--bg); border-color: var(--muted2); }
+    .btn-ghost { background: none; color: var(--muted); border: none; padding: 6px 10px; }
+    .btn-ghost:hover { background: var(--bg); color: var(--text); }
+    .btn-danger-ghost { background: none; color: var(--danger); border: none; padding: 6px 10px; }
+    .btn-danger-ghost:hover { background: var(--danger-bg); }
+    .btn-full { width: 100%; justify-content: center; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn svg { flex-shrink: 0; }
+
+    /* ── LAYOUT ── */
+    #app { display: none; height: 100vh; flex-direction: row; overflow: hidden; }
+    #app.visible { display: flex; }
+
+    /* ── SIDEBAR ── */
     #sidebar {
       width: var(--sidebar-w); min-width: var(--sidebar-w);
-      background: var(--surface); border-right: 1px solid var(--border);
+      background: var(--white); border-right: 1px solid var(--border);
       display: flex; flex-direction: column; overflow: hidden;
     }
-    .sidebar-section { padding: 16px 12px 8px; }
-    .sidebar-section .section-label { font-size: 9px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted2); padding: 0 4px; margin-bottom: 4px; }
-    .sidebar-divider { border: none; border-top: 1px solid var(--border); margin: 8px 12px; }
+    .sidebar-top {
+      padding: 18px 16px 14px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .sidebar-brand { font-size: 10px; font-weight: 800; letter-spacing: 0.2em; color: var(--accent); text-transform: uppercase; }
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 10px 8px; }
+    .nav-section-label {
+      font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted2); padding: 8px 10px 4px;
+    }
     .nav-item {
-      display: flex; align-items: center; gap: 8px;
-      padding: 8px 12px; border-radius: 6px; cursor: pointer;
-      font-size: 12px; font-weight: 500; color: var(--muted);
-      transition: background 0.15s, color 0.15s; user-select: none;
+      display: flex; align-items: center; gap: 9px;
+      padding: 8px 10px; border-radius: 7px; cursor: pointer;
+      font-size: 13px; font-weight: 500; color: var(--muted);
+      transition: background 0.12s, color 0.12s; user-select: none;
       border: none; background: none; width: 100%; text-align: left;
     }
-    .nav-item:hover { background: var(--surface2); color: var(--text); }
-    .nav-item.active { background: var(--accent-dim); color: var(--accent); }
-    .nav-item .nav-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
-    .nav-item-url { font-size: 9px; color: var(--muted2); margin-left: auto; }
-    .sidebar-actions { padding: 8px 12px 16px; display: flex; flex-direction: column; gap: 6px; margin-top: auto; }
+    .nav-item:hover { background: var(--bg); color: var(--text); }
+    .nav-item.active { background: var(--accent-bg); color: var(--accent); }
+    .nav-item .icon {
+      width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; opacity: 0.6;
+    }
+    .nav-item.active .icon { opacity: 1; }
+    .nav-divider { border: none; border-top: 1px solid var(--border); margin: 6px 8px; }
+    .sidebar-bottom {
+      padding: 10px 8px 14px; border-top: 1px solid var(--border);
+    }
 
-    /* CENTER PANEL */
-    #center {
-      flex: 1; display: flex; flex-direction: column; overflow: hidden;
-      background: var(--bg);
-    }
-    #center-empty {
-      flex: 1; display: flex; align-items: center; justify-content: center;
-      flex-direction: column; gap: 12px; color: var(--muted);
-    }
-    #center-empty .empty-icon { font-size: 40px; opacity: 0.3; }
-    #center-empty p { font-size: 12px; }
+    /* ── MAIN CONTENT ── */
+    #main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
-    /* SECTION TABS */
-    #section-tabs {
-      display: flex; gap: 2px; padding: 12px 16px 0;
-      border-bottom: 1px solid var(--border); flex-shrink: 0;
-      overflow-x: auto; background: var(--bg);
+    /* ── TOPBAR ── */
+    #topbar {
+      height: 52px; min-height: 52px; background: var(--white);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; padding: 0 24px; gap: 12px;
     }
-    .section-tab {
-      padding: 7px 14px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
-      text-transform: uppercase; cursor: pointer; border-radius: 6px 6px 0 0;
-      color: var(--muted); border: 1px solid transparent; border-bottom: none;
-      background: none; transition: color 0.15s, background 0.15s; white-space: nowrap;
-    }
-    .section-tab:hover { color: var(--text); background: var(--surface2); }
-    .section-tab.active { color: var(--accent); background: var(--surface); border-color: var(--border); border-bottom-color: var(--surface); position: relative; bottom: -1px; }
+    #topbar-title { font-size: 14px; font-weight: 600; color: var(--text); flex: 1; }
+    #save-status { font-size: 12px; color: var(--muted); transition: color 0.3s; }
+    #save-status.saved { color: var(--success); }
+    #save-status.error { color: var(--danger); }
 
-    /* FIELDS LIST */
-    #fields-list {
-      flex: 1; overflow-y: auto; padding: 16px;
-      display: flex; flex-direction: column; gap: 8px;
-    }
-    .field-card {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
-      padding: 12px 14px; cursor: pointer; transition: border-color 0.15s, background 0.15s;
-      display: flex; align-items: center; gap: 12px; border-left: 3px solid transparent;
-    }
-    .field-card:hover { border-color: var(--muted2); }
-    .field-card.active { border-left-color: var(--accent); background: var(--surface2); }
-    .field-card .fc-info { flex: 1; min-width: 0; }
-    .field-card .fc-label { font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
-    .field-card .fc-preview { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .field-card .fc-thumb { width: 60px; height: 45px; border-radius: 4px; object-fit: cover; background: var(--surface2); flex-shrink: 0; border: 1px solid var(--border); }
-    .field-card .fc-thumb-placeholder { width: 60px; height: 45px; border-radius: 4px; background: var(--surface2); flex-shrink: 0; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--muted2); font-size: 18px; }
-    .type-badge { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; background: var(--surface2); color: var(--muted); flex-shrink: 0; }
-    .type-badge.image { background: rgba(99,102,241,0.15); color: #818CF8; }
-    .type-badge.text { background: rgba(34,197,94,0.1); color: #4ADE80; }
-    .type-badge.textarea { background: rgba(251,191,36,0.1); color: #FCD34D; }
-    .type-badge.block { background: rgba(255,79,0,0.1); color: var(--accent); }
+    /* ── CONTENT AREA ── */
+    #content { flex: 1; overflow-y: auto; padding: 28px 32px; }
 
-    /* BLOCKS SECTION */
-    .blocks-header { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding: 8px 0 6px; border-top: 1px solid var(--border); margin-top: 8px; }
-    .block-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; cursor: pointer; border-left: 3px solid transparent; display: flex; align-items: center; gap: 10px; }
-    .block-card:hover { border-color: var(--muted2); }
-    .block-card.active { border-left-color: var(--accent); background: var(--surface2); }
-
-    /* CENTER FOOTER */
-    #center-footer { padding: 12px 16px; border-top: 1px solid var(--border); background: var(--bg); flex-shrink: 0; }
-
-    /* RIGHT PANEL */
-    #props {
-      width: var(--props-w); min-width: var(--props-w);
-      background: var(--surface); border-left: 1px solid var(--border);
-      display: flex; flex-direction: column; overflow: hidden;
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 100%; text-align: center; padding: 40px;
     }
-    #props-empty {
-      flex: 1; display: flex; align-items: center; justify-content: center;
-      flex-direction: column; gap: 8px; color: var(--muted); padding: 20px;
-    }
-    #props-empty p { font-size: 11px; text-align: center; line-height: 1.6; }
-    #props-content { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 16px; }
-    .props-header { display: flex; align-items: center; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
-    .props-header .ph-label { font-size: 13px; font-weight: 600; flex: 1; }
+    .empty-icon { font-size: 40px; margin-bottom: 16px; opacity: 0.3; }
+    .empty-state h2 { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .empty-state p { font-size: 13px; color: var(--muted); max-width: 260px; }
 
-    /* SPACING GRID */
-    .spacing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-    .spacing-input-wrap { display: flex; align-items: center; gap: 6px; }
-    .spacing-input-wrap .sp-label { font-size: 9px; font-weight: 700; color: var(--muted); width: 10px; flex-shrink: 0; text-transform: uppercase; }
+    /* ── SECTION CARD ── */
+    .section-card {
+      background: var(--white); border: 1px solid var(--border); border-radius: 10px;
+      margin-bottom: 16px; overflow: hidden;
+    }
+    .section-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 18px; border-bottom: 1px solid var(--border); cursor: pointer;
+      user-select: none;
+    }
+    .section-card-header:hover { background: var(--bg); }
+    .section-card-title { font-size: 13px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; }
+    .section-badge {
+      font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+      background: var(--bg); color: var(--muted); border: 1px solid var(--border); border-radius: 4px;
+      padding: 2px 7px;
+    }
+    .section-card-body { padding: 18px; }
+    .section-card-body.hidden { display: none; }
+    .chevron { transition: transform 0.2s; opacity: 0.4; }
+    .chevron.open { transform: rotate(180deg); }
 
-    /* FORMS & INPUTS */
-    .form-group { display: flex; flex-direction: column; gap: 5px; }
-    .form-group label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
-    input[type="text"], input[type="password"], input[type="number"], textarea, select {
-      background: var(--bg); border: 1px solid var(--border); color: var(--text);
-      border-radius: 6px; padding: 8px 10px; font-size: 12px; width: 100%;
-      outline: none; transition: border-color 0.15s; font-family: inherit; resize: vertical;
-    }
-    input[type="text"]:focus, input[type="password"]:focus, input[type="number"]:focus, textarea:focus, select:focus {
-      border-color: var(--accent);
-    }
-    input[type="number"] { -moz-appearance: textfield; }
-    input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
-    select option { background: var(--surface); }
+    /* ── GRID FIELDS ── */
+    .fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .fields-grid .field-full { grid-column: 1 / -1; }
 
-    /* FILE DROP */
-    .file-drop {
-      border: 1px dashed var(--border); border-radius: 6px; padding: 16px;
-      text-align: center; cursor: pointer; transition: border-color 0.15s, background 0.15s;
+    /* ── TABS ── */
+    .tab-bar {
+      display: flex; gap: 2px; border-bottom: 1px solid var(--border);
+      padding: 0 24px; background: var(--white); overflow-x: auto;
     }
-    .file-drop:hover, .file-drop.drag-over { border-color: var(--accent); background: var(--accent-dim); }
-    .file-drop input[type="file"] { display: none; }
-    .file-drop p { font-size: 11px; color: var(--muted); }
-    .file-drop p strong { color: var(--accent); }
-    .img-preview { width: 100%; max-height: 140px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 8px; }
-    .img-preview-placeholder { width: 100%; height: 80px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface2); display: flex; align-items: center; justify-content: center; color: var(--muted2); font-size: 24px; margin-bottom: 8px; }
-    .url-input-wrap { display: flex; gap: 6px; align-items: center; }
-    .url-input-wrap .or-sep { font-size: 10px; color: var(--muted); white-space: nowrap; }
+    .tab-btn {
+      padding: 12px 14px; font-size: 13px; font-weight: 500;
+      color: var(--muted); border: none; background: none; cursor: pointer;
+      border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
 
-    /* BUTTONS */
-    .btn {
-      padding: 8px 16px; border-radius: 6px; font-size: 11px; font-weight: 600;
-      letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer;
-      border: 1px solid transparent; transition: opacity 0.15s, background 0.15s;
-      font-family: inherit;
+    /* ── IMAGE UPLOAD ── */
+    .img-upload-zone {
+      border: 2px dashed var(--border2); border-radius: 8px;
+      padding: 20px; text-align: center; cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
     }
-    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-    .btn-primary:hover:not(:disabled) { opacity: 0.85; }
-    .btn-secondary { background: var(--surface2); color: var(--text); border-color: var(--border); }
-    .btn-secondary:hover:not(:disabled) { border-color: var(--muted); }
-    .btn-ghost { background: none; color: var(--muted); border-color: var(--border); }
-    .btn-ghost:hover:not(:disabled) { color: var(--text); border-color: var(--muted2); }
-    .btn-danger { background: rgba(239,68,68,0.1); color: var(--danger); border-color: rgba(239,68,68,0.2); }
-    .btn-danger:hover:not(:disabled) { background: rgba(239,68,68,0.2); }
-    .btn-full { width: 100%; text-align: center; }
-    .btn-sm { padding: 5px 10px; font-size: 10px; }
+    .img-upload-zone:hover { border-color: var(--accent); background: var(--accent-bg); }
+    .img-upload-zone.has-image { border-style: solid; padding: 0; overflow: hidden; }
+    .img-upload-zone img { width: 100%; height: 160px; object-fit: cover; display: block; }
+    .upload-label { font-size: 12px; color: var(--muted); margin-top: 6px; }
 
-    /* MODAL */
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex;
-      align-items: center; justify-content: center; z-index: 1000; padding: 20px;
-    }
-    .modal {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-      width: 100%; max-width: 480px; max-height: 90vh; display: flex; flex-direction: column;
+    /* ── BLOCKS LIST ── */
+    .blocks-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+    .block-item {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
       overflow: hidden;
     }
-    .modal-header { padding: 18px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-    .modal-header h2 { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; }
-    .modal-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 18px; line-height: 1; padding: 2px; }
-    .modal-close:hover { color: var(--text); }
-    .modal-body { padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
-    .modal-footer { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; flex-shrink: 0; }
-    .modal-error { color: var(--danger); font-size: 11px; margin-top: -6px; }
-
-    /* TOAST */
-    #toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 2000; pointer-events: none; }
-    .toast {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
-      padding: 10px 16px; font-size: 12px; color: var(--text); min-width: 200px;
-      animation: slideIn 0.2s ease; border-left: 3px solid var(--accent);
+    .block-item-header {
+      display: flex; align-items: center; gap: 8px; padding: 10px 12px;
+      cursor: pointer; user-select: none;
     }
-    .toast.success { border-left-color: var(--success); }
-    .toast.error { border-left-color: var(--danger); }
-    .toast.fade-out { animation: fadeOut 0.3s ease forwards; }
-    @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
-    @keyframes fadeOut { to { opacity: 0; transform: translateX(20px); } }
+    .block-item-header:hover { background: var(--border); }
+    .block-handle { opacity: 0.3; cursor: grab; }
+    .block-type-badge {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      background: var(--white); color: var(--muted); border: 1px solid var(--border2);
+      border-radius: 4px; padding: 2px 6px; flex-shrink: 0;
+    }
+    .block-preview { font-size: 12px; color: var(--muted); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .block-body { padding: 12px; border-top: 1px solid var(--border); display: none; }
+    .block-body.open { display: block; }
+    .add-block-bar {
+      display: flex; gap: 8px; flex-wrap: wrap;
+    }
+    .add-block-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500;
+      cursor: pointer; border: 1px dashed var(--border2); background: none; color: var(--muted);
+      transition: all 0.12s;
+    }
+    .add-block-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
 
-    /* UPLOAD PROGRESS */
-    .upload-progress { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--muted); }
-    .progress-bar { flex: 1; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
-    .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.2s; }
+    /* ── TOAST ── */
+    #toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--text); color: #fff; border-radius: 8px;
+      padding: 10px 18px; font-size: 13px; font-weight: 500;
+      transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+      pointer-events: none; z-index: 9999; white-space: nowrap;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+    #toast.success { background: var(--success); }
+    #toast.error { background: var(--danger); }
 
-    /* HIDDEN */
+    /* ── PROJECTS LIST ── */
+    .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-bottom: 20px; }
+    .project-card {
+      background: var(--white); border: 1px solid var(--border); border-radius: 10px;
+      padding: 16px; transition: box-shadow 0.15s, border-color 0.15s; cursor: pointer;
+    }
+    .project-card:hover { border-color: var(--border2); box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+    .project-card-meta { font-size: 11px; color: var(--muted2); margin-bottom: 6px; display: flex; gap: 8px; }
+    .project-card-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+    .project-card-cat { font-size: 11px; color: var(--accent); font-weight: 500; }
+    .new-item-card {
+      background: none; border: 2px dashed var(--border2); border-radius: 10px;
+      padding: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      gap: 8px; font-size: 13px; font-weight: 500; color: var(--muted);
+      transition: border-color 0.15s, color 0.15s, background 0.15s; min-height: 88px;
+    }
+    .new-item-card:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35);
+      z-index: 1000; align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--white); border-radius: 12px; padding: 28px;
+      width: 520px; max-width: 95vw; max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+    .modal-header h2 { font-size: 16px; font-weight: 600; color: var(--text); }
+    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 22px; border-top: 1px solid var(--border); padding-top: 18px; }
+
+    /* ── PAGE HEADER ── */
+    .page-header { margin-bottom: 24px; }
+    .page-header h1 { font-size: 18px; font-weight: 600; color: var(--text); letter-spacing: -0.02em; }
+    .page-header p { font-size: 13px; color: var(--muted); margin-top: 3px; }
+    .page-header-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+    /* ── INLINE IMAGE FIELD ── */
+    .inline-img { display: flex; align-items: center; gap: 12px; }
+    .inline-img-thumb {
+      width: 64px; height: 48px; border-radius: 6px; object-fit: cover;
+      border: 1px solid var(--border); flex-shrink: 0; background: var(--bg);
+    }
+    .inline-img-empty {
+      width: 64px; height: 48px; border-radius: 6px; background: var(--bg);
+      border: 1px dashed var(--border2); flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ── RANGE SLIDER ── */
+    input[type="range"] {
+      width: 100%; height: 4px; appearance: none;
+      background: var(--border2); border-radius: 2px; outline: none; cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none; width: 16px; height: 16px; border-radius: 50%;
+      background: var(--accent); cursor: pointer; border: 2px solid #fff;
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+    .range-row { display: flex; align-items: center; gap: 10px; }
+    .range-row .range-val { font-size: 12px; font-weight: 500; color: var(--text); min-width: 34px; text-align: right; }
+
+    /* ── UTILS ── */
+    .flex-row { display: flex; align-items: center; gap: 10px; }
+    .text-muted { color: var(--muted); }
+    .text-sm { font-size: 12px; }
+    .mt-4 { margin-top: 16px; }
+    .mt-3 { margin-top: 12px; }
+    .mt-2 { margin-top: 8px; }
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-<!-- ─── LOGIN VIEW ─── -->
-<div id="login-view">
-  <div class="login-card">
-    <div class="logo">EM ADMIN</div>
-    <h1>Admin Access</h1>
-    <p>Enter your password to continue</p>
-    <div class="form-group">
-      <label for="login-pw">Password</label>
-      <input type="password" id="login-pw" placeholder="••••••••" autocomplete="current-password" />
+<!-- ═══════════════ LOGIN ═══════════════ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-brand">EM Studio</div>
+    <h1>Admin Dashboard</h1>
+    <p>Sign in to manage your site content.</p>
+    <div class="login-error" id="login-error">Incorrect password. Please try again.</div>
+    <div class="field-group">
+      <label class="field-label">Password</label>
+      <input type="password" id="login-pw" placeholder="Enter password" autocomplete="current-password"/>
     </div>
-    <div class="error-msg" id="login-error"></div>
-    <button class="btn btn-primary btn-full" style="margin-top:16px" id="login-btn">Sign In</button>
+    <button class="btn btn-primary btn-full mt-3" onclick="login()">
+      Sign In
+    </button>
   </div>
 </div>
 
-<!-- ─── DASHBOARD VIEW ─── -->
-<div id="dashboard-view" class="hidden">
+<!-- ═══════════════ APP ═══════════════ -->
+<div id="app">
 
-  <!-- TOP BAR -->
-  <div id="topbar">
-    <span class="logo">EM ADMIN</span>
-    <span class="save-status" id="save-status"></span>
-    <div class="tb-actions">
-      <a id="preview-link" href="#" target="_blank" class="btn btn-ghost btn-sm">Preview Page</a>
-      <button class="btn btn-secondary btn-sm" id="save-btn">Save</button>
-      <button class="btn btn-ghost btn-sm" id="logout-btn">Logout</button>
+  <!-- SIDEBAR -->
+  <nav id="sidebar">
+    <div class="sidebar-top">
+      <span class="sidebar-brand">EM Admin</span>
+      <a href="/" target="_blank" class="btn btn-ghost text-sm" style="padding:4px 8px;" title="View site">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M6 3H3v10h10v-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M9 2h5v5M14 2l-7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        View Site
+      </a>
     </div>
-  </div>
+    <div class="sidebar-nav">
+      <div class="nav-section-label">Pages</div>
+      <button class="nav-item" data-page="home" onclick="loadPage('home')">
+        <span class="icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 6.5L8 2l6 4.5V14H2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg></span>
+        Home
+      </button>
+      <button class="nav-item" data-page="about" onclick="loadPage('about')">
+        <span class="icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.4"/><path d="M2 14c0-3.314 2.686-5 6-5s6 1.686 6 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+        About
+      </button>
+      <button class="nav-item" data-page="work" onclick="loadPage('work')">
+        <span class="icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="4" width="12" height="9" rx="1" stroke="currentColor" stroke-width="1.4"/><path d="M6 4V3a2 2 0 0 1 4 0v1" stroke="currentColor" stroke-width="1.4"/></svg></span>
+        Work
+      </button>
+      <button class="nav-item" data-page="insights" onclick="loadPage('insights')">
+        <span class="icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2v1m0 10v1M2 8H1m14 0h-1m-2-4.243-.707.707M4.707 11.293l-.707.707m9.9 0-.707-.707M4.707 4.707 4 4M8 5a3 3 0 1 0 0 6 3 3 0 0 0 0-6z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></span>
+        Insights
+      </button>
+      <button class="nav-item" data-page="contact" onclick="loadPage('contact')">
+        <span class="icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M2 5l6 4 6-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+        Contact
+      </button>
+
+      <hr class="nav-divider"/>
+      <div class="nav-section-label">Projects</div>
+      <button class="nav-item" data-page="projects" onclick="loadPage('projects')">
+        <span class="icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4"/></svg></span>
+        All Projects
+      </button>
+
+      <hr class="nav-divider"/>
+      <div class="nav-section-label">Articles</div>
+      <button class="nav-item" data-page="articles" onclick="loadPage('articles')">
+        <span class="icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M3 8h7M3 12h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+        All Articles
+      </button>
+    </div>
+    <div class="sidebar-bottom">
+      <button class="nav-item" onclick="logout()">
+        <span class="icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 14H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h3M10 11l3-3-3-3M13 8H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        Sign Out
+      </button>
+    </div>
+  </nav>
 
   <!-- MAIN -->
   <div id="main">
-
-    <!-- SIDEBAR -->
-    <div id="sidebar">
-      <div class="sidebar-section">
-        <div class="section-label">Pages</div>
-        <div id="pages-nav"></div>
-      </div>
-      <hr class="sidebar-divider" />
-      <div class="sidebar-actions">
-        <button class="btn btn-secondary btn-full" id="new-project-btn">+ New Project</button>
-        <button class="btn btn-secondary btn-full" id="new-insight-btn">+ New Insight</button>
-      </div>
+    <div id="topbar">
+      <div id="topbar-title">Dashboard</div>
+      <span id="save-status"></span>
+      <button class="btn btn-accent" id="save-btn" onclick="saveCurrentPage()" style="display:none">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 9l4 4 6-6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Save Changes
+      </button>
     </div>
 
-    <!-- CENTER PANEL -->
-    <div id="center">
-      <div id="center-empty">
-        <div class="empty-icon">&#9783;</div>
-        <p>Select a page from the sidebar<br />to start editing</p>
-      </div>
-      <div id="center-content" class="hidden" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
-        <div id="section-tabs"></div>
-        <div id="fields-list"></div>
-        <div id="center-footer">
-          <button class="btn btn-ghost btn-sm" id="add-block-btn">+ Add Custom Block</button>
-        </div>
-      </div>
-    </div>
+    <!-- TAB BAR (hidden by default) -->
+    <div class="tab-bar hidden" id="tab-bar"></div>
 
-    <!-- RIGHT PANEL -->
-    <div id="props">
-      <div id="props-empty">
-        <p>Click a field card<br />to edit its properties</p>
-      </div>
-      <div id="props-content" class="hidden"></div>
+    <div id="content">
+      <!-- Dynamic content injected here -->
     </div>
-
   </div>
 </div>
 
-<!-- ─── TOAST CONTAINER ─── -->
-<div id="toast-container"></div>
+<!-- Toast -->
+<div id="toast"></div>
 
-<!-- ─── MODALS (rendered dynamically) ─── -->
-<div id="modal-container"></div>
-
-<script>
-'use strict';
-
-// ═══════════════════════════════════════════════════════════════
-// CONSTANTS
-// ═══════════════════════════════════════════════════════════════
-
-const API = 'http://localhost:3001';
-
-const SCHEMA = {
-  home: { label: 'Home', url: 'http://localhost:3000/', sections: {
-    hero: { label: 'Hero', fields: [
-      { id: 'hero-label', label: 'Label', type: 'text' },
-      { id: 'hero-h1', label: 'Headline', type: 'text' },
-      { id: 'hero-subtitle', label: 'Subtitle', type: 'textarea' },
-    ]},
-    featured: { label: 'Featured Project', fields: [
-      { id: 'featured-img', label: 'Image', type: 'image' },
-      { id: 'featured-title', label: 'Title', type: 'text' },
-      { id: 'featured-desc', label: 'Description', type: 'textarea' },
-    ]},
-    cta: { label: 'CTA', fields: [
-      { id: 'cta-h2', label: 'Heading', type: 'text' },
-    ]},
-  }},
-  about: { label: 'About', url: 'http://localhost:3000/about.html', sections: {
-    hero: { label: 'Hero', fields: [
-      { id: 'about-hero-label', label: 'Label', type: 'text' },
-      { id: 'about-h1', label: 'Headline', type: 'text' },
-      { id: 'about-hero-p', label: 'Intro', type: 'textarea' },
-    ]},
-    image: { label: 'Studio Image', fields: [
-      { id: 'about-main-img', label: 'Image', type: 'image' },
-    ]},
-    expertise: { label: 'Expertise', fields: [
-      { id: 'exp-1-title', label: 'Skill 1', type: 'text' }, { id: 'exp-1-text', label: 'Skill 1 Desc', type: 'textarea' },
-      { id: 'exp-2-title', label: 'Skill 2', type: 'text' }, { id: 'exp-2-text', label: 'Skill 2 Desc', type: 'textarea' },
-      { id: 'exp-3-title', label: 'Skill 3', type: 'text' }, { id: 'exp-3-text', label: 'Skill 3 Desc', type: 'textarea' },
-      { id: 'exp-4-title', label: 'Skill 4', type: 'text' }, { id: 'exp-4-text', label: 'Skill 4 Desc', type: 'textarea' },
-      { id: 'exp-5-title', label: 'Skill 5', type: 'text' }, { id: 'exp-5-text', label: 'Skill 5 Desc', type: 'textarea' },
-      { id: 'exp-6-title', label: 'Skill 6', type: 'text' }, { id: 'exp-6-text', label: 'Skill 6 Desc', type: 'textarea' },
-    ]},
-    process: { label: 'Process', fields: [
-      { id: 'proc-1-title', label: 'Step 1 Heading', type: 'text' }, { id: 'proc-1-text', label: 'Step 1 Body', type: 'textarea' },
-      { id: 'proc-2-title', label: 'Step 2 Heading', type: 'text' }, { id: 'proc-2-text', label: 'Step 2 Body', type: 'textarea' },
-    ]},
-  }},
-  work: { label: 'Work', url: 'http://localhost:3000/work.html', sections: {
-    hero: { label: 'Hero', fields: [
-      { id: 'work-h1', label: 'Headline', type: 'text' },
-      { id: 'work-count', label: 'Project Count Label', type: 'text' },
-    ]},
-  }},
-  contact: { label: 'Contact', url: 'http://localhost:3000/contact.html', sections: {
-    hero: { label: 'Hero', fields: [
-      { id: 'contact-h1', label: 'Headline', type: 'text' },
-      { id: 'contact-subtext', label: 'Availability Text', type: 'textarea' },
-    ]},
-    info: { label: 'Contact Info', fields: [
-      { id: 'contact-email', label: 'Email', type: 'text' },
-      { id: 'contact-phone', label: 'Phone', type: 'text' },
-    ]},
-  }},
-  insights: { label: 'Insights', url: 'http://localhost:3000/insights.html', sections: {
-    hero: { label: 'Hero', fields: [
-      { id: 'insights-h1', label: 'Headline', type: 'text' },
-    ]},
-    article1: { label: 'Article 1', fields: [
-      { id: 'art1-img', label: 'Image', type: 'image' },
-      { id: 'art1-title', label: 'Title', type: 'text' },
-      { id: 'art1-excerpt', label: 'Excerpt', type: 'textarea' },
-    ]},
-    article2: { label: 'Article 2', fields: [
-      { id: 'art2-img', label: 'Image', type: 'image' },
-      { id: 'art2-title', label: 'Title', type: 'text' },
-      { id: 'art2-excerpt', label: 'Excerpt', type: 'textarea' },
-    ]},
-    article3: { label: 'Article 3', fields: [
-      { id: 'art3-img', label: 'Image', type: 'image' },
-      { id: 'art3-title', label: 'Title', type: 'text' },
-      { id: 'art3-excerpt', label: 'Excerpt', type: 'textarea' },
-    ]},
-  }},
-};
-
-// ═══════════════════════════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════════════════════════
-
-const state = {
-  token: localStorage.getItem('admin_token'),
-  selectedPage: null,
-  selectedSection: null,
-  selectedField: null,    // { id, isBlock, blockIndex } or null
-  pageData: {},           // { [page]: { fields: {id: {value, margin, padding}}, blocks: [] } }
-  dirty: false,
-};
-
-// Pending edits in the right panel (before "Apply Changes")
-let pendingEdit = {
-  value: '',
-  margin: { t: 0, r: 0, b: 0, l: 0 },
-  padding: { t: 0, r: 0, b: 0, l: 0 },
-};
-
-// ═══════════════════════════════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════════════════════════════
-
-function $(sel, ctx = document) { return ctx.querySelector(sel); }
-function $$(sel, ctx = document) { return [...ctx.querySelectorAll(sel)]; }
-
-function emptySpacing() { return { t: 0, r: 0, b: 0, l: 0 }; }
-function defaultFieldData() { return { value: '', margin: emptySpacing(), padding: emptySpacing() }; }
-
-function slugify(str) {
-  return str.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/[\s]+/g, '-').replace(/-+/g, '-');
-}
-
-function cloneSpacing(sp) { return { t: sp.t||0, r: sp.r||0, b: sp.b||0, l: sp.l||0 }; }
-
-function getFieldData(page, fieldId) {
-  const pd = state.pageData[page];
-  if (!pd) return defaultFieldData();
-  return pd.fields[fieldId] || defaultFieldData();
-}
-
-function getFieldSchema(page, fieldId) {
-  const ps = SCHEMA[page];
-  if (!ps) return null;
-  for (const secKey of Object.keys(ps.sections)) {
-    const sec = ps.sections[secKey];
-    for (const f of sec.fields) {
-      if (f.id === fieldId) return f;
-    }
-  }
-  return null;
-}
-
-function toast(msg, type = 'info') {
-  const el = document.createElement('div');
-  el.className = `toast ${type}`;
-  el.textContent = msg;
-  $('#toast-container').appendChild(el);
-  setTimeout(() => {
-    el.classList.add('fade-out');
-    setTimeout(() => el.remove(), 300);
-  }, 2800);
-}
-
-function setSaveStatus(msg, cls = '') {
-  const el = $('#save-status');
-  el.textContent = msg;
-  el.className = 'save-status' + (cls ? ' ' + cls : '');
-}
-
-function markDirty() {
-  state.dirty = true;
-  setSaveStatus('Unsaved changes', '');
-}
-
-// ═══════════════════════════════════════════════════════════════
-// API
-// ═══════════════════════════════════════════════════════════════
-
-async function apiLogin(password) {
-  const r = await fetch(`${API}/api/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ password }),
-  });
-  if (!r.ok) throw new Error('Invalid password');
-  return r.json();
-}
-
-async function apiGetContent(page) {
-  const r = await fetch(`${API}/api/content/${page}`, {
-    headers: { 'x-token': state.token || '' },
-  });
-  if (!r.ok) throw new Error(`Failed to load ${page}`);
-  return r.json();
-}
-
-async function apiSaveContent(page, data) {
-  const r = await fetch(`${API}/api/content/${page}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', 'x-token': state.token || '' },
-    body: JSON.stringify(data),
-  });
-  if (!r.ok) throw new Error('Save failed');
-  return r.json();
-}
-
-async function apiUpload(file, onProgress) {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    const fd = new FormData();
-    fd.append('file', file);
-    xhr.open('POST', `${API}/api/upload`);
-    xhr.setRequestHeader('x-token', state.token || '');
-    if (onProgress) xhr.upload.onprogress = e => { if (e.lengthComputable) onProgress(e.loaded / e.total); };
-    xhr.onload = () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        try { resolve(JSON.parse(xhr.responseText)); } catch { reject(new Error('Bad response')); }
-      } else { reject(new Error('Upload failed')); }
-    };
-    xhr.onerror = () => reject(new Error('Network error'));
-    xhr.send(fd);
-  });
-}
-
-async function apiCreateProject(data) {
-  const r = await fetch(`${API}/api/project`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-token': state.token || '' },
-    body: JSON.stringify(data),
-  });
-  if (!r.ok) throw new Error('Failed to create project');
-  return r.json();
-}
-
-async function apiCreateInsight(data) {
-  const r = await fetch(`${API}/api/insight`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-token': state.token || '' },
-    body: JSON.stringify(data),
-  });
-  if (!r.ok) throw new Error('Failed to create insight');
-  return r.json();
-}
-
-// ═══════════════════════════════════════════════════════════════
-// LOGIN
-// ═══════════════════════════════════════════════════════════════
-
-function initLogin() {
-  const btn = $('#login-btn');
-  const pw = $('#login-pw');
-  const err = $('#login-error');
-
-  async function doLogin() {
-    err.textContent = '';
-    btn.disabled = true;
-    btn.textContent = 'Signing in…';
-    try {
-      const res = await apiLogin(pw.value.trim());
-      state.token = res.token;
-      localStorage.setItem('admin_token', res.token);
-      showDashboard();
-    } catch (e) {
-      err.textContent = e.message || 'Login failed';
-    } finally {
-      btn.disabled = false;
-      btn.textContent = 'Sign In';
-    }
-  }
-
-  btn.addEventListener('click', doLogin);
-  pw.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-}
-
-// ═══════════════════════════════════════════════════════════════
-// DASHBOARD INIT
-// ═══════════════════════════════════════════════════════════════
-
-function showDashboard() {
-  $('#login-view').classList.add('hidden');
-  $('#dashboard-view').classList.remove('hidden');
-  buildSidebar();
-  bindTopbar();
-}
-
-function showLogin() {
-  $('#dashboard-view').classList.add('hidden');
-  $('#login-view').classList.remove('hidden');
-  $('#login-pw').value = '';
-  $('#login-error').textContent = '';
-}
-
-function bindTopbar() {
-  $('#logout-btn').addEventListener('click', () => {
-    localStorage.removeItem('admin_token');
-    state.token = null;
-    state.selectedPage = null;
-    state.selectedSection = null;
-    state.selectedField = null;
-    state.pageData = {};
-    showLogin();
-  });
-
-  $('#save-btn').addEventListener('click', savePage);
-  $('#new-project-btn').addEventListener('click', openNewProjectModal);
-  $('#new-insight-btn').addEventListener('click', openNewInsightModal);
-  $('#add-block-btn').addEventListener('click', openAddBlockModal);
-}
-
-// ═══════════════════════════════════════════════════════════════
-// SIDEBAR
-// ═══════════════════════════════════════════════════════════════
-
-function buildSidebar() {
-  const nav = $('#pages-nav');
-  nav.innerHTML = '';
-  Object.entries(SCHEMA).forEach(([key, ps]) => {
-    const btn = document.createElement('button');
-    btn.className = 'nav-item';
-    btn.dataset.page = key;
-    btn.innerHTML = `<span class="nav-dot"></span><span>${ps.label}</span>`;
-    btn.addEventListener('click', () => selectPage(key));
-    nav.appendChild(btn);
-  });
-}
-
-// ═══════════════════════════════════════════════════════════════
-// PAGE SELECTION
-// ═══════════════════════════════════════════════════════════════
-
-async function selectPage(pageKey) {
-  // Warn if dirty
-  if (state.dirty && state.selectedPage && state.selectedPage !== pageKey) {
-    if (!confirm('You have unsaved changes. Discard them?')) return;
-  }
-
-  // Update nav highlight
-  $$('.nav-item').forEach(el => el.classList.remove('active'));
-  $(`.nav-item[data-page="${pageKey}"]`)?.classList.add('active');
-
-  state.selectedPage = pageKey;
-  state.selectedSection = null;
-  state.selectedField = null;
-  state.dirty = false;
-
-  setSaveStatus('');
-
-  // Preview link
-  const ps = SCHEMA[pageKey];
-  const previewLink = $('#preview-link');
-  if (ps && ps.url) {
-    previewLink.href = ps.url;
-    previewLink.style.display = '';
-  } else {
-    previewLink.style.display = 'none';
-  }
-
-  // Show loading
-  showCenterLoading(true);
-
-  try {
-    const data = await apiGetContent(pageKey);
-    // Merge with defaults
-    const fields = {};
-    if (ps) {
-      Object.values(ps.sections).forEach(sec => {
-        sec.fields.forEach(f => {
-          const existing = data.fields && data.fields[f.id];
-          fields[f.id] = {
-            value: existing?.value ?? '',
-            margin: { ...emptySpacing(), ...(existing?.margin || {}) },
-            padding: { ...emptySpacing(), ...(existing?.padding || {}) },
-          };
-        });
-      });
-    }
-    // Preserve any extra fields from server
-    if (data.fields) {
-      Object.entries(data.fields).forEach(([id, val]) => {
-        if (!fields[id]) {
-          fields[id] = {
-            value: val?.value ?? val ?? '',
-            margin: { ...emptySpacing(), ...(val?.margin || {}) },
-            padding: { ...emptySpacing(), ...(val?.padding || {}) },
-          };
-        }
-      });
-    }
-    state.pageData[pageKey] = {
-      fields,
-      blocks: Array.isArray(data.blocks) ? data.blocks : [],
-    };
-  } catch (e) {
-    // Initialize empty if API fails
-    const fields = {};
-    if (ps) {
-      Object.values(ps.sections).forEach(sec => {
-        sec.fields.forEach(f => { fields[f.id] = defaultFieldData(); });
-      });
-    }
-    state.pageData[pageKey] = { fields, blocks: [] };
-    toast(`Could not load content: ${e.message}`, 'error');
-  }
-
-  showCenterLoading(false);
-
-  // Select first section by default
-  if (ps) {
-    const firstSection = Object.keys(ps.sections)[0];
-    renderCenter(pageKey, firstSection);
-  }
-}
-
-function showCenterLoading(loading) {
-  if (loading) {
-    $('#center-empty').classList.remove('hidden');
-    $('#center-content').classList.add('hidden');
-    $('#center-empty').innerHTML = '<div style="color:var(--muted);font-size:12px;">Loading…</div>';
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════
-// CENTER PANEL
-// ═══════════════════════════════════════════════════════════════
-
-function renderCenter(pageKey, sectionKey) {
-  state.selectedSection = sectionKey;
-
-  const ps = SCHEMA[pageKey];
-  if (!ps) return;
-
-  $('#center-empty').classList.add('hidden');
-  $('#center-content').classList.remove('hidden');
-  $('#center-content').style.display = 'flex';
-
-  renderSectionTabs(pageKey, sectionKey);
-  renderFieldsList(pageKey, sectionKey);
-}
-
-function renderSectionTabs(pageKey, activeSectionKey) {
-  const ps = SCHEMA[pageKey];
-  const tabsEl = $('#section-tabs');
-  tabsEl.innerHTML = '';
-  Object.entries(ps.sections).forEach(([key, sec]) => {
-    const tab = document.createElement('button');
-    tab.className = 'section-tab' + (key === activeSectionKey ? ' active' : '');
-    tab.textContent = sec.label;
-    tab.addEventListener('click', () => {
-      state.selectedField = null;
-      renderCenter(pageKey, key);
-      renderPropsEmpty();
-    });
-    tabsEl.appendChild(tab);
-  });
-  // Blocks tab
-  const blocksTab = document.createElement('button');
-  blocksTab.className = 'section-tab' + (activeSectionKey === '__blocks__' ? ' active' : '');
-  blocksTab.textContent = 'Custom Blocks';
-  blocksTab.addEventListener('click', () => {
-    state.selectedSection = '__blocks__';
-    state.selectedField = null;
-    renderCenter(pageKey, '__blocks__');
-    renderPropsEmpty();
-  });
-  tabsEl.appendChild(blocksTab);
-}
-
-function renderFieldsList(pageKey, sectionKey) {
-  const listEl = $('#fields-list');
-  listEl.innerHTML = '';
-
-  const pd = state.pageData[pageKey];
-  const ps = SCHEMA[pageKey];
-
-  if (sectionKey === '__blocks__') {
-    const blocks = pd ? pd.blocks : [];
-    if (blocks.length === 0) {
-      const empty = document.createElement('div');
-      empty.style.cssText = 'color:var(--muted);font-size:12px;text-align:center;padding:32px 0;';
-      empty.textContent = 'No custom blocks. Click "+ Add Custom Block" below.';
-      listEl.appendChild(empty);
-    } else {
-      blocks.forEach((block, idx) => {
-        listEl.appendChild(buildBlockCard(block, idx, pageKey));
-      });
-    }
-    return;
-  }
-
-  const sec = ps?.sections[sectionKey];
-  if (!sec) return;
-
-  sec.fields.forEach(field => {
-    listEl.appendChild(buildFieldCard(field, pageKey));
-  });
-}
-
-function buildFieldCard(field, pageKey) {
-  const fd = getFieldData(pageKey, field.id);
-  const card = document.createElement('div');
-  const isActive = state.selectedField && !state.selectedField.isBlock && state.selectedField.id === field.id;
-  card.className = 'field-card' + (isActive ? ' active' : '');
-  card.dataset.fieldId = field.id;
-
-  let previewHtml = '';
-  let thumbHtml = '';
-
-  if (field.type === 'image') {
-    if (fd.value) {
-      thumbHtml = `<img class="fc-thumb" src="${escHtml(fd.value)}" alt="" onerror="this.style.display='none'" />`;
-    } else {
-      thumbHtml = `<div class="fc-thumb-placeholder">&#128247;</div>`;
-    }
-    previewHtml = fd.value ? escHtml(truncate(fd.value, 40)) : '<em style="color:var(--muted2)">No image</em>';
-  } else {
-    previewHtml = fd.value ? escHtml(truncate(fd.value, 60)) : '<em style="color:var(--muted2)">Empty</em>';
-  }
-
-  card.innerHTML = `
-    ${thumbHtml}
-    <div class="fc-info">
-      <div class="fc-label">${escHtml(field.label)}</div>
-      <div class="fc-preview">${previewHtml}</div>
+<!-- New Project Modal -->
+<div class="modal-overlay" id="new-project-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2>New Project</h2>
+      <button class="btn btn-ghost" onclick="closeModal('new-project-modal')">✕</button>
     </div>
-    <span class="type-badge ${field.type}">${field.type}</span>
-  `;
-
-  card.addEventListener('click', () => {
-    state.selectedField = { id: field.id, isBlock: false };
-    $$('.field-card').forEach(c => c.classList.remove('active'));
-    $$('.block-card').forEach(c => c.classList.remove('active'));
-    card.classList.add('active');
-    renderPropsField(field, pageKey);
-  });
-
-  return card;
-}
-
-function buildBlockCard(block, idx, pageKey) {
-  const isActive = state.selectedField && state.selectedField.isBlock && state.selectedField.blockIndex === idx;
-  const card = document.createElement('div');
-  card.className = 'block-card' + (isActive ? ' active' : '');
-  card.innerHTML = `
-    <div class="fc-info">
-      <div class="fc-label">${escHtml(block.type || 'Block')} <span style="color:var(--muted);font-weight:400">#${idx + 1}</span></div>
-      <div class="fc-preview">${block.content ? escHtml(truncate(String(block.content), 50)) : '<em style="color:var(--muted2)">No content</em>'}</div>
-    </div>
-    <span class="type-badge block">${escHtml(block.section || '—')}</span>
-  `;
-  card.addEventListener('click', () => {
-    state.selectedField = { isBlock: true, blockIndex: idx };
-    $$('.field-card').forEach(c => c.classList.remove('active'));
-    $$('.block-card').forEach(c => c.classList.remove('active'));
-    card.classList.add('active');
-    renderPropsBlock(block, idx, pageKey);
-  });
-  return card;
-}
-
-// ═══════════════════════════════════════════════════════════════
-// RIGHT PANEL (PROPERTIES)
-// ═══════════════════════════════════════════════════════════════
-
-function renderPropsEmpty() {
-  $('#props-empty').classList.remove('hidden');
-  $('#props-content').classList.add('hidden');
-}
-
-function renderPropsField(field, pageKey) {
-  const fd = getFieldData(pageKey, field.id);
-  pendingEdit = {
-    value: fd.value,
-    margin: cloneSpacing(fd.margin),
-    padding: cloneSpacing(fd.padding),
-  };
-
-  const container = $('#props-content');
-  container.innerHTML = '';
-  container.classList.remove('hidden');
-  $('#props-empty').classList.add('hidden');
-
-  // Header
-  const header = document.createElement('div');
-  header.className = 'props-header';
-  header.innerHTML = `<span class="ph-label">${escHtml(field.label)}</span><span class="type-badge ${field.type}">${field.type}</span>`;
-  container.appendChild(header);
-
-  // Content editor
-  const contentSection = buildContentEditor(field, fd);
-  container.appendChild(contentSection);
-
-  // Spacing
-  container.appendChild(buildSpacingSection('Margin', 'margin'));
-  container.appendChild(buildSpacingSection('Padding', 'padding'));
-
-  // Apply button
-  const applyBtn = document.createElement('button');
-  applyBtn.className = 'btn btn-primary btn-full';
-  applyBtn.textContent = 'Apply Changes';
-  applyBtn.addEventListener('click', () => applyFieldChanges(field.id, pageKey));
-  container.appendChild(applyBtn);
-}
-
-function buildContentEditor(field, fd) {
-  const wrap = document.createElement('div');
-  wrap.className = 'form-group';
-
-  const lbl = document.createElement('label');
-  lbl.textContent = 'Content';
-  wrap.appendChild(lbl);
-
-  if (field.type === 'text') {
-    const inp = document.createElement('input');
-    inp.type = 'text';
-    inp.value = fd.value || '';
-    inp.addEventListener('input', () => { pendingEdit.value = inp.value; });
-    wrap.appendChild(inp);
-  } else if (field.type === 'textarea') {
-    const ta = document.createElement('textarea');
-    ta.rows = 4;
-    ta.value = fd.value || '';
-    ta.addEventListener('input', () => { pendingEdit.value = ta.value; });
-    wrap.appendChild(ta);
-  } else if (field.type === 'image') {
-    wrap.appendChild(buildImageEditor(fd.value, (url) => { pendingEdit.value = url; }));
-  }
-
-  return wrap;
-}
-
-function buildImageEditor(currentUrl, onChange) {
-  const wrap = document.createElement('div');
-  wrap.style.display = 'flex';
-  wrap.style.flexDirection = 'column';
-  wrap.style.gap = '8px';
-
-  // Preview
-  const preview = document.createElement('div');
-  if (currentUrl) {
-    const img = document.createElement('img');
-    img.className = 'img-preview';
-    img.src = currentUrl;
-    img.onerror = () => { img.style.display = 'none'; };
-    preview.appendChild(img);
-  } else {
-    const ph = document.createElement('div');
-    ph.className = 'img-preview-placeholder';
-    ph.innerHTML = '&#128247;';
-    preview.appendChild(ph);
-  }
-  wrap.appendChild(preview);
-
-  // Drop zone
-  const dropZone = document.createElement('div');
-  dropZone.className = 'file-drop';
-  const fileInput = document.createElement('input');
-  fileInput.type = 'file';
-  fileInput.accept = 'image/*';
-  dropZone.innerHTML = `<p><strong>Click to upload</strong> or drag & drop</p><p style="margin-top:4px;font-size:10px">PNG, JPG, GIF, WebP</p>`;
-  dropZone.appendChild(fileInput);
-
-  // Progress bar (hidden initially)
-  const progressWrap = document.createElement('div');
-  progressWrap.className = 'upload-progress hidden';
-  progressWrap.innerHTML = `<span>Uploading…</span><div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>`;
-  wrap.appendChild(progressWrap);
-
-  const updatePreview = (url) => {
-    preview.innerHTML = '';
-    if (url) {
-      const img = document.createElement('img');
-      img.className = 'img-preview';
-      img.src = url;
-      img.onerror = () => { img.style.display = 'none'; };
-      preview.appendChild(img);
-    }
-    onChange(url);
-  };
-
-  const doUpload = async (file) => {
-    progressWrap.classList.remove('hidden');
-    const fill = progressWrap.querySelector('.progress-fill');
-    try {
-      const res = await apiUpload(file, (pct) => { fill.style.width = (pct * 100) + '%'; });
-      updatePreview(res.url);
-      toast('Image uploaded', 'success');
-    } catch (e) {
-      toast(`Upload failed: ${e.message}`, 'error');
-    } finally {
-      progressWrap.classList.add('hidden');
-      fill.style.width = '0%';
-    }
-  };
-
-  dropZone.addEventListener('click', (e) => { if (e.target !== fileInput) fileInput.click(); });
-  fileInput.addEventListener('change', () => { if (fileInput.files[0]) doUpload(fileInput.files[0]); });
-  dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-  dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('drag-over'); });
-  dropZone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dropZone.classList.remove('drag-over');
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) doUpload(file);
-  });
-  wrap.appendChild(dropZone);
-  wrap.appendChild(progressWrap);
-
-  // URL input
-  const urlWrap = document.createElement('div');
-  urlWrap.className = 'url-input-wrap';
-  const orSep = document.createElement('span');
-  orSep.className = 'or-sep';
-  orSep.textContent = 'or URL:';
-  const urlInp = document.createElement('input');
-  urlInp.type = 'text';
-  urlInp.placeholder = 'https://…';
-  urlInp.value = currentUrl || '';
-  urlInp.style.flex = '1';
-  urlInp.addEventListener('input', () => {
-    pendingEdit.value = urlInp.value;
-    // Live preview on URL change
-    if (urlInp.value) {
-      updatePreview(urlInp.value);
-    }
-  });
-  urlInp.addEventListener('blur', () => { if (urlInp.value) updatePreview(urlInp.value); });
-  urlWrap.appendChild(orSep);
-  urlWrap.appendChild(urlInp);
-  wrap.appendChild(urlWrap);
-
-  return wrap;
-}
-
-function buildSpacingSection(title, key) {
-  const section = document.createElement('div');
-  section.style.display = 'flex';
-  section.style.flexDirection = 'column';
-  section.style.gap = '6px';
-
-  const lbl = document.createElement('label');
-  lbl.className = 'label-caps';
-  lbl.textContent = title;
-  section.appendChild(lbl);
-
-  const grid = document.createElement('div');
-  grid.className = 'spacing-grid';
-
-  const sides = [['T', 't'], ['R', 'r'], ['B', 'b'], ['L', 'l']];
-  sides.forEach(([label, prop]) => {
-    const wrap = document.createElement('div');
-    wrap.className = 'spacing-input-wrap';
-    const sp = document.createElement('span');
-    sp.className = 'sp-label';
-    sp.textContent = label;
-    const inp = document.createElement('input');
-    inp.type = 'number';
-    inp.min = '0';
-    inp.value = pendingEdit[key][prop] || 0;
-    inp.style.flex = '1';
-    inp.addEventListener('input', () => { pendingEdit[key][prop] = parseInt(inp.value) || 0; });
-    wrap.appendChild(sp);
-    wrap.appendChild(inp);
-    grid.appendChild(wrap);
-  });
-
-  section.appendChild(grid);
-  return section;
-}
-
-function applyFieldChanges(fieldId, pageKey) {
-  const pd = state.pageData[pageKey];
-  if (!pd) return;
-  pd.fields[fieldId] = {
-    value: pendingEdit.value,
-    margin: cloneSpacing(pendingEdit.margin),
-    padding: cloneSpacing(pendingEdit.padding),
-  };
-  markDirty();
-  // Re-render just the card in the list
-  const section = state.selectedSection;
-  if (section && section !== '__blocks__') {
-    renderFieldsList(pageKey, section);
-    // Re-select the card
-    const card = $$(`.field-card`).find(c => c.dataset.fieldId === fieldId);
-    if (card) card.classList.add('active');
-  }
-  toast('Changes applied', 'success');
-}
-
-function renderPropsBlock(block, idx, pageKey) {
-  pendingEdit = {
-    value: block.content || '',
-    margin: cloneSpacing(block.margin || emptySpacing()),
-    padding: cloneSpacing(block.padding || emptySpacing()),
-  };
-
-  const container = $('#props-content');
-  container.innerHTML = '';
-  container.classList.remove('hidden');
-  $('#props-empty').classList.add('hidden');
-
-  const header = document.createElement('div');
-  header.className = 'props-header';
-  header.innerHTML = `<span class="ph-label">${escHtml(block.type || 'Block')}</span><span class="type-badge block">block</span>`;
-  container.appendChild(header);
-
-  // Content
-  const contentSection = document.createElement('div');
-  contentSection.className = 'form-group';
-  const contentLbl = document.createElement('label');
-  contentLbl.textContent = 'Content';
-  contentSection.appendChild(contentLbl);
-
-  if (block.type === 'Image') {
-    contentSection.appendChild(buildImageEditor(block.content, (url) => { pendingEdit.value = url; }));
-  } else if (block.type === 'Divider') {
-    const div = document.createElement('div');
-    div.style.cssText = 'background:var(--border);height:2px;border-radius:1px;margin:8px 0;';
-    contentSection.appendChild(div);
-  } else {
-    const ta = document.createElement('textarea');
-    ta.rows = 3;
-    ta.value = block.content || '';
-    ta.addEventListener('input', () => { pendingEdit.value = ta.value; });
-    contentSection.appendChild(ta);
-  }
-  container.appendChild(contentSection);
-
-  container.appendChild(buildSpacingSection('Margin', 'margin'));
-  container.appendChild(buildSpacingSection('Padding', 'padding'));
-
-  const applyBtn = document.createElement('button');
-  applyBtn.className = 'btn btn-primary btn-full';
-  applyBtn.textContent = 'Apply Changes';
-  applyBtn.addEventListener('click', () => {
-    const pd = state.pageData[pageKey];
-    if (!pd) return;
-    pd.blocks[idx] = {
-      ...pd.blocks[idx],
-      content: pendingEdit.value,
-      margin: cloneSpacing(pendingEdit.margin),
-      padding: cloneSpacing(pendingEdit.padding),
-    };
-    markDirty();
-    renderFieldsList(pageKey, '__blocks__');
-    toast('Block updated', 'success');
-  });
-  container.appendChild(applyBtn);
-
-  const deleteBtn = document.createElement('button');
-  deleteBtn.className = 'btn btn-danger btn-full';
-  deleteBtn.textContent = 'Delete Block';
-  deleteBtn.addEventListener('click', () => {
-    if (!confirm('Delete this block?')) return;
-    const pd = state.pageData[pageKey];
-    if (!pd) return;
-    pd.blocks.splice(idx, 1);
-    markDirty();
-    state.selectedField = null;
-    renderFieldsList(pageKey, '__blocks__');
-    renderPropsEmpty();
-    toast('Block deleted', 'info');
-  });
-  container.appendChild(deleteBtn);
-}
-
-// ═══════════════════════════════════════════════════════════════
-// SAVE
-// ═══════════════════════════════════════════════════════════════
-
-async function savePage() {
-  const page = state.selectedPage;
-  if (!page) { toast('No page selected', 'error'); return; }
-
-  const pd = state.pageData[page];
-  if (!pd) return;
-
-  const saveBtn = $('#save-btn');
-  saveBtn.disabled = true;
-  setSaveStatus('Saving…', '');
-
-  try {
-    await apiSaveContent(page, pd);
-    state.dirty = false;
-    setSaveStatus('Saved ✓', 'saved');
-    toast('Page saved successfully', 'success');
-    setTimeout(() => {
-      if (!state.dirty) setSaveStatus('');
-    }, 2000);
-  } catch (e) {
-    setSaveStatus('Save failed', 'error');
-    toast(`Save failed: ${e.message}`, 'error');
-  } finally {
-    saveBtn.disabled = false;
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════
-// MODALS
-// ═══════════════════════════════════════════════════════════════
-
-function createModal(title, bodyHtml, footerHtml) {
-  const container = $('#modal-container');
-  container.innerHTML = `
-    <div class="modal-overlay" id="active-modal-overlay">
-      <div class="modal" role="dialog" aria-modal="true">
-        <div class="modal-header">
-          <h2>${escHtml(title)}</h2>
-          <button class="modal-close" id="modal-close-btn" aria-label="Close">&times;</button>
-        </div>
-        <div class="modal-body">${bodyHtml}</div>
-        <div class="modal-footer">${footerHtml}</div>
+    <div class="fields-grid">
+      <div class="field-group field-full">
+        <label class="field-label">Title *</label>
+        <input type="text" id="np-title" placeholder="Project title"/>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Slug *</label>
+        <input type="text" id="np-slug" placeholder="my-project-name"/>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Category</label>
+        <input type="text" id="np-category" placeholder="Brand Identity"/>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Client</label>
+        <input type="text" id="np-client" placeholder="Client name"/>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Year</label>
+        <input type="text" id="np-year" placeholder="2024"/>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Scope</label>
+        <input type="text" id="np-scope" placeholder="Brand Identity, Strategy"/>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Role</label>
+        <input type="text" id="np-role" placeholder="Creative Director"/>
+      </div>
+      <div class="field-group field-full">
+        <label class="field-label">Description</label>
+        <textarea id="np-desc" placeholder="Brief project overview..."></textarea>
       </div>
     </div>
-  `;
-  $('#modal-close-btn').addEventListener('click', closeModal);
-  $('#active-modal-overlay').addEventListener('click', (e) => {
-    if (e.target === e.currentTarget) closeModal();
-  });
-  document.addEventListener('keydown', handleModalEsc);
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('new-project-modal')">Cancel</button>
+      <button class="btn btn-accent" onclick="createProject()">Create Project</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Article Modal -->
+<div class="modal-overlay" id="new-article-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2>New Article</h2>
+      <button class="btn btn-ghost" onclick="closeModal('new-article-modal')">✕</button>
+    </div>
+    <div class="fields-grid">
+      <div class="field-group field-full">
+        <label class="field-label">Title *</label>
+        <input type="text" id="na-title" placeholder="Article title"/>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Slug *</label>
+        <input type="text" id="na-slug" placeholder="article-slug"/>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Category</label>
+        <input type="text" id="na-category" placeholder="Design"/>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Date</label>
+        <input type="date" id="na-date"/>
+      </div>
+      <div class="field-group field-full">
+        <label class="field-label">Excerpt</label>
+        <textarea id="na-excerpt" placeholder="Short summary..." style="min-height:70px"></textarea>
+      </div>
+      <div class="field-group field-full">
+        <label class="field-label">Body (HTML)</label>
+        <textarea id="na-body" placeholder="<p>Article content...</p>" style="min-height:160px; font-family: monospace; font-size:12px;"></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('new-article-modal')">Cancel</button>
+      <button class="btn btn-accent" onclick="createArticle()">Create Article</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let TOKEN = localStorage.getItem('em_token') || ''
+let currentPage = null
+let currentData = {}
+let pendingChanges = false
+
+const API = '/api'
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+;(function init() {
+  document.getElementById('login-pw').addEventListener('keydown', e => { if (e.key === 'Enter') login() })
+  if (TOKEN) showApp()
+  else showLogin()
+})()
+
+function showLogin() {
+  document.getElementById('login-screen').style.display = 'flex'
+  document.getElementById('app').classList.remove('visible')
+}
+function showApp() {
+  document.getElementById('login-screen').style.display = 'none'
+  document.getElementById('app').classList.add('visible')
+  loadPage('home')
 }
 
-function closeModal() {
-  $('#modal-container').innerHTML = '';
-  document.removeEventListener('keydown', handleModalEsc);
+// ═══════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════
+async function login() {
+  const pw = document.getElementById('login-pw').value.trim()
+  const err = document.getElementById('login-error')
+  err.classList.remove('show')
+  try {
+    const r = await fetch(`${API}/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({password:pw}) })
+    const d = await r.json()
+    if (!r.ok) { err.classList.add('show'); return }
+    TOKEN = d.token
+    localStorage.setItem('em_token', TOKEN)
+    showApp()
+  } catch { err.classList.add('show') }
+}
+function logout() {
+  TOKEN = ''
+  localStorage.removeItem('em_token')
+  showLogin()
 }
 
-function handleModalEsc(e) { if (e.key === 'Escape') closeModal(); }
+// ═══════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════
+function loadPage(page) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page === page))
+  currentPage = page
+  document.getElementById('tab-bar').classList.add('hidden')
+  document.getElementById('save-btn').style.display = 'none'
+  pendingChanges = false
+  setSaveStatus('')
 
-// ── ADD CUSTOM BLOCK MODAL ──
+  const titles = { home:'Home', about:'About', work:'Work', insights:'Insights', contact:'Contact', projects:'Projects', articles:'Articles' }
+  document.getElementById('topbar-title').textContent = titles[page] || page
 
-function openAddBlockModal() {
-  if (!state.selectedPage) { toast('Select a page first', 'error'); return; }
+  const content = document.getElementById('content')
+  content.innerHTML = '<div style="padding:40px;color:var(--muted);font-size:13px">Loading…</div>'
 
-  const ps = SCHEMA[state.selectedPage];
-  const sectionOptions = ps
-    ? Object.entries(ps.sections).map(([k, s]) => `<option value="${escAttr(k)}">${escHtml(s.label)}</option>`).join('')
-    : '';
+  if (page === 'projects') { renderProjectsPage(); return }
+  if (page === 'articles') { renderArticlesPage(); return }
 
-  createModal('Add Custom Block', `
-    <div class="form-group">
-      <label>Block Type</label>
-      <select id="block-type-sel">
-        <option value="Text Block">Text Block</option>
-        <option value="Heading">Heading</option>
-        <option value="Image">Image</option>
-        <option value="Divider">Divider</option>
-      </select>
-    </div>
-    <div class="form-group" id="block-content-wrap">
-      <label>Content</label>
-      <textarea id="block-content" rows="3" placeholder="Enter content…"></textarea>
-    </div>
-    <div class="form-group">
-      <label>Target Section</label>
-      <select id="block-section-sel">
-        ${sectionOptions}
-      </select>
-    </div>
-    <div class="modal-error" id="block-modal-error"></div>
-  `, `
-    <button class="btn btn-ghost" id="block-cancel-btn">Cancel</button>
-    <button class="btn btn-primary" id="block-add-btn">Add Block</button>
-  `);
-
-  const typeSel = $('#block-type-sel');
-  const contentWrap = $('#block-content-wrap');
-  const contentInput = $('#block-content');
-  let imageBlockUrl = '';
-
-  // Dynamic content based on type
-  typeSel.addEventListener('change', () => {
-    const type = typeSel.value;
-    contentWrap.innerHTML = '';
-    if (type === 'Divider') {
-      const lbl = document.createElement('label');
-      lbl.textContent = 'No content needed';
-      lbl.style.color = 'var(--muted)';
-      contentWrap.appendChild(lbl);
-      return;
-    }
-    const label = document.createElement('label');
-    label.textContent = 'Content';
-    contentWrap.appendChild(label);
-    if (type === 'Image') {
-      const imgWrap = buildImageEditor('', (url) => { imageBlockUrl = url; });
-      contentWrap.appendChild(imgWrap);
-    } else {
-      const ta = document.createElement('textarea');
-      ta.id = 'block-content';
-      ta.rows = 3;
-      ta.placeholder = 'Enter content…';
-      contentWrap.appendChild(ta);
-    }
-  });
-
-  $('#block-cancel-btn').addEventListener('click', closeModal);
-  $('#block-add-btn').addEventListener('click', () => {
-    const type = typeSel.value;
-    const sectionKey = $('#block-section-sel').value;
-    let content = '';
-    if (type === 'Image') {
-      content = imageBlockUrl;
-    } else if (type !== 'Divider') {
-      const ta = contentWrap.querySelector('textarea');
-      content = ta ? ta.value.trim() : '';
-    }
-
-    const pd = state.pageData[state.selectedPage];
-    if (!pd) { closeModal(); return; }
-
-    pd.blocks.push({ type, content, section: sectionKey, margin: emptySpacing(), padding: emptySpacing() });
-    markDirty();
-    closeModal();
-    // Show blocks tab
-    state.selectedSection = '__blocks__';
-    renderCenter(state.selectedPage, '__blocks__');
-    toast('Block added', 'success');
-  });
+  // Page editors
+  fetch(`${API}/content/${page}`, authHeaders())
+    .then(r => r.json())
+    .then(data => { currentData = data; renderPageEditor(page, data) })
+    .catch(() => { currentData = {}; renderPageEditor(page, {}) })
 }
 
-// ── NEW PROJECT MODAL ──
+// ═══════════════════════════════════════
+// FIELD HELPERS
+// ═══════════════════════════════════════
+function val(data, key, fallback = '') { return (data.fields && data.fields[key] !== undefined) ? data.fields[key] : fallback }
 
-function openNewProjectModal() {
-  createModal('New Project', `
-    <div class="form-group">
-      <label>Title</label>
-      <input type="text" id="proj-title" placeholder="Project title…" />
-    </div>
-    <div class="form-group">
-      <label>Slug <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(auto-generated)</span></label>
-      <input type="text" id="proj-slug" placeholder="project-slug" />
-    </div>
-    <div class="form-group">
-      <label>Category</label>
-      <input type="text" id="proj-category" placeholder="Branding, Motion…" />
-    </div>
-    <div class="form-group">
-      <label>Year</label>
-      <input type="text" id="proj-year" placeholder="2024" />
-    </div>
-    <div class="form-group">
-      <label>Client</label>
-      <input type="text" id="proj-client" placeholder="Client name…" />
-    </div>
-    <div class="form-group">
-      <label>Scope</label>
-      <input type="text" id="proj-scope" placeholder="Brand Identity, Web…" />
-    </div>
-    <div class="form-group">
-      <label>Role</label>
-      <input type="text" id="proj-role" placeholder="Creative Director…" />
-    </div>
-    <div class="form-group">
-      <label>Description</label>
-      <textarea id="proj-desc" rows="3" placeholder="Project description…"></textarea>
-    </div>
-    <div class="modal-error" id="proj-modal-error"></div>
-  `, `
-    <button class="btn btn-ghost" id="proj-cancel-btn">Cancel</button>
-    <button class="btn btn-primary" id="proj-create-btn">Create Project</button>
-  `);
-
-  // Auto-generate slug from title
-  $('#proj-title').addEventListener('input', () => {
-    $('#proj-slug').value = slugify($('#proj-title').value);
-  });
-
-  $('#proj-cancel-btn').addEventListener('click', closeModal);
-  $('#proj-create-btn').addEventListener('click', async () => {
-    const errEl = $('#proj-modal-error');
-    errEl.textContent = '';
-    const btn = $('#proj-create-btn');
-
-    const title = $('#proj-title').value.trim();
-    const slug = $('#proj-slug').value.trim();
-    if (!title) { errEl.textContent = 'Title is required.'; return; }
-    if (!slug) { errEl.textContent = 'Slug is required.'; return; }
-
-    btn.disabled = true;
-    btn.textContent = 'Creating…';
-    try {
-      await apiCreateProject({
-        slug,
-        title,
-        category: $('#proj-category').value.trim(),
-        year: $('#proj-year').value.trim(),
-        client: $('#proj-client').value.trim(),
-        scope: $('#proj-scope').value.trim(),
-        role: $('#proj-role').value.trim(),
-        description: $('#proj-desc').value.trim(),
-      });
-      closeModal();
-      toast(`Project "${title}" created`, 'success');
-    } catch (e) {
-      errEl.textContent = e.message || 'Failed to create project.';
-      btn.disabled = false;
-      btn.textContent = 'Create Project';
-    }
-  });
-}
-
-// ── NEW INSIGHT MODAL ──
-
-function openNewInsightModal() {
-  createModal('New Insight', `
-    <div class="form-group">
-      <label>Title</label>
-      <input type="text" id="ins-title" placeholder="Article title…" />
-    </div>
-    <div class="form-group">
-      <label>Slug <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(auto-generated)</span></label>
-      <input type="text" id="ins-slug" placeholder="article-slug" />
-    </div>
-    <div class="form-group">
-      <label>Category</label>
-      <input type="text" id="ins-category" placeholder="Design, Strategy…" />
-    </div>
-    <div class="form-group">
-      <label>Date</label>
-      <input type="text" id="ins-date" placeholder="May 2024" />
-    </div>
-    <div class="form-group">
-      <label>Author</label>
-      <input type="text" id="ins-author" placeholder="Eyuel Mulat" />
-    </div>
-    <div class="form-group">
-      <label>Excerpt</label>
-      <textarea id="ins-excerpt" rows="3" placeholder="Short excerpt…"></textarea>
-    </div>
-    <div class="form-group">
-      <label>Body</label>
-      <textarea id="ins-body" rows="5" placeholder="Full article body…"></textarea>
-    </div>
-    <div class="modal-error" id="ins-modal-error"></div>
-  `, `
-    <button class="btn btn-ghost" id="ins-cancel-btn">Cancel</button>
-    <button class="btn btn-primary" id="ins-create-btn">Create Insight</button>
-  `);
-
-  $('#ins-title').addEventListener('input', () => {
-    $('#ins-slug').value = slugify($('#ins-title').value);
-  });
-
-  $('#ins-cancel-btn').addEventListener('click', closeModal);
-  $('#ins-create-btn').addEventListener('click', async () => {
-    const errEl = $('#ins-modal-error');
-    errEl.textContent = '';
-    const btn = $('#ins-create-btn');
-
-    const title = $('#ins-title').value.trim();
-    const slug = $('#ins-slug').value.trim();
-    if (!title) { errEl.textContent = 'Title is required.'; return; }
-    if (!slug) { errEl.textContent = 'Slug is required.'; return; }
-
-    btn.disabled = true;
-    btn.textContent = 'Creating…';
-    try {
-      await apiCreateInsight({
-        slug,
-        title,
-        category: $('#ins-category').value.trim(),
-        date: $('#ins-date').value.trim(),
-        author: $('#ins-author').value.trim(),
-        excerpt: $('#ins-excerpt').value.trim(),
-        body: $('#ins-body').value.trim(),
-      });
-      closeModal();
-      toast(`Insight "${title}" created`, 'success');
-    } catch (e) {
-      errEl.textContent = e.message || 'Failed to create insight.';
-      btn.disabled = false;
-      btn.textContent = 'Create Insight';
-    }
-  });
-}
-
-// ═══════════════════════════════════════════════════════════════
-// UTILITIES
-// ═══════════════════════════════════════════════════════════════
-
-function escHtml(str) {
-  if (str == null) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-function escAttr(str) { return escHtml(str); }
-
-function truncate(str, n) {
-  if (!str) return '';
-  return str.length > n ? str.slice(0, n) + '…' : str;
-}
-
-// ═══════════════════════════════════════════════════════════════
-// BOOTSTRAP
-// ═══════════════════════════════════════════════════════════════
-
-(function init() {
-  initLogin();
-
-  if (state.token) {
-    showDashboard();
+function fieldHTML(key, label, value, type = 'text', options = {}) {
+  const id = `field-${key}`
+  if (type === 'textarea') {
+    return `<div class="field-group${options.full ? ' field-full' : ''}">
+      <label class="field-label">${label}</label>
+      <textarea id="${id}" data-key="${key}" oninput="markChanged()">${esc(value)}</textarea>
+    </div>`
   }
-})();
+  if (type === 'image') {
+    const thumb = value ? `<img src="${value}" class="inline-img-thumb"/>` : `<div class="inline-img-empty"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="var(--muted2)" stroke-width="1.3"/><circle cx="5.5" cy="5.5" r="1" fill="var(--muted2)"/><path d="M2 11l3-3 3 3 2-2 4 4" stroke="var(--muted2)" stroke-width="1.2" stroke-linecap="round"/></svg></div>`
+    return `<div class="field-group${options.full ? ' field-full' : ''}">
+      <label class="field-label">${label}</label>
+      <div class="inline-img">
+        <div id="${id}-preview">${thumb}</div>
+        <div style="flex:1">
+          <input type="url" id="${id}" data-key="${key}" value="${esc(value)}" placeholder="Image URL" oninput="markChanged();updateImgPreview('${id}')"/>
+          <div class="flex-row mt-2">
+            <label class="btn btn-outline text-sm" style="cursor:pointer;font-size:12px">
+              Upload
+              <input type="file" accept="image/*" style="display:none" onchange="uploadImg(this,'${id}')"/>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>`
+  }
+  return `<div class="field-group${options.full ? ' field-full' : ''}">
+    <label class="field-label">${label}</label>
+    <input type="${type}" id="${id}" data-key="${key}" value="${esc(value)}" oninput="markChanged()"/>
+  </div>`
+}
+
+function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
+
+function updateImgPreview(id) {
+  const url = document.getElementById(id).value
+  const el = document.getElementById(id + '-preview')
+  if (!el) return
+  if (url) el.innerHTML = `<img src="${url}" class="inline-img-thumb"/>`
+  else el.innerHTML = `<div class="inline-img-empty"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="var(--muted2)" stroke-width="1.3"/></svg></div>`
+}
+
+function markChanged() {
+  pendingChanges = true
+  document.getElementById('save-btn').style.display = ''
+  setSaveStatus('Unsaved changes')
+}
+
+function setSaveStatus(msg, type = '') {
+  const el = document.getElementById('save-status')
+  el.textContent = msg
+  el.className = type
+}
+
+function getFieldValues() {
+  const fields = {}
+  document.querySelectorAll('[data-key]').forEach(el => { fields[el.dataset.key] = el.value })
+  return fields
+}
+
+// ═══════════════════════════════════════
+// SAVE
+// ═══════════════════════════════════════
+async function saveCurrentPage() {
+  if (!currentPage || ['projects','articles'].includes(currentPage)) return
+  setSaveStatus('Saving…')
+  currentData.fields = getFieldValues()
+  try {
+    const r = await fetch(`${API}/content/${currentPage}`, {
+      method:'PUT', headers:{'Content-Type':'application/json','x-token':TOKEN},
+      body: JSON.stringify(currentData)
+    })
+    if (!r.ok) throw new Error()
+    setSaveStatus('Saved', 'saved')
+    pendingChanges = false
+    document.getElementById('save-btn').style.display = 'none'
+    toast('Changes saved', 'success')
+    setTimeout(() => setSaveStatus(''), 3000)
+  } catch {
+    setSaveStatus('Error saving', 'error')
+    toast('Could not save', 'error')
+  }
+}
+
+// ═══════════════════════════════════════
+// IMAGE UPLOAD
+// ═══════════════════════════════════════
+async function uploadImg(input, fieldId) {
+  if (!input.files[0]) return
+  const fd = new FormData()
+  fd.append('file', input.files[0])
+  try {
+    const r = await fetch(`${API}/upload`, { method:'POST', headers:{'x-token':TOKEN}, body:fd })
+    const d = await r.json()
+    if (!r.ok) throw new Error(d.error)
+    const el = document.getElementById(fieldId)
+    if (el) { el.value = d.url; updateImgPreview(fieldId); markChanged() }
+    toast('Image uploaded', 'success')
+  } catch(e) { toast(e.message || 'Upload failed', 'error') }
+}
+
+// ═══════════════════════════════════════
+// PAGE EDITORS
+// ═══════════════════════════════════════
+function renderPageEditor(page, data) {
+  document.getElementById('save-btn').style.display = ''
+  const content = document.getElementById('content')
+  const html = {
+    home:     renderHomeEditor,
+    about:    renderAboutEditor,
+    work:     renderWorkEditor,
+    insights: renderInsightsEditor,
+    contact:  renderContactEditor,
+  }[page]
+  if (!html) { content.innerHTML = '<div class="empty-state"><div class="empty-icon">🚧</div><h2>Coming soon</h2><p>This page editor is not available yet.</p></div>'; return }
+  content.innerHTML = html(data)
+  bindBlocks()
+}
+
+function sectionCard(title, badge, bodyHTML, open = true) {
+  const id = 'sc-' + Math.random().toString(36).slice(2)
+  return `<div class="section-card">
+    <div class="section-card-header" onclick="toggleSection('${id}')">
+      <div class="section-card-title">
+        ${title}
+        ${badge ? `<span class="section-badge">${badge}</span>` : ''}
+      </div>
+      <svg class="chevron ${open?'open':''}" id="${id}-chev" width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="section-card-body ${open?'':'hidden'}" id="${id}">${bodyHTML}</div>
+  </div>`
+}
+
+function toggleSection(id) {
+  const body = document.getElementById(id)
+  const chev = document.getElementById(id + '-chev')
+  body.classList.toggle('hidden')
+  chev.classList.toggle('open')
+}
+
+// HOME EDITOR
+function renderHomeEditor(data) {
+  const v = k => val(data, k)
+  return `<div class="page-header"><h1>Home Page</h1><p>Edit the content of your homepage.</p></div>` +
+  sectionCard('Hero Section', 'Section 01', `
+    <div class="fields-grid">
+      ${fieldHTML('hero_kicker','Kicker Label', v('hero_kicker'), 'text')}
+      ${fieldHTML('hero_year','Year', v('hero_year') || '2024', 'text')}
+      ${fieldHTML('hero_title_line1','Title — Line 1', v('hero_title_line1'), 'text', {full:true})}
+      ${fieldHTML('hero_title_line2','Title — Line 2', v('hero_title_line2'), 'text', {full:true})}
+      ${fieldHTML('hero_subtitle','Subtitle Text', v('hero_subtitle'), 'textarea', {full:true})}
+      ${fieldHTML('hero_cta','CTA Label', v('hero_cta') || 'View Work', 'text')}
+      ${fieldHTML('hero_cta_url','CTA URL', v('hero_cta_url') || '/work.html', 'text')}
+    </div>`) +
+  sectionCard('Stats Bar', 'Section 02', `
+    <div class="fields-grid">
+      ${fieldHTML('stat1_num','Stat 1 — Number', v('stat1_num'), 'text')}
+      ${fieldHTML('stat1_label','Stat 1 — Label', v('stat1_label'), 'text')}
+      ${fieldHTML('stat2_num','Stat 2 — Number', v('stat2_num'), 'text')}
+      ${fieldHTML('stat2_label','Stat 2 — Label', v('stat2_label'), 'text')}
+      ${fieldHTML('stat3_num','Stat 3 — Number', v('stat3_num'), 'text')}
+      ${fieldHTML('stat3_label','Stat 3 — Label', v('stat3_label'), 'text')}
+    </div>`) +
+  sectionCard('Featured Project', 'Section 03', `
+    <div class="fields-grid">
+      ${fieldHTML('feat_label','Label', v('feat_label') || 'Featured', 'text')}
+      ${fieldHTML('feat_title','Title', v('feat_title'), 'text')}
+      ${fieldHTML('feat_cat','Category', v('feat_cat'), 'text')}
+      ${fieldHTML('feat_year','Year', v('feat_year'), 'text')}
+      ${fieldHTML('feat_url','Link URL', v('feat_url'), 'text')}
+      ${fieldHTML('feat_img','Cover Image', v('feat_img'), 'image', {full:true})}
+    </div>`) +
+  sectionCard('Tagline / About Blurb', 'Section 04', `
+    <div class="fields-grid">
+      ${fieldHTML('tagline','Tagline', v('tagline'), 'textarea', {full:true})}
+      ${fieldHTML('about_cta','CTA Label', v('about_cta') || 'About Me', 'text')}
+      ${fieldHTML('about_cta_url','CTA URL', v('about_cta_url') || '/about.html', 'text')}
+    </div>`)
+}
+
+// ABOUT EDITOR
+function renderAboutEditor(data) {
+  const v = k => val(data, k)
+  return `<div class="page-header"><h1>About Page</h1><p>Edit your bio, skills, and experience sections.</p></div>` +
+  sectionCard('Hero', 'Section 01', `
+    <div class="fields-grid">
+      ${fieldHTML('hero_kicker','Kicker', v('hero_kicker'), 'text')}
+      ${fieldHTML('hero_title','Title', v('hero_title'), 'text', {full:true})}
+      ${fieldHTML('hero_subtitle','Subtitle', v('hero_subtitle'), 'textarea', {full:true})}
+    </div>`) +
+  sectionCard('Profile Image', 'Section 02', `
+    <div class="fields-grid">
+      ${fieldHTML('profile_img','Profile Image', v('profile_img'), 'image', {full:true})}
+    </div>`) +
+  sectionCard('Story / Bio', 'Section 03', `
+    <div class="fields-grid">
+      ${fieldHTML('story_heading','Heading', v('story_heading'), 'text', {full:true})}
+      ${fieldHTML('story_body','Body Text', v('story_body'), 'textarea', {full:true})}
+    </div>`) +
+  sectionCard('Services', 'Section 04', `
+    <div class="fields-grid">
+      ${fieldHTML('service1','Service 1', v('service1'), 'text')}
+      ${fieldHTML('service2','Service 2', v('service2'), 'text')}
+      ${fieldHTML('service3','Service 3', v('service3'), 'text')}
+      ${fieldHTML('service4','Service 4', v('service4'), 'text')}
+      ${fieldHTML('service5','Service 5', v('service5'), 'text')}
+      ${fieldHTML('service6','Service 6', v('service6'), 'text')}
+    </div>`) +
+  sectionCard('Philosophy / Values', 'Section 05', `
+    <div class="fields-grid">
+      ${fieldHTML('phil_heading','Heading', v('phil_heading'), 'text', {full:true})}
+      ${fieldHTML('phil_body','Body Text', v('phil_body'), 'textarea', {full:true})}
+    </div>`)
+}
+
+// WORK EDITOR
+function renderWorkEditor(data) {
+  const v = k => val(data, k)
+  return `<div class="page-header page-header-row">
+    <div><h1>Work Page</h1><p>Edit page copy and manage project listings.</p></div>
+    <button class="btn btn-accent" onclick="openModal('new-project-modal')">+ New Project</button>
+  </div>` +
+  sectionCard('Page Header', 'Section 01', `
+    <div class="fields-grid">
+      ${fieldHTML('hero_kicker','Kicker', v('hero_kicker'), 'text')}
+      ${fieldHTML('hero_title','Title', v('hero_title'), 'text', {full:true})}
+      ${fieldHTML('hero_subtitle','Subtitle', v('hero_subtitle'), 'textarea', {full:true})}
+    </div>`) +
+  sectionCard('Filter Labels', 'Section 02', `
+    <div class="fields-grid">
+      ${fieldHTML('filter_all','All Label', v('filter_all') || 'All Work', 'text')}
+      ${fieldHTML('filter_brand','Brand Label', v('filter_brand') || 'Brand', 'text')}
+      ${fieldHTML('filter_web','Web Label', v('filter_web') || 'Web', 'text')}
+      ${fieldHTML('filter_motion','Motion Label', v('filter_motion') || 'Motion', 'text')}
+    </div>`)
+}
+
+// INSIGHTS EDITOR
+function renderInsightsEditor(data) {
+  const v = k => val(data, k)
+  return `<div class="page-header page-header-row">
+    <div><h1>Insights Page</h1><p>Edit the insights index page copy.</p></div>
+    <button class="btn btn-accent" onclick="openModal('new-article-modal')">+ New Article</button>
+  </div>` +
+  sectionCard('Page Header', 'Section 01', `
+    <div class="fields-grid">
+      ${fieldHTML('hero_kicker','Kicker', v('hero_kicker'), 'text')}
+      ${fieldHTML('hero_title','Title', v('hero_title'), 'text', {full:true})}
+      ${fieldHTML('hero_subtitle','Subtitle', v('hero_subtitle'), 'textarea', {full:true})}
+    </div>`)
+}
+
+// CONTACT EDITOR
+function renderContactEditor(data) {
+  const v = k => val(data, k)
+  return `<div class="page-header"><h1>Contact Page</h1><p>Edit contact details and the enquiry form.</p></div>` +
+  sectionCard('Page Header', 'Section 01', `
+    <div class="fields-grid">
+      ${fieldHTML('hero_kicker','Kicker', v('hero_kicker'), 'text')}
+      ${fieldHTML('hero_title','Title', v('hero_title'), 'text', {full:true})}
+      ${fieldHTML('hero_subtitle','Subtitle', v('hero_subtitle'), 'textarea', {full:true})}
+    </div>`) +
+  sectionCard('Contact Details', 'Section 02', `
+    <div class="fields-grid">
+      ${fieldHTML('email','Email', v('email') || 'hello@eyuelmulat.com', 'text')}
+      ${fieldHTML('phone','Phone', v('phone'), 'text')}
+      ${fieldHTML('location','Location', v('location') || 'Addis Ababa, Ethiopia', 'text')}
+      ${fieldHTML('instagram','Instagram URL', v('instagram'), 'text')}
+      ${fieldHTML('linkedin','LinkedIn URL', v('linkedin'), 'text')}
+      ${fieldHTML('behance','Behance URL', v('behance'), 'text')}
+    </div>`) +
+  sectionCard('Form Labels', 'Section 03', `
+    <div class="fields-grid">
+      ${fieldHTML('form_heading','Form Heading', v('form_heading') || 'Let\'s Work Together', 'text', {full:true})}
+      ${fieldHTML('form_submit_label','Submit Button Label', v('form_submit_label') || 'Send Enquiry', 'text')}
+    </div>`)
+}
+
+// ═══════════════════════════════════════
+// PROJECTS LIST
+// ═══════════════════════════════════════
+async function renderProjectsPage() {
+  const content = document.getElementById('content')
+  try {
+    const r = await fetch(`${API}/projects`, authHeaders())
+    const projects = await r.json()
+    let cards = projects.map(p => `
+      <div class="project-card" onclick="openProjectDetail('${esc(p.slug)}')">
+        <div class="project-card-meta">
+          <span>${p.year || '—'}</span>
+          <span>·</span>
+          <span>${p.category || '—'}</span>
+        </div>
+        <div class="project-card-title">${esc(p.title)}</div>
+        <div class="project-card-cat">${esc(p.client || '')}</div>
+      </div>`).join('')
+    content.innerHTML = `
+      <div class="page-header page-header-row">
+        <div><h1>Projects</h1><p>${projects.length} project${projects.length !== 1 ? 's' : ''}</p></div>
+        <button class="btn btn-accent" onclick="openModal('new-project-modal')">+ New Project</button>
+      </div>
+      <div class="projects-grid">
+        ${cards}
+        <button class="new-item-card" onclick="openModal('new-project-modal')">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          New Project
+        </button>
+      </div>`
+  } catch {
+    content.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠</div><h2>Could not load projects</h2><p>Make sure the server is running.</p></div>'
+  }
+}
+
+// ═══════════════════════════════════════
+// ARTICLES LIST
+// ═══════════════════════════════════════
+async function renderArticlesPage() {
+  const content = document.getElementById('content')
+  const insightsFile = `${API}/content/insights-list`
+  try {
+    // Try to list articles from content/articles.json
+    const r = await fetch(`${API}/content/articles`, authHeaders())
+    const data = await r.json()
+    const articles = (data.items || [])
+    let cards = articles.map(a => `
+      <div class="project-card">
+        <div class="project-card-meta">
+          <span>${a.date || '—'}</span>
+          <span>·</span>
+          <span>${a.category || '—'}</span>
+        </div>
+        <div class="project-card-title">${esc(a.title)}</div>
+        <div class="project-card-cat">/insights/${esc(a.slug)}.html</div>
+      </div>`).join('')
+    content.innerHTML = `
+      <div class="page-header page-header-row">
+        <div><h1>Articles</h1><p>${articles.length} article${articles.length !== 1 ? 's' : ''}</p></div>
+        <button class="btn btn-accent" onclick="openModal('new-article-modal')">+ New Article</button>
+      </div>
+      <div class="projects-grid">
+        ${cards}
+        <button class="new-item-card" onclick="openModal('new-article-modal')">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          New Article
+        </button>
+      </div>`
+  } catch {
+    content.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠</div><h2>Could not load articles</h2></div>'
+  }
+}
+
+// ═══════════════════════════════════════
+// PROJECT DETAIL EDITOR
+// ═══════════════════════════════════════
+async function openProjectDetail(slug) {
+  document.getElementById('topbar-title').textContent = 'Editing Project'
+  document.getElementById('save-btn').style.display = 'none'
+  const content = document.getElementById('content')
+  content.innerHTML = `<div style="padding:40px;color:var(--muted);font-size:13px">Loading…</div>`
+
+  try {
+    const r = await fetch(`${API}/content/${slug}`, authHeaders())
+    const data = await r.json()
+    currentData = data
+    currentPage = slug
+
+    const v = k => val(data, k)
+
+    content.innerHTML = `
+      <div class="page-header page-header-row">
+        <div>
+          <button class="btn btn-ghost" style="padding:4px 0;margin-bottom:8px" onclick="loadPage('projects')">← Back to Projects</button>
+          <h1>${esc(slug)}</h1>
+          <p>Edit project content and blocks</p>
+        </div>
+        <div class="flex-row">
+          <a href="/work/${esc(slug)}.html" target="_blank" class="btn btn-outline">View Project</a>
+        </div>
+      </div>` +
+      sectionCard('Project Meta', 'Header', `
+        <div class="fields-grid">
+          ${fieldHTML('title','Title', v('title'), 'text', {full:true})}
+          ${fieldHTML('category','Category', v('category'), 'text')}
+          ${fieldHTML('year','Year', v('year'), 'text')}
+          ${fieldHTML('client','Client', v('client'), 'text')}
+          ${fieldHTML('scope','Scope', v('scope'), 'text')}
+          ${fieldHTML('role','Role', v('role'), 'text')}
+          ${fieldHTML('description','Description', v('description'), 'textarea', {full:true})}
+          ${fieldHTML('hero_img','Hero Image', v('hero_img'), 'image', {full:true})}
+        </div>`) +
+      renderBlocksEditor(data.blocks || [])
+
+    document.getElementById('save-btn').style.display = ''
+    bindBlocks()
+  } catch(e) {
+    content.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠</div><h2>Could not load project</h2></div>'
+  }
+}
+
+// ═══════════════════════════════════════
+// BLOCKS EDITOR
+// ═══════════════════════════════════════
+function renderBlocksEditor(blocks) {
+  const list = blocks.map((b, i) => renderBlock(b, i)).join('')
+  return sectionCard('Content Blocks', 'Blocks', `
+    <div class="blocks-list" id="blocks-list">${list}</div>
+    <div class="add-block-bar">
+      <button class="add-block-btn" onclick="addBlock('text')">+ Text</button>
+      <button class="add-block-btn" onclick="addBlock('image')">+ Image</button>
+      <button class="add-block-btn" onclick="addBlock('image-text')">+ Image + Text</button>
+      <button class="add-block-btn" onclick="addBlock('gallery')">+ Gallery</button>
+      <button class="add-block-btn" onclick="addBlock('quote')">+ Quote</button>
+      <button class="add-block-btn" onclick="addBlock('spacer')">+ Spacer</button>
+    </div>`)
+}
+
+function renderBlock(b, i) {
+  const preview = b.type === 'text' ? (b.text||'').slice(0,60) :
+                  b.type === 'image' ? (b.url ? '📷 Image' : 'No image') :
+                  b.type === 'quote' ? (b.text||'').slice(0,50) :
+                  b.type === 'gallery' ? `${(b.images||[]).length} images` :
+                  b.type === 'spacer' ? `${b.height||'80'}px` :
+                  b.type === 'image-text' ? (b.text||'').slice(0,40) : ''
+  const body = renderBlockBody(b, i)
+  return `<div class="block-item" data-block-index="${i}">
+    <div class="block-item-header" onclick="toggleBlock(this)">
+      <span class="block-handle">⠿</span>
+      <span class="block-type-badge">${b.type||'block'}</span>
+      <span class="block-preview">${esc(preview)}</span>
+      <button class="btn btn-danger-ghost" style="padding:2px 6px;font-size:11px" onclick="event.stopPropagation();removeBlock(${i})">✕</button>
+    </div>
+    <div class="block-body">${body}</div>
+  </div>`
+}
+
+function renderBlockBody(b, i) {
+  const P = (k,v='') => `<div class="field-group"><label class="field-label">${k}</label>${v}</div>`
+  if (b.type === 'text') return P('Text', `<textarea data-bkey="${i}.text" oninput="updateBlockData(${i},'text',this.value);markChanged()">${esc(b.text||'')}</textarea>`)
+  if (b.type === 'quote') return P('Quote', `<textarea data-bkey="${i}.text" oninput="updateBlockData(${i},'text',this.value);markChanged()">${esc(b.text||'')}</textarea>`) +
+    P('Attribution', `<input type="text" value="${esc(b.attribution||'')}" data-bkey="${i}.attribution" oninput="updateBlockData(${i},'attribution',this.value);markChanged()"/>`)
+  if (b.type === 'spacer') return P('Height (px)', `<div class="range-row"><input type="range" min="20" max="300" value="${b.height||80}" oninput="updateBlockData(${i},'height',+this.value);markChanged();this.nextElementSibling.textContent=this.value+'px'"/><span class="range-val">${b.height||80}px</span></div>`)
+  if (b.type === 'image') return P('Image URL', `<div class="inline-img"><div id="blk-prev-${i}">${b.url?`<img src="${b.url}" class="inline-img-thumb"/>`:`<div class="inline-img-empty"></div>`}</div><div style="flex:1"><input type="url" value="${esc(b.url||'')}" placeholder="https://…" oninput="updateBlockData(${i},'url',this.value);markChanged();updateBlockImgPreview(${i},this.value)"/><div class="flex-row mt-2"><label class="btn btn-outline" style="font-size:12px;cursor:pointer">Upload<input type="file" accept="image/*" style="display:none" onchange="uploadBlockImg(this,${i})"/></label></div></div></div>`) +
+    P('Caption', `<input type="text" value="${esc(b.caption||'')}" oninput="updateBlockData(${i},'caption',this.value);markChanged()"/>`)
+  if (b.type === 'image-text') return P('Image', `<div class="inline-img"><div id="blk-prev-${i}">${b.img?`<img src="${b.img}" class="inline-img-thumb"/>`:`<div class="inline-img-empty"></div>`}</div><div style="flex:1"><input type="url" value="${esc(b.img||'')}" oninput="updateBlockData(${i},'img',this.value);markChanged();updateBlockImgPreview(${i},this.value,true)"/><label class="btn btn-outline mt-2" style="font-size:12px;cursor:pointer">Upload<input type="file" accept="image/*" style="display:none" onchange="uploadBlockImg(this,${i},true)"/></label></div></div>`) +
+    P('Text', `<textarea oninput="updateBlockData(${i},'text',this.value);markChanged()">${esc(b.text||'')}</textarea>`) +
+    P('Image Side', `<select onchange="updateBlockData(${i},'side',this.value);markChanged()"><option value="left" ${b.side==='left'?'selected':''}>Left</option><option value="right" ${b.side==='right'?'selected':''}>Right</option></select>`)
+  if (b.type === 'gallery') {
+    const imgs = (b.images||[]).map((img,j) => `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><img src="${esc(img)}" style="width:48px;height:36px;object-fit:cover;border-radius:4px;border:1px solid var(--border)"/><input type="url" value="${esc(img)}" style="flex:1" oninput="updateGalleryImg(${i},${j},this.value);markChanged()"/><button class="btn btn-danger-ghost" style="padding:2px 6px;font-size:11px" onclick="removeGalleryImg(${i},${j})">✕</button></div>`).join('')
+    return P('Images', `<div id="gallery-imgs-${i}">${imgs}</div><div class="flex-row mt-2"><label class="btn btn-outline" style="font-size:12px;cursor:pointer">+ Add Image<input type="file" accept="image/*" multiple style="display:none" onchange="uploadGalleryImgs(this,${i})"/></label></div>`)
+  }
+  return ''
+}
+
+function toggleBlock(header) {
+  const body = header.nextElementSibling
+  body.classList.toggle('open')
+}
+
+function bindBlocks() {}
+
+function addBlock(type) {
+  const defaults = { text:{type:'text',text:''}, image:{type:'image',url:'',caption:''}, quote:{type:'quote',text:'',attribution:''}, gallery:{type:'gallery',images:[]}, spacer:{type:'spacer',height:80}, 'image-text':{type:'image-text',img:'',text:'',side:'left'} }
+  if (!currentData.blocks) currentData.blocks = []
+  currentData.blocks.push({...defaults[type]})
+  markChanged()
+  rerenderBlocks()
+}
+
+function removeBlock(i) {
+  currentData.blocks.splice(i, 1)
+  markChanged()
+  rerenderBlocks()
+}
+
+function updateBlockData(i, key, val) {
+  if (!currentData.blocks) return
+  currentData.blocks[i][key] = val
+}
+
+function updateBlockImgPreview(i, url, isImg=false) {
+  const el = document.getElementById(`blk-prev-${i}`)
+  if (!el) return
+  el.innerHTML = url ? `<img src="${url}" class="inline-img-thumb"/>` : `<div class="inline-img-empty"></div>`
+}
+
+async function uploadBlockImg(input, i, isImgText=false) {
+  if (!input.files[0]) return
+  const fd = new FormData()
+  fd.append('file', input.files[0])
+  try {
+    const r = await fetch(`${API}/upload`, { method:'POST', headers:{'x-token':TOKEN}, body:fd })
+    const d = await r.json()
+    if (!r.ok) throw new Error(d.error)
+    const key = isImgText ? 'img' : 'url'
+    updateBlockData(i, key, d.url)
+    updateBlockImgPreview(i, d.url, isImgText)
+    markChanged()
+    toast('Image uploaded', 'success')
+  } catch(e) { toast(e.message || 'Upload failed', 'error') }
+}
+
+function updateGalleryImg(i, j, url) {
+  if (!currentData.blocks[i].images) currentData.blocks[i].images = []
+  currentData.blocks[i].images[j] = url
+}
+function removeGalleryImg(i, j) {
+  currentData.blocks[i].images.splice(j, 1)
+  markChanged()
+  rerenderBlocks()
+}
+async function uploadGalleryImgs(input, i) {
+  for (const file of input.files) {
+    const fd = new FormData()
+    fd.append('file', file)
+    try {
+      const r = await fetch(`${API}/upload`, { method:'POST', headers:{'x-token':TOKEN}, body:fd })
+      const d = await r.json()
+      if (!r.ok) throw new Error(d.error)
+      if (!currentData.blocks[i].images) currentData.blocks[i].images = []
+      currentData.blocks[i].images.push(d.url)
+    } catch(e) {}
+  }
+  markChanged()
+  rerenderBlocks()
+  toast('Images uploaded', 'success')
+}
+
+function rerenderBlocks() {
+  const list = document.getElementById('blocks-list')
+  if (!list) return
+  list.innerHTML = (currentData.blocks||[]).map((b,i) => renderBlock(b,i)).join('')
+}
+
+// ═══════════════════════════════════════
+// CREATE PROJECT / ARTICLE
+// ═══════════════════════════════════════
+function slugify(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g,'') }
+
+document.getElementById('np-title').addEventListener('input', function() {
+  const s = document.getElementById('np-slug')
+  if (!s._touched) s.value = slugify(this.value)
+})
+document.getElementById('np-slug').addEventListener('input', function() { this._touched = true })
+document.getElementById('na-title').addEventListener('input', function() {
+  const s = document.getElementById('na-slug')
+  if (!s._touched) s.value = slugify(this.value)
+})
+document.getElementById('na-slug').addEventListener('input', function() { this._touched = true })
+
+async function createProject() {
+  const get = id => document.getElementById(id).value.trim()
+  const slug = get('np-slug'), title = get('np-title')
+  if (!slug || !title) { toast('Title and slug are required', 'error'); return }
+  try {
+    const r = await fetch(`${API}/project`, {
+      method:'POST', headers:{'Content-Type':'application/json','x-token':TOKEN},
+      body: JSON.stringify({ slug, title, category:get('np-category'), year:get('np-year'), client:get('np-client'), scope:get('np-scope'), role:get('np-role'), description:get('np-desc') })
+    })
+    const d = await r.json()
+    if (!r.ok) throw new Error(d.error || 'Failed')
+    closeModal('new-project-modal')
+    toast(`Project "${title}" created`, 'success')
+    loadPage('projects')
+  } catch(e) { toast(e.message, 'error') }
+}
+
+async function createArticle() {
+  const get = id => document.getElementById(id).value.trim()
+  const slug = get('na-slug'), title = get('na-title')
+  if (!slug || !title) { toast('Title and slug are required', 'error'); return }
+  try {
+    const r = await fetch(`${API}/insight`, {
+      method:'POST', headers:{'Content-Type':'application/json','x-token':TOKEN},
+      body: JSON.stringify({ slug, title, category:get('na-category'), date:get('na-date'), excerpt:get('na-excerpt'), body:get('na-body') })
+    })
+    const d = await r.json()
+    if (!r.ok) throw new Error(d.error || 'Failed')
+    closeModal('new-article-modal')
+    toast(`Article "${title}" created`, 'success')
+    loadPage('articles')
+  } catch(e) { toast(e.message, 'error') }
+}
+
+// ═══════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════
+function openModal(id) { document.getElementById(id).classList.add('open') }
+function closeModal(id) { document.getElementById(id).classList.remove('open') }
+
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open') })
+})
+
+// ═══════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════
+let toastTimer
+function toast(msg, type = '') {
+  const el = document.getElementById('toast')
+  el.textContent = msg
+  el.className = 'show' + (type ? ' ' + type : '')
+  clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => el.className = '', 2800)
+}
+
+// ═══════════════════════════════════════
+// AUTH HELPER
+// ═══════════════════════════════════════
+function authHeaders() { return { headers: { 'x-token': TOKEN } } }
+
+// Keyboard shortcut: Cmd+S / Ctrl+S to save
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveCurrentPage() }
+})
 </script>
 </body>
 </html>

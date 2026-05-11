@@ -4,6 +4,10 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   server: {
     port: 3000,
+    proxy: {
+      '/api': { target: 'http://localhost:3001', changeOrigin: true },
+      '/public/uploads': { target: 'http://localhost:3001', changeOrigin: true },
+    },
   },
   build: {
     rollupOptions: {
@@ -13,6 +17,7 @@ export default defineConfig({
         work:           resolve(__dirname, 'work.html'),
         contact:        resolve(__dirname, 'contact.html'),
         insights:       resolve(__dirname, 'insights.html'),
+        admin:          resolve(__dirname, 'admin/index.html'),
         'work-nexus':      resolve(__dirname, 'work/nexus-dashboard.html'),
         'work-vanguard':   resolve(__dirname, 'work/vanguard-capital.html'),
         'insight-systems': resolve(__dirname, 'insights/why-brand-systems-outlast-assets.html'),
