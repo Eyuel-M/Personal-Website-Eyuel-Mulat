@@ -6,7 +6,6 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const app = express()
 const PORT = process.env.PORT || 3001
 
 const ADMIN_PASS  = process.env.ADMIN_PASS  || 'admin2024'
@@ -17,48 +16,42 @@ const UPLOADS_DIR = path.join(__dirname, 'public', 'uploads')
 fs.mkdirSync(CONTENT_DIR, { recursive: true })
 fs.mkdirSync(UPLOADS_DIR, { recursive: true })
 
-// ── Middleware ──────────────────────────────────────────────────────────────
-app.use(cors())
-app.use(express.json({ limit: '10mb' }))
+// ── Build API middleware (used by both Vite plugin and standalone) ───────────
+export function createApiApp() {
+  const app = express()
+  app.use(cors())
+  app.use(express.json({ limit: '10mb' }))
 
-// Serve uploaded files
-app.use('/public/uploads', express.static(UPLOADS_DIR))
+  // Serve uploaded files
+  app.use('/public/uploads', express.static(UPLOADS_DIR))
 
-// Serve admin panel
-app.use('/admin', express.static(path.join(__dirname, 'admin')))
+  const storage = multer.diskStorage({
+    destination: UPLOADS_DIR,
+    filename: (req, file, cb) => {
+      const ext  = path.extname(file.originalname).toLowerCase()
+      const name = path.basename(file.originalname, ext)
+        .replace(/[^a-z0-9]/gi, '-').toLowerCase().slice(0, 40)
+      cb(null, `${name}-${Date.now()}${ext}`)
+    },
+  })
+  const upload = multer({
+    storage,
+    limits: { fileSize: 30 * 1024 * 1024 },
+    fileFilter: (req, file, cb) => {
+      const ok = /\.(jpe?g|png|gif|webp|svg|mp4|webm|mov)$/i.test(file.originalname)
+      cb(ok ? null : new Error('Unsupported file type'), ok)
+    },
+  })
 
-// Serve main site static files (for production; Vite handles dev)
-app.use(express.static(path.join(__dirname)))
+  function auth(req, res, next) {
+    if (req.headers['x-token'] === ADMIN_TOKEN) return next()
+    res.status(401).json({ error: 'Unauthorized' })
+  }
 
-// ── File upload ─────────────────────────────────────────────────────────────
-const storage = multer.diskStorage({
-  destination: UPLOADS_DIR,
-  filename: (req, file, cb) => {
-    const ext  = path.extname(file.originalname).toLowerCase()
-    const name = path.basename(file.originalname, ext)
-      .replace(/[^a-z0-9]/gi, '-').toLowerCase().slice(0, 40)
-    cb(null, `${name}-${Date.now()}${ext}`)
-  },
-})
-const upload = multer({
-  storage,
-  limits: { fileSize: 30 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    const ok = /\.(jpe?g|png|gif|webp|svg|mp4|webm|mov)$/i.test(file.originalname)
-    cb(ok ? null : new Error('Unsupported file type'), ok)
-  },
-})
+  // ── Routes ────────────────────────────────────────────────────────────────
 
-// ── Auth ────────────────────────────────────────────────────────────────────
-function auth(req, res, next) {
-  if (req.headers['x-token'] === ADMIN_TOKEN) return next()
-  res.status(401).json({ error: 'Unauthorized' })
-}
-
-// ── Routes ──────────────────────────────────────────────────────────────────
-
-// Login
-app.post('/api/login', (req, res) => {
+  // Login
+  app.post('/api/login', (req, res) => {
   if (req.body.password === ADMIN_PASS) {
     res.json({ token: ADMIN_TOKEN })
   } else {
@@ -140,7 +133,10 @@ app.post('/api/insight', auth, (req, res) => {
   fs.writeFileSync(insightsFile, JSON.stringify(articles, null, 2))
 
   res.json({ ok: true, url: `/insights/${slug}.html` })
-})
+  })
+
+  return app
+}
 
 // ── Page Templates ──────────────────────────────────────────────────────────
 
@@ -323,9 +319,14 @@ ${footerHTML()}
 </html>`
 }
 
-// ── Start ───────────────────────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`\n  ◆ Admin panel  →  http://localhost:${PORT}/admin`)
-  console.log(`    API          →  http://localhost:${PORT}/api`)
-  console.log(`    Password     →  ${ADMIN_PASS}\n`)
-})
+// ── Standalone mode (npm run admin) ─────────────────────────────────────────
+const isMain = process.argv[1] === fileURLToPath(import.meta.url)
+if (isMain) {
+  const app = createApiApp()
+  app.use('/admin', express.static(path.join(__dirname, 'admin')))
+  app.use(express.static(path.join(__dirname)))
+  app.listen(PORT, () => {
+    console.log(`\n  ◆ Site + Admin  →  http://localhost:${PORT}`)
+    console.log(`    Password      →  ${ADMIN_PASS}\n`)
+  })
+}

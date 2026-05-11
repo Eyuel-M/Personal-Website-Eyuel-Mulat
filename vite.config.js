@@ -1,26 +1,26 @@
 import { resolve } from 'path'
 import { defineConfig } from 'vite'
+import { createApiApp } from './server.js'
 
 export default defineConfig({
   plugins: [
     {
-      name: 'admin-rewrite',
+      name: 'api-and-admin',
       configureServer(server) {
+        // Rewrite /admin → /admin/index.html so Vite serves the right file
         server.middlewares.use((req, _res, next) => {
           if (req.url === '/admin' || req.url === '/admin/') {
             req.url = '/admin/index.html'
           }
           next()
         })
+        // Mount Express API routes directly on Vite's server
+        server.middlewares.use(createApiApp())
       },
     },
   ],
   server: {
     port: 3000,
-    proxy: {
-      '/api': { target: 'http://localhost:3001', changeOrigin: true },
-      '/public/uploads': { target: 'http://localhost:3001', changeOrigin: true },
-    },
   },
   build: {
     rollupOptions: {
