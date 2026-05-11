@@ -3,371 +3,287 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Studio Admin — Eyuel Mulat</title>
+  <title>Content Manager — Eyuel Mulat</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --ink:       #0C0C0C;
-      --ink-2:     #3A3A3A;
-      --ink-3:     #7A7A7A;
-      --ink-4:     #AAAAAA;
-      --ink-5:     #D4D4D4;
-      --paper:     #F7F6F4;
-      --white:     #FFFFFF;
-      --rule:      #E4E4E2;
-      --rule-2:    #EDEDE B;
-      --sidebar-w: 216px;
+      --navy: #1C2B4A;
+      --navy-hover: rgba(255,255,255,0.12);
+      --side-inactive: rgba(255,255,255,0.50);
+      --bg: #EEEEF0;
+      --white: #FFFFFF;
+      --border: #E0E0E0;
+      --label: #888888;
+      --input-border: #D8D8D8;
+      --danger: #C41E1E;
+      --success-bg: #E8F5E9;
+      --sidebar-w: 220px;
     }
-
-    html, body { height: 100%; background: var(--paper); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Helvetica Neue', sans-serif; font-size: 13px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
-
-    ::selection { background: var(--ink); color: var(--white); }
+    html, body { height: 100%; background: var(--bg); color: #111; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Helvetica Neue', sans-serif; font-size: 13px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+    ::selection { background: var(--navy); color: #fff; }
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--ink-5); }
-    ::-webkit-scrollbar-thumb:hover { background: var(--ink-4); }
+    ::-webkit-scrollbar-thumb { background: #ccc; }
 
-    /* ─── LOGIN ─────────────────────────────────────── */
-    #login-screen {
-      display: flex; align-items: center; justify-content: center;
-      min-height: 100vh; background: var(--paper);
-    }
+    /* LOGIN */
+    #login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: var(--bg); }
     .login-wrap { width: 360px; }
-    .login-wordmark {
-      font-size: 10px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase;
-      color: var(--ink); margin-bottom: 48px; display: block;
-    }
-    .login-wrap h1 { font-size: 28px; font-weight: 300; color: var(--ink); letter-spacing: -0.03em; margin-bottom: 6px; }
-    .login-wrap p { font-size: 12px; color: var(--ink-3); margin-bottom: 32px; }
-    .login-err {
-      font-size: 12px; color: var(--ink); background: var(--ink); color: var(--white);
-      padding: 10px 14px; margin-bottom: 16px; display: none; font-weight: 500;
-    }
+    .login-logo { font-size: 10px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--navy); display: block; margin-bottom: 48px; }
+    .login-wrap h1 { font-size: 26px; font-weight: 300; color: #111; letter-spacing: -0.03em; margin-bottom: 6px; }
+    .login-wrap p { font-size: 12px; color: #888; margin-bottom: 32px; }
+    .login-err { font-size: 12px; background: var(--danger); color: #fff; padding: 10px 14px; margin-bottom: 16px; display: none; font-weight: 500; border-radius: 4px; }
     .login-err.show { display: block; }
 
-    /* ─── FORM ELEMENTS ──────────────────────────────── */
-    .f-label { display: block; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 7px; }
-    input[type=text], input[type=password], input[type=url], input[type=date], textarea, select {
-      width: 100%; padding: 10px 12px; font-size: 13px; font-family: inherit;
-      border: 1px solid var(--rule); background: var(--white);
-      color: var(--ink); outline: none; border-radius: 2px;
-      transition: border-color 0.12s; resize: vertical; line-height: 1.5;
+    /* FORM */
+    .f-label { display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--label); margin-bottom: 6px; }
+    input[type=text], input[type=password], input[type=url], input[type=date], input[type=number], textarea, select {
+      width: 100%; padding: 8px 10px; font-size: 13px; font-family: inherit;
+      border: 1px solid var(--input-border); background: var(--white); color: #111;
+      outline: none; border-radius: 4px; transition: border-color 0.12s; resize: vertical; line-height: 1.5;
     }
-    input:focus, textarea:focus, select:focus { border-color: var(--ink); }
+    input:focus, textarea:focus, select:focus { border-color: var(--navy); }
     textarea { min-height: 80px; }
-    select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237A7A7A'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; cursor: pointer; }
+    input::placeholder, textarea::placeholder { color: #BBB; }
+    select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; cursor: pointer; }
+    .f-group { margin-bottom: 16px; }
 
-    .f-group { margin-bottom: 20px; }
-
-    /* ─── BUTTONS ────────────────────────────────────── */
-    .btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 9px 18px; font-size: 12px; font-weight: 600; letter-spacing: 0.06em;
-      text-transform: uppercase; cursor: pointer; border: none; border-radius: 2px;
-      transition: opacity 0.12s; white-space: nowrap; text-decoration: none;
-    }
-    .btn-ink   { background: var(--ink); color: var(--white); }
-    .btn-ink:hover { opacity: 0.8; }
-    .btn-ghost { background: none; color: var(--ink-3); border: 1px solid var(--rule); }
-    .btn-ghost:hover { color: var(--ink); border-color: var(--ink); }
-    .btn-bare  { background: none; border: none; color: var(--ink-3); padding: 6px 8px; font-size: 11px; letter-spacing: 0.05em; font-weight: 500; text-transform: uppercase; }
-    .btn-bare:hover { color: var(--ink); }
-    .btn-danger { background: none; border: none; color: var(--ink-4); padding: 4px 6px; font-size: 11px; cursor: pointer; }
-    .btn-danger:hover { color: #C00; }
+    /* BUTTONS */
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; border: none; border-radius: 4px; transition: opacity 0.12s; white-space: nowrap; text-decoration: none; font-family: inherit; }
+    .btn-navy { background: var(--navy); color: #fff; }
+    .btn-navy:hover { opacity: 0.85; }
+    .btn-ghost { background: none; color: #555; border: 1px solid var(--border); }
+    .btn-ghost:hover { border-color: var(--navy); color: var(--navy); }
+    .btn-danger-sm { background: none; border: none; color: #ccc; padding: 4px 6px; font-size: 12px; cursor: pointer; border-radius: 3px; line-height: 1; }
+    .btn-danger-sm:hover { color: var(--danger); background: #fff0f0; }
     .btn:disabled { opacity: 0.35; cursor: default; }
     .btn-full { width: 100%; justify-content: center; }
 
-    /* ─── APP SHELL ──────────────────────────────────── */
+    /* APP SHELL */
     #app { display: none; height: 100vh; }
     #app.on { display: flex; }
 
-    /* ─── SIDEBAR ────────────────────────────────────── */
-    #sidebar {
-      width: var(--sidebar-w); min-width: var(--sidebar-w);
-      background: var(--ink); display: flex; flex-direction: column;
-      overflow: hidden; user-select: none;
-    }
-    .sb-top {
-      padding: 22px 20px 18px; border-bottom: 1px solid rgba(255,255,255,0.07);
-    }
-    .sb-wordmark {
-      font-size: 9px; font-weight: 800; letter-spacing: 0.28em; text-transform: uppercase;
-      color: rgba(255,255,255,0.9); display: block; margin-bottom: 2px;
-    }
-    .sb-sub { font-size: 9px; color: rgba(255,255,255,0.3); letter-spacing: 0.08em; }
-    .sb-nav { flex: 1; overflow-y: auto; padding: 10px 0; }
-    .sb-group-label {
-      font-size: 8.5px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
-      color: rgba(255,255,255,0.25); padding: 16px 20px 6px;
-    }
-    .sb-item {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 9px 20px; cursor: pointer; font-size: 12px; font-weight: 400;
-      color: rgba(255,255,255,0.45); transition: color 0.1s, background 0.1s;
-      border: none; background: none; width: 100%; text-align: left;
-    }
-    .sb-item:hover { color: rgba(255,255,255,0.8); }
-    .sb-item.active { color: rgba(255,255,255,0.95); font-weight: 500; }
-    .sb-item .sb-dot { width: 4px; height: 4px; border-radius: 50%; background: currentColor; flex-shrink: 0; opacity: 0; }
-    .sb-item.active .sb-dot { opacity: 1; }
-    .sb-rule { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 6px 0; }
-    .sb-bottom {
-      padding: 12px 0 8px; border-top: 1px solid rgba(255,255,255,0.07);
-    }
+    /* SIDEBAR */
+    #sidebar { width: var(--sidebar-w); min-width: var(--sidebar-w); background: var(--navy); display: flex; flex-direction: column; overflow: hidden; user-select: none; }
+    .sb-top { padding: 20px 18px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .sb-wordmark { font-size: 11px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.9); display: block; margin-bottom: 2px; }
+    .sb-sub { font-size: 10px; color: rgba(255,255,255,0.35); letter-spacing: 0.06em; }
+    .sb-nav { flex: 1; overflow-y: auto; padding: 8px 0; }
+    .sb-group { font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 14px 18px 5px; }
+    .sb-item { display: flex; align-items: center; gap: 8px; padding: 8px 18px; cursor: pointer; font-size: 12px; font-weight: 400; color: var(--side-inactive); transition: color 0.1s, background 0.1s; border: none; background: none; width: 100%; text-align: left; border-radius: 0; }
+    .sb-item:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.06); }
+    .sb-item.active { color: #fff; font-weight: 500; background: var(--navy-hover); }
+    .sb-item .sb-icon { font-size: 9px; width: 14px; text-align: center; flex-shrink: 0; }
+    .sb-rule { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin: 5px 0; }
+    .sb-bottom { padding: 10px 0 8px; border-top: 1px solid rgba(255,255,255,0.08); }
+    .sb-bottom .sb-item { font-size: 11px; }
 
-    /* ─── MAIN ───────────────────────────────────────── */
+    /* MAIN */
     #main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
 
-    /* ─── TOPBAR ─────────────────────────────────────── */
-    #topbar {
-      height: 56px; min-height: 56px; background: var(--white);
-      border-bottom: 1px solid var(--rule);
-      display: flex; align-items: center; padding: 0 32px; gap: 16px;
-    }
-    #tb-title { font-size: 13px; font-weight: 600; color: var(--ink); flex: 1; letter-spacing: -0.01em; }
-    #tb-status { font-size: 11px; color: var(--ink-4); transition: color 0.3s; letter-spacing: 0.03em; }
-    #tb-status.saved { color: #2A7A2A; }
-    #tb-status.error { color: #AA0000; }
+    /* TOPBAR */
+    #topbar { height: 56px; min-height: 56px; background: var(--white); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 28px; gap: 12px; }
+    .tb-titles { flex: 1; }
+    #tb-title { font-size: 15px; font-weight: 700; color: #111; letter-spacing: -0.01em; line-height: 1.2; }
+    #tb-desc { font-size: 11px; color: #999; }
+    #tb-status { font-size: 11px; color: #aaa; }
+    #tb-status.dirty { color: #E67E22; }
+    #tb-status.saved { color: #27AE60; }
+    #tb-status.error { color: var(--danger); }
 
-    /* ─── CONTENT AREA ───────────────────────────────── */
+    /* CONTENT */
     #content { flex: 1; overflow-y: auto; padding: 0; }
 
-    /* ─── FIELD TABLE LAYOUT ─────────────────────────── */
-    .page-editor { max-width: 820px; padding: 32px 40px 80px; }
+    /* CARD */
+    .card { background: var(--white); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.07); margin-bottom: 16px; }
+    .card-head { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .card-title { font-size: 14px; font-weight: 600; color: #111; }
+    .card-desc { font-size: 12px; color: #888; margin-top: 2px; }
+    .card-body { padding: 18px; }
 
-    .section-block { margin-bottom: 48px; }
-    .section-head {
-      display: flex; align-items: center; gap: 16px;
-      margin-bottom: 24px; padding-bottom: 14px;
-      border-bottom: 1px solid var(--rule);
-    }
-    .section-num {
-      font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
-      color: var(--ink-4);
-    }
-    .section-name {
-      font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--ink-2);
-    }
-    .section-desc { font-size: 11px; color: var(--ink-4); margin-left: auto; }
+    /* SECTION DIVIDER */
+    .sec-div { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #555; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin: 18px 0 14px; }
 
-    /* Field row: label | input */
-    .field-row {
-      display: grid; grid-template-columns: 180px 1fr; gap: 0;
-      border-bottom: 1px solid var(--rule); align-items: start;
-    }
-    .field-row:last-child { border-bottom: none; }
-    .field-row-label {
-      padding: 14px 16px 14px 0;
-      font-size: 11px; font-weight: 500; color: var(--ink-3);
-      display: flex; flex-direction: column; gap: 3px;
-    }
-    .field-row-label .f-name { color: var(--ink-2); font-weight: 500; font-size: 12px; }
-    .field-row-label .f-hint { font-size: 10px; color: var(--ink-4); line-height: 1.3; }
-    .field-row-input { padding: 10px 0 10px 0; }
-    .field-row-input input, .field-row-input textarea, .field-row-input select {
-      border: 1px solid transparent; background: transparent;
-      padding: 6px 8px; border-radius: 2px;
-    }
-    .field-row-input input:hover, .field-row-input textarea:hover, .field-row-input select:hover { border-color: var(--rule); background: var(--white); }
-    .field-row-input input:focus, .field-row-input textarea:focus, .field-row-input select:focus { border-color: var(--ink); background: var(--white); }
+    /* FIELD GRID */
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field-grid .full { grid-column: 1 / -1; }
+    .field-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
 
-    /* Image field */
-    .img-field { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; }
-    .img-thumb-wrap {
-      width: 80px; height: 56px; flex-shrink: 0; background: var(--paper);
-      border: 1px solid var(--rule); border-radius: 2px; overflow: hidden;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .img-thumb-wrap img { width: 100%; height: 100%; object-fit: cover; }
-    .img-thumb-empty { color: var(--ink-5); font-size: 18px; }
-    .img-field-inputs { flex: 1; display: flex; flex-direction: column; gap: 6px; }
-    .img-upload-btn {
-      display: inline-flex; align-items: center; gap: 5px;
-      font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
-      color: var(--ink-3); cursor: pointer; border: 1px solid var(--rule);
-      background: none; padding: 5px 10px; border-radius: 2px;
-      transition: color 0.1s, border-color 0.1s; white-space: nowrap;
-    }
-    .img-upload-btn:hover { color: var(--ink); border-color: var(--ink); }
+    /* PAGE EDITOR WRAPPER */
+    .page-editor { padding: 24px 28px 80px; max-width: 900px; }
 
-    /* ─── BLOCKS ─────────────────────────────────────── */
-    .blocks-section { border-top: 2px solid var(--ink); padding-top: 28px; margin-top: 0; }
-    .blocks-list { margin-bottom: 16px; }
-    .block-row {
-      border: 1px solid var(--rule); border-radius: 2px; margin-bottom: 8px;
-      background: var(--white);
-    }
-    .block-row-header {
-      display: flex; align-items: center; gap: 10px; padding: 10px 14px;
-      cursor: pointer; border-bottom: 1px solid transparent; transition: border-color 0.1s;
-    }
-    .block-row-header:hover { background: var(--paper); }
-    .block-row.open .block-row-header { border-bottom-color: var(--rule); }
-    .block-type-tag {
-      font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--ink); background: var(--paper); border: 1px solid var(--rule);
-      padding: 2px 7px; border-radius: 2px; flex-shrink: 0;
-    }
-    .block-preview-text { flex: 1; font-size: 11px; color: var(--ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .block-handle { font-size: 14px; color: var(--ink-5); cursor: grab; }
-    .block-body { padding: 16px; display: none; }
-    .block-row.open .block-body { display: block; }
-    .add-blocks { display: flex; gap: 8px; flex-wrap: wrap; }
-    .add-block {
-      font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
-      color: var(--ink-3); cursor: pointer; border: 1px dashed var(--ink-5);
-      background: none; padding: 7px 12px; border-radius: 2px;
-      transition: all 0.1s;
-    }
-    .add-block:hover { color: var(--ink); border-color: var(--ink); border-style: solid; }
+    /* MEDIA DROP ZONE */
+    .drop-zone { border: 2px dashed var(--input-border); border-radius: 6px; background: #fafafa; transition: border-color 0.15s, background 0.15s; cursor: pointer; position: relative; overflow: hidden; }
+    .drop-zone:hover, .drop-zone.drag-over { border-color: var(--navy); background: #f0f4ff; }
+    .drop-zone-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 24px 16px; }
+    .drop-zone-icon { font-size: 28px; color: #ccc; }
+    .drop-zone-text { font-size: 11px; color: #aaa; text-align: center; line-height: 1.4; }
+    .drop-zone-text strong { color: #666; font-weight: 600; }
+    .drop-zone-preview { width: 100%; position: relative; }
+    .drop-zone-preview img, .drop-zone-preview video { width: 100%; display: block; border-radius: 4px; max-height: 260px; object-fit: contain; background: #f0f0f0; }
+    .drop-zone-preview .dz-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.5)); padding: 8px 10px 6px; display: flex; align-items: center; justify-content: space-between; }
+    .dz-type-badge { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; background: rgba(0,0,0,0.5); color: #fff; padding: 2px 6px; border-radius: 2px; }
+    .dz-remove { background: rgba(180,0,0,0.7); color: #fff; border: none; font-size: 10px; padding: 3px 8px; border-radius: 3px; cursor: pointer; font-weight: 600; }
+    .dz-remove:hover { background: var(--danger); }
+    .dz-url-row { margin-top: 6px; display: flex; gap: 6px; align-items: center; }
+    .dz-url-row input { flex: 1; font-size: 11px; }
+    .dz-upload-btn { flex-shrink: 0; }
 
-    /* ─── GRID / LIST PAGES ──────────────────────────── */
-    .list-page { padding: 32px 40px 80px; }
-    .list-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 32px; gap: 16px; flex-wrap: wrap; }
-    .list-header-text h1 { font-size: 24px; font-weight: 300; letter-spacing: -0.03em; color: var(--ink); margin-bottom: 4px; }
-    .list-header-text p { font-size: 12px; color: var(--ink-3); }
-    .items-table { border: 1px solid var(--rule); border-radius: 3px; overflow: hidden; background: var(--white); }
-    .items-table-head {
-      display: grid; padding: 10px 20px;
-      background: var(--paper); border-bottom: 1px solid var(--rule);
-      font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3);
-    }
-    .items-row {
-      display: grid; padding: 14px 20px; border-bottom: 1px solid var(--rule);
-      cursor: pointer; transition: background 0.1s;
-    }
-    .items-row:last-child { border-bottom: none; }
-    .items-row:hover { background: var(--paper); }
-    .item-title { font-size: 13px; font-weight: 500; color: var(--ink); }
-    .item-meta  { font-size: 11px; color: var(--ink-3); }
-    .item-cat   { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
-    .add-row-btn {
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      padding: 14px 20px; cursor: pointer; color: var(--ink-3); font-size: 12px; font-weight: 500;
-      border: 1px dashed var(--ink-5); border-radius: 3px; margin-top: 10px;
-      background: none; transition: all 0.1s; width: 100%;
-    }
-    .add-row-btn:hover { border-color: var(--ink); border-style: solid; color: var(--ink); }
+    /* PROJECTS / ARTICLES — collapsible cards */
+    .list-page { padding: 24px 28px 80px; }
+    .list-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 12px; flex-wrap: wrap; }
+    .list-top h2 { font-size: 20px; font-weight: 700; color: #111; letter-spacing: -0.02em; }
+    .list-top p { font-size: 12px; color: #888; }
+    .proj-card { background: var(--white); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.07); margin-bottom: 10px; overflow: hidden; }
+    .proj-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; cursor: pointer; user-select: none; }
+    .proj-header:hover { background: #fafafa; }
+    .proj-toggle { font-size: 11px; color: #aaa; width: 16px; flex-shrink: 0; transition: transform 0.2s; }
+    .proj-card.open .proj-toggle { transform: rotate(180deg); }
+    .proj-cat-tag { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; background: #f0f0f0; border: 1px solid var(--border); color: #555; padding: 2px 8px; border-radius: 3px; flex-shrink: 0; }
+    .proj-title { font-size: 13px; font-weight: 600; color: #111; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .proj-year { font-size: 11px; color: #aaa; flex-shrink: 0; }
+    .proj-actions { display: flex; gap: 2px; flex-shrink: 0; }
+    .proj-body { display: none; padding: 18px; border-top: 1px solid var(--border); }
+    .proj-card.open .proj-body { display: block; }
 
-    /* ─── EMPTY STATE ────────────────────────────────── */
-    .empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 80px 40px; text-align: center; }
-    .empty h2 { font-size: 18px; font-weight: 300; letter-spacing: -0.02em; color: var(--ink-3); margin-bottom: 8px; }
-    .empty p  { font-size: 12px; color: var(--ink-4); max-width: 260px; }
+    /* BLOCKS */
+    .blocks-section { margin-top: 20px; border-top: 2px solid #111; padding-top: 16px; }
+    .blocks-list { margin-bottom: 12px; }
+    .block-card { background: #fafafa; border: 1px solid var(--border); border-radius: 5px; margin-bottom: 8px; overflow: hidden; }
+    .block-card-header { display: flex; align-items: center; gap: 8px; padding: 9px 12px; cursor: pointer; }
+    .block-card-header:hover { background: #f0f0f0; }
+    .block-card.open .block-card-header { border-bottom: 1px solid var(--border); }
+    .block-type-pill { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; background: var(--navy); color: #fff; padding: 2px 7px; border-radius: 3px; flex-shrink: 0; }
+    .block-preview { flex: 1; font-size: 11px; color: #888; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .block-card-body { display: none; padding: 14px; }
+    .block-card.open .block-card-body { display: block; }
+    .block-reorder { display: flex; flex-direction: column; gap: 1px; }
+    .block-reorder button { background: none; border: none; color: #bbb; cursor: pointer; font-size: 11px; padding: 1px 4px; line-height: 1; }
+    .block-reorder button:hover { color: #555; }
+    .add-blocks { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+    .add-block-btn { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #888; cursor: pointer; border: 1px dashed #ccc; background: none; padding: 6px 10px; border-radius: 4px; transition: all 0.12s; font-family: inherit; }
+    .add-block-btn:hover { color: var(--navy); border-color: var(--navy); border-style: solid; }
 
-    /* ─── MODAL ──────────────────────────────────────── */
-    .modal-bg { display: none; position: fixed; inset: 0; background: rgba(12,12,12,0.5); z-index: 999; align-items: center; justify-content: center; }
+    /* CAPABILITIES, CLIENTS, etc. */
+    .item-card { background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin-bottom: 10px; display: flex; gap: 14px; align-items: flex-start; }
+    .item-card-fields { flex: 1; }
+    .cap-media-wrap { width: 72px; flex-shrink: 0; }
+    .client-logo-wrap { width: 100px; flex-shrink: 0; }
+    .note-label { font-size: 11px; color: #888; background: #f7f7f7; border: 1px solid var(--border); border-radius: 4px; padding: 8px 12px; margin-bottom: 16px; }
+
+    /* RANGE */
+    input[type=range] { width: 100%; height: 3px; appearance: none; background: #ddd; outline: none; cursor: pointer; border: none; border-radius: 2px; }
+    input[type=range]::-webkit-slider-thumb { appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--navy); border: 2px solid #fff; box-shadow: 0 0 0 1px var(--navy); cursor: pointer; }
+    .range-row { display: flex; align-items: center; gap: 10px; }
+    .range-val { font-size: 11px; font-weight: 600; color: #333; min-width: 44px; text-align: right; font-variant-numeric: tabular-nums; }
+
+    /* SLIDESHOW */
+    .slide-card { background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 14px; margin-bottom: 10px; }
+    .slide-card-top { display: flex; gap: 12px; align-items: flex-start; }
+    .slide-preview-wrap { flex: 1; background: #f0f0f0; border-radius: 4px; overflow: hidden; min-height: 100px; display: flex; align-items: center; justify-content: center; }
+    .slide-preview-wrap img, .slide-preview-wrap video { width: 100%; max-height: 200px; object-fit: contain; display: block; }
+    .slide-preview-empty { font-size: 12px; color: #bbb; padding: 24px; text-align: center; }
+    .slide-actions { display: flex; flex-direction: column; gap: 4px; }
+    .slide-url-row { margin-top: 10px; display: flex; gap: 8px; align-items: center; }
+    .slide-url-row input { flex: 1; }
+
+    /* CATEGORIES, CONTACT SERVICES */
+    .simple-item { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+    .simple-item input { flex: 1; }
+
+    /* TOAST */
+    #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(72px); background: #111; color: #fff; padding: 10px 20px; font-size: 12px; font-weight: 600; pointer-events: none; z-index: 9999; transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1); white-space: nowrap; border-radius: 4px; }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+    #toast.ok  { background: #155724; }
+    #toast.err { background: #7B1717; }
+
+    /* MODAL */
+    .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 999; align-items: center; justify-content: center; }
     .modal-bg.open { display: flex; }
-    .modal-box {
-      background: var(--white); width: 520px; max-width: 95vw; max-height: 92vh;
-      overflow-y: auto; padding: 32px; box-shadow: 0 24px 80px rgba(0,0,0,0.18);
-    }
-    .modal-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
-    .modal-top h2 { font-size: 18px; font-weight: 300; letter-spacing: -0.02em; }
-    .modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--rule); }
-    .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .modal-box { background: var(--white); width: 520px; max-width: 95vw; max-height: 92vh; overflow-y: auto; padding: 28px; border-radius: 8px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+    .modal-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .modal-top h2 { font-size: 18px; font-weight: 600; letter-spacing: -0.02em; }
+    .modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border); }
+    .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .modal-grid .full { grid-column: 1 / -1; }
 
-    /* ─── TOAST ──────────────────────────────────────── */
-    #toast {
-      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(72px);
-      background: var(--ink); color: var(--white); padding: 10px 20px;
-      font-size: 12px; font-weight: 500; letter-spacing: 0.04em;
-      pointer-events: none; z-index: 9999; transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1);
-      white-space: nowrap; border-radius: 2px;
-    }
-    #toast.show { transform: translateX(-50%) translateY(0); }
-    #toast.ok   { background: #1A5C1A; }
-    #toast.err  { background: #8B0000; }
-
-    /* ─── RANGE ──────────────────────────────────────── */
-    input[type=range] { width: 100%; height: 2px; appearance: none; background: var(--ink-5); outline: none; cursor: pointer; border: none; }
-    input[type=range]::-webkit-slider-thumb { appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--ink); border: 2px solid var(--white); box-shadow: 0 0 0 1px var(--ink); cursor: pointer; }
-    .range-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; }
-    .range-val { font-size: 11px; font-weight: 600; color: var(--ink); min-width: 38px; text-align: right; font-variant-numeric: tabular-nums; }
-
-    /* ─── UTILS ──────────────────────────────────────── */
-    .row { display: flex; align-items: center; gap: 10px; }
-    .mt1 { margin-top: 6px; }
-    .mt2 { margin-top: 12px; }
+    /* UTILS */
     .hidden { display: none !important; }
-
-    /* ─── BACK LINK ──────────────────────────────────── */
-    .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--ink-3); cursor: pointer; border: none; background: none; padding: 0; margin-bottom: 28px; letter-spacing: 0.04em; }
-    .back-link:hover { color: var(--ink); }
-    .back-link::before { content: '←'; }
-
-    /* ─── DETAIL TITLE ───────────────────────────────── */
-    .detail-heading { margin-bottom: 36px; }
-    .detail-heading h1 { font-size: 22px; font-weight: 300; letter-spacing: -0.03em; color: var(--ink); margin-bottom: 4px; }
-    .detail-heading p  { font-size: 12px; color: var(--ink-3); }
-
+    .mt8 { margin-top: 8px; }
+    .mt12 { margin-top: 12px; }
+    .flex-row { display: flex; align-items: center; gap: 8px; }
+    .empty-state { padding: 60px 40px; text-align: center; color: #aaa; }
+    .empty-state h2 { font-size: 18px; font-weight: 300; margin-bottom: 6px; }
+    .empty-state p { font-size: 12px; }
   </style>
 </head>
 <body>
 
-<!-- ═══ LOGIN ═══════════════════════════════════════════════════════════════ -->
+<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-wrap">
-    <span class="login-wordmark">Eyuel Mulat Studio</span>
-    <h1>Studio Admin</h1>
-    <p>Enter your password to access the content manager.</p>
+    <span class="login-logo">Eyuel Mulat Studio</span>
+    <h1>Content Manager</h1>
+    <p>Enter your password to access the admin.</p>
     <div class="login-err" id="login-err">Incorrect password.</div>
     <div class="f-group">
       <label class="f-label">Password</label>
       <input type="password" id="login-pw" placeholder="••••••••••"/>
     </div>
-    <button class="btn btn-ink btn-full" onclick="login()">Enter</button>
+    <button class="btn btn-navy btn-full" onclick="login()">Sign In</button>
   </div>
 </div>
 
-<!-- ═══ APP ══════════════════════════════════════════════════════════════════ -->
+<!-- APP -->
 <div id="app">
-
   <!-- SIDEBAR -->
   <nav id="sidebar">
     <div class="sb-top">
       <span class="sb-wordmark">Eyuel Mulat</span>
-      <span class="sb-sub">Studio Admin</span>
+      <span class="sb-sub">Content Manager</span>
     </div>
     <div class="sb-nav">
-      <div class="sb-group-label">Pages</div>
-      <button class="sb-item" data-p="home"     onclick="go('home')">Home<span class="sb-dot"></span></button>
-      <button class="sb-item" data-p="about"    onclick="go('about')">About<span class="sb-dot"></span></button>
-      <button class="sb-item" data-p="work"     onclick="go('work')">Work<span class="sb-dot"></span></button>
-      <button class="sb-item" data-p="insights" onclick="go('insights')">Insights<span class="sb-dot"></span></button>
-      <button class="sb-item" data-p="contact"  onclick="go('contact')">Contact<span class="sb-dot"></span></button>
+      <div class="sb-group">Sections</div>
+      <button class="sb-item" data-p="home"         onclick="go('home')"><span class="sb-icon">▪</span>Site Settings</button>
+      <button class="sb-item" data-p="hero"         onclick="go('hero')"><span class="sb-icon">▪</span>Hero</button>
+      <button class="sb-item" data-p="slideshow"    onclick="go('slideshow')"><span class="sb-icon">▪</span>Slideshow</button>
+      <button class="sb-item" data-p="about"        onclick="go('about')"><span class="sb-icon">▪</span>About</button>
+      <button class="sb-item" data-p="capabilities" onclick="go('capabilities')"><span class="sb-icon">▪</span>Capabilities</button>
+      <button class="sb-item" data-p="work"         onclick="go('work')"><span class="sb-icon">▪</span>Work</button>
+      <button class="sb-item" data-p="categories"   onclick="go('categories')"><span class="sb-icon">▪</span>Categories</button>
+      <button class="sb-item" data-p="insights"     onclick="go('insights')"><span class="sb-icon">▪</span>Insights</button>
+      <button class="sb-item" data-p="contact"      onclick="go('contact')"><span class="sb-icon">▪</span>Contact</button>
+      <button class="sb-item" data-p="clients"      onclick="go('clients')"><span class="sb-icon">▪</span>Clients</button>
+      <button class="sb-item" data-p="footer"       onclick="go('footer')"><span class="sb-icon">▪</span>Footer</button>
       <hr class="sb-rule"/>
-      <div class="sb-group-label">Projects</div>
-      <button class="sb-item" data-p="projects" onclick="go('projects')">All Projects<span class="sb-dot"></span></button>
-      <hr class="sb-rule"/>
-      <div class="sb-group-label">Articles</div>
-      <button class="sb-item" data-p="articles" onclick="go('articles')">All Articles<span class="sb-dot"></span></button>
+      <button class="sb-item" data-p="projects"     onclick="go('projects')"><span class="sb-icon">▪</span>Projects</button>
+      <button class="sb-item" data-p="articles"     onclick="go('articles')"><span class="sb-icon">▪</span>Articles</button>
     </div>
     <div class="sb-bottom">
-      <a href="/" target="_blank" class="sb-item" style="text-decoration:none">View Site</a>
-      <button class="sb-item" onclick="logout()">Sign Out</button>
+      <a href="/" target="_blank" class="sb-item" style="text-decoration:none"><span class="sb-icon">↗</span>View Website</a>
+      <button class="sb-item" onclick="logout()"><span class="sb-icon">→</span>Sign Out</button>
     </div>
   </nav>
 
   <!-- MAIN -->
   <div id="main">
     <header id="topbar">
-      <div id="tb-title">Home</div>
+      <div class="tb-titles">
+        <div id="tb-title">Home</div>
+        <div id="tb-desc"></div>
+      </div>
       <span id="tb-status"></span>
-      <button class="btn btn-ghost hidden" id="save-btn" onclick="savePage()">Save</button>
+      <button class="btn btn-ghost hidden" id="save-btn" onclick="saveCurrent()">Save Changes</button>
     </header>
     <div id="content">
-      <div class="empty"><h2>Select a page</h2><p>Choose a page from the sidebar to start editing.</p></div>
+      <div class="empty-state"><h2>Select a section</h2><p>Choose from the sidebar to start editing.</p></div>
     </div>
   </div>
 </div>
 
-<!-- Modals -->
+<!-- NEW PROJECT MODAL -->
 <div class="modal-bg" id="m-project">
   <div class="modal-box">
-    <div class="modal-top"><h2>New Project</h2><button class="btn-bare" onclick="closeM('m-project')">✕</button></div>
+    <div class="modal-top"><h2>New Project</h2><button class="btn btn-ghost" onclick="closeM('m-project')" style="padding:6px 10px">✕</button></div>
     <div class="modal-grid">
       <div class="f-group full"><label class="f-label">Project Title *</label><input type="text" id="mp-title" placeholder="e.g. Forma Creative"/></div>
       <div class="f-group"><label class="f-label">Slug *</label><input type="text" id="mp-slug" placeholder="forma-creative"/></div>
@@ -380,25 +296,26 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeM('m-project')">Cancel</button>
-      <button class="btn btn-ink" onclick="createProject()">Create Project</button>
+      <button class="btn btn-navy" onclick="createProject()">Create Project</button>
     </div>
   </div>
 </div>
 
+<!-- NEW ARTICLE MODAL -->
 <div class="modal-bg" id="m-article">
   <div class="modal-box">
-    <div class="modal-top"><h2>New Article</h2><button class="btn-bare" onclick="closeM('m-article')">✕</button></div>
+    <div class="modal-top"><h2>New Article</h2><button class="btn btn-ghost" onclick="closeM('m-article')" style="padding:6px 10px">✕</button></div>
     <div class="modal-grid">
-      <div class="f-group full"><label class="f-label">Article Title *</label><input type="text" id="ma-title" placeholder="e.g. Why Grid Systems Matter"/></div>
+      <div class="f-group full"><label class="f-label">Title *</label><input type="text" id="ma-title" placeholder="e.g. Why Grid Systems Matter"/></div>
       <div class="f-group"><label class="f-label">Slug *</label><input type="text" id="ma-slug" placeholder="why-grid-systems-matter"/></div>
       <div class="f-group"><label class="f-label">Category</label><input type="text" id="ma-cat" placeholder="Design"/></div>
       <div class="f-group"><label class="f-label">Date</label><input type="date" id="ma-date"/></div>
       <div class="f-group full"><label class="f-label">Excerpt</label><textarea id="ma-excerpt" placeholder="One-line summary..." style="min-height:60px"></textarea></div>
-      <div class="f-group full"><label class="f-label">Body (HTML)</label><textarea id="ma-body" placeholder="<p>Article content here...</p>" style="min-height:140px;font-family:monospace;font-size:12px"></textarea></div>
+      <div class="f-group full"><label class="f-label">Body (HTML)</label><textarea id="ma-body" placeholder="<p>Article content here...</p>" style="min-height:120px;font-family:monospace;font-size:12px"></textarea></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeM('m-article')">Cancel</button>
-      <button class="btn btn-ink" onclick="createArticle()">Create Article</button>
+      <button class="btn btn-navy" onclick="createArticle()">Create Article</button>
     </div>
   </div>
 </div>
@@ -406,613 +323,1418 @@
 <div id="toast"></div>
 
 <script>
-// ─────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════
 // BOOTSTRAP
-// ─────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════
 let TOKEN = localStorage.getItem('em_token') || ''
 let activePage = null
 let pageData = {}
 let dirty = false
+let currentSaveFn = null
 const API = '/api'
+const MEDIA_ACCEPT = 'image/*,video/*,.gif,.mp4,.webm,.mov'
 
 document.getElementById('login-pw').addEventListener('keydown', e => { if (e.key === 'Enter') login() })
 document.querySelectorAll('.modal-bg').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open') }))
+document.getElementById('mp-title').addEventListener('input', function() { const s = document.getElementById('mp-slug'); if (!s._t) s.value = slugify(this.value) })
+document.getElementById('mp-slug').addEventListener('input', function() { this._t = true })
+document.getElementById('ma-title').addEventListener('input', function() { const s = document.getElementById('ma-slug'); if (!s._t) s.value = slugify(this.value) })
+document.getElementById('ma-slug').addEventListener('input', function() { this._t = true })
+document.addEventListener('keydown', e => { if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveCurrent() } })
 
 if (TOKEN) showApp(); else showLogin()
 
 function showLogin() { document.getElementById('login-screen').style.display = 'flex'; document.getElementById('app').classList.remove('on') }
 function showApp()   { document.getElementById('login-screen').style.display = 'none'; document.getElementById('app').classList.add('on'); go('home') }
 
-// ─────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════
 // AUTH
-// ─────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════
 async function login() {
   const pw = document.getElementById('login-pw').value
   const err = document.getElementById('login-err')
   err.classList.remove('show')
   try {
-    const r = await fetch(`${API}/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({password:pw}) })
+    const r = await fetch(`${API}/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pw }) })
     const d = await r.json()
     if (!r.ok) { err.classList.add('show'); return }
     TOKEN = d.token; localStorage.setItem('em_token', TOKEN); showApp()
   } catch { err.classList.add('show') }
 }
 function logout() { TOKEN = ''; localStorage.removeItem('em_token'); showLogin() }
-function ah() { return { headers: {'x-token': TOKEN} } }
+function ah() { return { 'x-token': TOKEN } }
 
-// ─────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════
 // NAV
-// ─────────────────────────────────────────────────────────
-async function go(page) {
-  document.querySelectorAll('.sb-item').forEach(n => n.classList.toggle('active', n.dataset.p === page))
-  activePage = page
-  dirty = false
-  document.getElementById('save-btn').classList.add('hidden')
-  setStatus('')
-
-  const titles = { home:'Home', about:'About', work:'Work', insights:'Insights', contact:'Contact', projects:'Projects', articles:'Articles' }
-  document.getElementById('tb-title').textContent = titles[page] || page
-
-  const content = document.getElementById('content')
-  content.innerHTML = '<div style="padding:40px;font-size:12px;color:var(--ink-4)">Loading…</div>'
-
-  if (page === 'projects') { renderProjects(); return }
-  if (page === 'articles')  { renderArticles(); return }
-
-  try {
-    const r = await fetch(`${API}/content/${page}`, ah())
-    const d = r.ok ? await r.json() : {}
-    pageData = d
-    renderEditor(page, d)
-  } catch { pageData = {}; renderEditor(page, {}) }
+// ══════════════════════════════════════════════════════════
+const VIEWS = {
+  'home':         { title: 'Site Settings',  desc: 'Global site content and home page',       load: loadGeneric('home'),         save: saveGeneric('home') },
+  'hero':         { title: 'Hero',           desc: 'Home page hero section',                  load: loadGeneric('hero'),         save: saveGeneric('hero') },
+  'slideshow':    { title: 'Hero Slideshow', desc: 'Media cycling in the hero section',       load: loadSlideshow,               save: saveSlideshow },
+  'about':        { title: 'About',          desc: 'About page content',                      load: loadGeneric('about'),        save: saveGeneric('about') },
+  'capabilities': { title: 'Capabilities',   desc: 'Services shown on home page',             load: loadCapabilities,            save: saveCapabilities },
+  'work':         { title: 'Work',           desc: 'Work page content',                       load: loadGeneric('work'),         save: saveGeneric('work') },
+  'categories':   { title: 'Categories',     desc: 'Manage project categories',               load: loadCategories,              save: saveCategories },
+  'insights':     { title: 'Insights',       desc: 'Insights page content',                   load: loadGeneric('insights'),     save: saveGeneric('insights') },
+  'contact':      { title: 'Contact',        desc: 'Contact page and form services',          load: loadContact,                 save: saveContact },
+  'clients':      { title: 'Clients',        desc: 'Client logos bar on home page',           load: loadClients,                 save: saveClients },
+  'footer':       { title: 'Footer',         desc: 'Footer content',                         load: loadGeneric('footer'),       save: saveGeneric('footer') },
+  'projects':     { title: 'Projects',       desc: 'Manage all projects',                     load: loadProjects,                save: null },
+  'articles':     { title: 'Articles',       desc: 'Manage all articles',                     load: loadArticles,                save: null },
 }
 
-// ─────────────────────────────────────────────────────────
+async function go(page) {
+  document.querySelectorAll('.sb-item[data-p]').forEach(n => n.classList.toggle('active', n.dataset.p === page))
+  activePage = page
+  dirty = false
+  pageData = {}
+  setStatus('')
+  const v = VIEWS[page]
+  currentSaveFn = v ? v.save : null
+  const hasSave = !!(v && v.save)
+  document.getElementById('save-btn').classList.toggle('hidden', !hasSave)
+  document.getElementById('tb-title').textContent = v ? v.title : page
+  document.getElementById('tb-desc').textContent = v ? v.desc : ''
+  const c = document.getElementById('content')
+  c.innerHTML = '<div style="padding:40px;font-size:12px;color:#aaa">Loading…</div>'
+  if (v && v.load) await v.load()
+}
+
+// ══════════════════════════════════════════════════════════
 // SAVE
-// ─────────────────────────────────────────────────────────
-async function savePage() {
-  if (!activePage || ['projects','articles'].includes(activePage)) return
+// ══════════════════════════════════════════════════════════
+async function saveCurrent() {
+  if (!currentSaveFn) return
   setStatus('Saving…')
-  pageData.fields = collectFields()
   try {
-    const r = await fetch(`${API}/content/${activePage}`, {
-      method:'PUT', headers:{'Content-Type':'application/json','x-token':TOKEN},
-      body: JSON.stringify(pageData)
-    })
-    if (!r.ok) throw new Error()
+    await currentSaveFn()
     dirty = false
-    document.getElementById('save-btn').classList.add('hidden')
     setStatus('Saved', 'saved')
     toast('Changes saved', 'ok')
     setTimeout(() => setStatus(''), 3000)
-  } catch { setStatus('Error saving', 'error'); toast('Save failed', 'err') }
+  } catch(e) {
+    setStatus('Error', 'error')
+    toast(e.message || 'Save failed', 'err')
+  }
 }
+function markDirty() {
+  dirty = true
+  document.getElementById('save-btn').classList.remove('hidden')
+  setStatus('Unsaved changes', 'dirty')
+}
+function setStatus(msg, cls = '') {
+  const el = document.getElementById('tb-status')
+  el.textContent = msg; el.className = cls
+}
+function slugify(s) { return String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') }
+function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
 
+// ══════════════════════════════════════════════════════════
+// GENERIC PAGE CONTENT (fields object)
+// ══════════════════════════════════════════════════════════
+function loadGeneric(page) {
+  return async function() {
+    try {
+      const r = await fetch(`${API}/content/${page}`, { headers: ah() })
+      pageData = r.ok ? await r.json() : {}
+    } catch { pageData = {} }
+    renderGenericEditor(page)
+  }
+}
+function saveGeneric(page) {
+  return async function() {
+    pageData.fields = collectFields()
+    const r = await fetch(`${API}/content/${page}`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-token': TOKEN },
+      body: JSON.stringify(pageData)
+    })
+    if (!r.ok) throw new Error('Server error')
+  }
+}
 function collectFields() {
   const f = {}
   document.querySelectorAll('[data-k]').forEach(el => { f[el.dataset.k] = el.value })
   return f
 }
-function markDirty() {
-  dirty = true
-  document.getElementById('save-btn').classList.remove('hidden')
-  setStatus('Unsaved changes')
-}
-function setStatus(msg, cls='') {
-  const el = document.getElementById('tb-status')
-  el.textContent = msg; el.className = cls
-}
-
-// ─────────────────────────────────────────────────────────
-// FIELD BUILDER HELPERS
-// ─────────────────────────────────────────────────────────
-function fv(key, fallback='') {
+function fv(key, fallback = '') {
   return pageData.fields && pageData.fields[key] !== undefined ? pageData.fields[key] : fallback
 }
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
 
-function row(key, name, hint, value, type='text') {
-  const id = 'f-'+key
-  let inp = ''
+function renderGenericEditor(page) {
+  const builders = { home: homeEditor, hero: heroEditor, about: aboutEditor, work: workEditor, insights: insightsEditor, footer: footerEditor }
+  const fn = builders[page]
+  document.getElementById('content').innerHTML = fn
+    ? `<div class="page-editor">${fn()}</div>`
+    : `<div class="empty-state"><h2>No editor for "${page}"</h2></div>`
+}
+
+// ══════════════════════════════════════════════════════════
+// FIELD HELPERS
+// ══════════════════════════════════════════════════════════
+function fRow(key, label, value, type = 'text') {
+  const id = 'f-' + key
+  let inp
   if (type === 'textarea') {
     inp = `<textarea id="${id}" data-k="${key}" oninput="markDirty()">${esc(value)}</textarea>`
-  } else if (type === 'image') {
-    const thumb = value
-      ? `<img src="${esc(value)}" id="${id}-thumb" style="width:100%;height:100%;object-fit:cover"/>`
-      : `<div class="img-thumb-empty" id="${id}-thumb">▭</div>`
-    inp = `<div class="img-field">
-      <div class="img-thumb-wrap">${thumb}</div>
-      <div class="img-field-inputs">
-        <input type="url" id="${id}" data-k="${key}" value="${esc(value)}" placeholder="https://… or upload" oninput="markDirty();updateImgThumb('${id}')"/>
-        <label class="img-upload-btn">↑ Upload<input type="file" accept="image/*" style="display:none" onchange="uploadImg(this,'${id}')"/></label>
+  } else if (type === 'media') {
+    inp = mediaDropZoneHTML(id, key, value, true)
+  } else {
+    inp = `<input type="text" id="${id}" data-k="${key}" value="${esc(value)}" oninput="markDirty()"/>`
+  }
+  return `<div class="f-group"><label class="f-label">${label}</label>${inp}</div>`
+}
+
+function cardSection(title, desc, innerHTML) {
+  return `<div class="card">
+    <div class="card-head"><div><div class="card-title">${title}</div>${desc ? `<div class="card-desc">${desc}</div>` : ''}</div></div>
+    <div class="card-body">${innerHTML}</div>
+  </div>`
+}
+
+// ══════════════════════════════════════════════════════════
+// MEDIA DROP ZONE
+// ══════════════════════════════════════════════════════════
+function mediaDropZoneHTML(id, dataKey, value, inline = false) {
+  const mediaType = value ? detectMediaType(value) : ''
+  let previewHTML = ''
+  if (value) {
+    const isVideo = /\.(mp4|webm|mov|avi|mkv)$/i.test(value)
+    const isGif = /\.gif$/i.test(value)
+    previewHTML = `<div class="drop-zone-preview">
+      ${isVideo
+        ? `<video src="${esc(value)}" muted playsinline style="width:100%;max-height:220px;object-fit:contain;background:#111;display:block"></video>`
+        : `<img src="${esc(value)}" style="width:100%;max-height:220px;object-fit:contain;display:block"/>`
+      }
+      <div class="dz-overlay">
+        <span class="dz-type-badge">${mediaType}</span>
+        <button class="dz-remove" onclick="clearMedia('${id}','${dataKey || ''}')">Remove</button>
       </div>
     </div>`
   } else {
-    inp = `<input type="${type}" id="${id}" data-k="${key}" value="${esc(value)}" oninput="markDirty()"/>`
+    previewHTML = `<div class="drop-zone-empty">
+      <div class="drop-zone-icon">⊞</div>
+      <div class="drop-zone-text"><strong>Drop file here</strong><br>or click to upload<br><span style="font-size:10px;color:#ccc">Image, Video, GIF</span></div>
+    </div>`
   }
-  return `<div class="field-row">
-    <div class="field-row-label"><span class="f-name">${name}</span>${hint ? `<span class="f-hint">${hint}</span>` : ''}</div>
-    <div class="field-row-input">${inp}</div>
+  const urlInput = `<div class="dz-url-row">
+    <input type="url" id="${id}" ${dataKey ? `data-k="${dataKey}"` : ''} value="${esc(value)}" placeholder="https://… or upload" oninput="markDirty();updateDropZonePreview('${id}')"/>
+    <label class="btn btn-ghost dz-upload-btn" style="cursor:pointer;font-size:10px;padding:6px 10px">
+      Upload<input type="file" accept="${MEDIA_ACCEPT}" style="display:none" onchange="uploadMedia(this,'${id}')"/>
+    </label>
   </div>`
+  return `<div class="drop-zone" id="${id}-zone"
+    ondragover="event.preventDefault();this.classList.add('drag-over')"
+    ondragleave="this.classList.remove('drag-over')"
+    ondrop="handleDrop(event,'${id}')"
+    onclick="if(event.target===this||event.target.closest('.drop-zone-empty'))this.querySelector('input[type=file]').click()">
+    <div id="${id}-preview">${previewHTML}</div>
+  </div>${urlInput}`
 }
 
-function section(num, name, desc, rows) {
-  return `<div class="section-block">
-    <div class="section-head">
-      <span class="section-num">${num}</span>
-      <span class="section-name">${name}</span>
-      ${desc ? `<span class="section-desc">${desc}</span>` : ''}
+function detectMediaType(url) {
+  if (!url) return ''
+  if (/\.gif$/i.test(url)) return 'GIF'
+  if (/\.(mp4|webm|mov|avi|mkv)$/i.test(url)) return 'Video'
+  return 'Image'
+}
+
+function updateDropZonePreview(id) {
+  const inp = document.getElementById(id)
+  if (!inp) return
+  const url = inp.value.trim()
+  const preview = document.getElementById(id + '-preview')
+  if (!preview) return
+  if (!url) {
+    preview.innerHTML = `<div class="drop-zone-empty"><div class="drop-zone-icon">⊞</div><div class="drop-zone-text"><strong>Drop file here</strong><br>or click to upload</div></div>`
+    return
+  }
+  const isVideo = /\.(mp4|webm|mov|avi|mkv)$/i.test(url)
+  const mediaType = detectMediaType(url)
+  const dataKey = inp.dataset.k || ''
+  preview.innerHTML = `<div class="drop-zone-preview">
+    ${isVideo
+      ? `<video src="${esc(url)}" muted playsinline style="width:100%;max-height:220px;object-fit:contain;background:#111;display:block"></video>`
+      : `<img src="${esc(url)}" style="width:100%;max-height:220px;object-fit:contain;display:block"/>`
+    }
+    <div class="dz-overlay">
+      <span class="dz-type-badge">${mediaType}</span>
+      <button class="dz-remove" onclick="clearMedia('${id}','${dataKey}')">Remove</button>
     </div>
-    ${rows}
   </div>`
 }
 
-// ─────────────────────────────────────────────────────────
-// IMAGE HELPERS
-// ─────────────────────────────────────────────────────────
-function updateImgThumb(id) {
-  const url = document.getElementById(id).value
-  const wrap = document.getElementById(id+'-thumb')
-  if (!wrap) return
-  if (url) wrap.outerHTML = `<img id="${id}-thumb" src="${url}" style="width:100%;height:100%;object-fit:cover"/>`
-  else      wrap.outerHTML = `<div class="img-thumb-empty" id="${id}-thumb">▭</div>`
+function clearMedia(id, dataKey) {
+  const inp = document.getElementById(id)
+  if (inp) inp.value = ''
+  updateDropZonePreview(id)
+  markDirty()
 }
-async function uploadImg(input, fieldId) {
+
+function handleDrop(e, id) {
+  e.preventDefault()
+  const zone = e.currentTarget
+  zone.classList.remove('drag-over')
+  const file = e.dataTransfer.files[0]
+  if (!file) return
+  uploadMediaFile(file, id)
+}
+
+async function uploadMedia(input, fieldId) {
+  if (!input.files[0]) return
+  await uploadMediaFile(input.files[0], fieldId)
+}
+
+async function uploadMediaFile(file, fieldId) {
+  const fd = new FormData(); fd.append('file', file)
+  try {
+    const r = await fetch(`${API}/upload`, { method: 'POST', headers: { 'x-token': TOKEN }, body: fd })
+    const d = await r.json()
+    if (!r.ok) throw new Error(d.error)
+    const inp = document.getElementById(fieldId)
+    if (inp) { inp.value = d.url; updateDropZonePreview(fieldId) }
+    markDirty()
+    toast('Uploaded', 'ok')
+  } catch(e) { toast(e.message || 'Upload failed', 'err') }
+}
+
+// ══════════════════════════════════════════════════════════
+// PAGE EDITORS — Generic
+// ══════════════════════════════════════════════════════════
+function homeEditor() {
+  return cardSection('Site Settings', 'Global meta and home page fields',
+    `<div class="field-grid">
+      ${fRow('hero_kicker','Hero Kicker', fv('hero_kicker','Strategy & Design'))}
+      ${fRow('hero_cta','CTA Button Label', fv('hero_cta','View Work'))}
+    </div>
+    ${fRow('hero_subtitle','Hero Subtitle', fv('hero_subtitle',''), 'textarea')}
+    <div class="field-grid">
+      ${fRow('hero_title_l1','Headline Line 1', fv('hero_title_l1','Design as Strategy.'))}
+      ${fRow('hero_title_l2','Headline Line 2', fv('hero_title_l2','Identity as System.'))}
+    </div>`)
+}
+
+function heroEditor() {
+  return cardSection('Hero Section', 'Home page hero',
+    `<div class="field-grid">
+      ${fRow('label','Kicker Label', fv('label','Strategy & Design'))}
+      ${fRow('h1_l1','Headline Line 1', fv('h1_l1','Design as Strategy.'))}
+      ${fRow('h1_l2','Headline Line 2', fv('h1_l2','Identity as System.'))}
+      ${fRow('cta','CTA Label', fv('cta','View Work'))}
+      ${fRow('cta_url','CTA URL', fv('cta_url','/work.html'))}
+    </div>
+    ${fRow('subtitle','Subtitle', fv('subtitle',''), 'textarea')}`)
+}
+
+function aboutEditor() {
+  return cardSection('Hero', 'Page header',
+    `<div class="field-grid">
+      ${fRow('hero_label','Kicker Label', fv('hero_label','Creative Director'))}
+      ${fRow('hero_h1_l1','Headline Line 1', fv('hero_h1_l1','Making brands'))}
+      ${fRow('hero_h1_l2','Headline Line 2', fv('hero_h1_l2','that endure.'))}
+    </div>
+    ${fRow('hero_intro','Introduction', fv('hero_intro',''), 'textarea')}`) +
+  cardSection('Philosophy', '01 / Three Principles',
+    `<div class="field-grid">
+      ${fRow('phil1_title','Principle 1 Title', fv('phil1_title','Listen before designing'))}
+    </div>
+    ${fRow('phil1_body','Principle 1 Body', fv('phil1_body',''), 'textarea')}
+    <div class="field-grid">
+      ${fRow('phil2_title','Principle 2 Title', fv('phil2_title','Build systems, not assets'))}
+    </div>
+    ${fRow('phil2_body','Principle 2 Body', fv('phil2_body',''), 'textarea')}
+    <div class="field-grid">
+      ${fRow('phil3_title','Principle 3 Title', fv('phil3_title','Precision over decoration'))}
+    </div>
+    ${fRow('phil3_body','Principle 3 Body', fv('phil3_body',''), 'textarea')}`) +
+  cardSection('CTA', 'End of page',
+    `<div class="field-grid">
+      ${fRow('cta_kicker','Kicker', fv('cta_kicker','Have a project in mind?'))}
+      ${fRow('cta_h2_l1','Headline Line 1', fv('cta_h2_l1',"Let's build it"))}
+      ${fRow('cta_h2_l2','Headline Line 2', fv('cta_h2_l2','together.'))}
+    </div>`)
+}
+
+function workEditor() {
+  return cardSection('Page Header', '',
+    `<div class="field-grid">
+      ${fRow('hero_label','Label', fv('hero_label','Selected Work'))}
+      ${fRow('hero_h1','Headline', fv('hero_h1','Work'))}
+    </div>`) +
+  cardSection('CTA', 'Bottom call to action',
+    `<div class="field-grid">
+      ${fRow('cta_kicker','Kicker', fv('cta_kicker','Have a project in mind?'))}
+      ${fRow('cta_h2_l1','Headline Line 1', fv('cta_h2_l1',"Let's create"))}
+      ${fRow('cta_h2_l2','Headline Line 2', fv('cta_h2_l2','the next one.'))}
+    </div>`)
+}
+
+function insightsEditor() {
+  return cardSection('Page Header', '',
+    `<div class="field-grid">
+      ${fRow('hero_label','Label', fv('hero_label','Ideas & Thinking'))}
+      ${fRow('hero_h1','Headline', fv('hero_h1','Insights'))}
+    </div>
+    ${fRow('hero_subtitle','Subtitle', fv('hero_subtitle',''), 'textarea')}`)
+}
+
+function footerEditor() {
+  return cardSection('Footer', 'Contact details and links',
+    `<div class="field-grid">
+      ${fRow('email','Email', fv('email','hello@eyuelmulat.com'))}
+      ${fRow('phone','Phone', fv('phone','+251 95 355 3856'))}
+      ${fRow('location','Location', fv('location','Addis Ababa, Ethiopia'))}
+      ${fRow('ig_url','Instagram URL', fv('ig_url','#'))}
+      ${fRow('li_url','LinkedIn URL', fv('li_url','#'))}
+      ${fRow('be_url','Behance URL', fv('be_url','#'))}
+      ${fRow('copy','Copyright', fv('copy','© 2024 Eyuel Mulat'))}
+    </div>`)
+}
+
+// ══════════════════════════════════════════════════════════
+// CAPABILITIES
+// ══════════════════════════════════════════════════════════
+let capsData = []
+
+async function loadCapabilities() {
+  try {
+    const r = await fetch(`${API}/capabilities`)
+    capsData = r.ok ? await r.json() : []
+  } catch { capsData = [] }
+  renderCapsView()
+}
+
+function renderCapsView() {
+  const c = document.getElementById('content')
+  const items = capsData.map((cap, i) => `
+    <div class="item-card" id="cap-${i}">
+      <div class="cap-media-wrap">
+        <label class="f-label">Icon / Image</label>
+        ${mediaDropZoneHTML(`cap-icon-${i}`, '', cap.icon || '', false)}
+      </div>
+      <div class="item-card-fields">
+        <div class="f-group"><label class="f-label">Title</label><input type="text" value="${esc(cap.title||'')}" oninput="capsData[${i}].title=this.value;markDirty()"/></div>
+        <div class="f-group"><label class="f-label">Description</label><textarea oninput="capsData[${i}].description=this.value;markDirty()">${esc(cap.description||'')}</textarea></div>
+      </div>
+      <button class="btn-danger-sm" onclick="removeCap(${i})" title="Delete" style="margin-top:4px">✕</button>
+    </div>`).join('')
+  c.innerHTML = `<div class="page-editor">
+    <div class="note-label">When more than 3 capabilities exist, the home page shows left/right navigation arrows automatically.</div>
+    ${items}
+    <button class="btn btn-ghost" onclick="addCap()" style="margin-top:4px">+ Add Capability</button>
+  </div>`
+}
+
+async function saveCapabilities() {
+  // Sync icon URLs from inputs
+  capsData.forEach((cap, i) => {
+    const inp = document.getElementById(`cap-icon-${i}`)
+    if (inp) cap.icon = inp.value
+  })
+  const r = await fetch(`${API}/capabilities`, {
+    method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-token': TOKEN },
+    body: JSON.stringify(capsData)
+  })
+  if (!r.ok) throw new Error('Server error')
+}
+
+function addCap() {
+  capsData.push({ id: Date.now().toString(), icon: '', title: '', description: '' })
+  renderCapsView(); markDirty()
+}
+function removeCap(i) {
+  if (!confirm('Delete this capability?')) return
+  capsData.splice(i, 1); renderCapsView(); markDirty()
+}
+
+// ══════════════════════════════════════════════════════════
+// CLIENTS
+// ══════════════════════════════════════════════════════════
+let clientsData = []
+
+async function loadClients() {
+  try {
+    const r = await fetch(`${API}/clients`)
+    clientsData = r.ok ? await r.json() : []
+  } catch { clientsData = [] }
+  renderClientsView()
+}
+
+function renderClientsView() {
+  const c = document.getElementById('content')
+  const items = clientsData.map((cl, i) => `
+    <div class="item-card" id="cl-${i}">
+      <div class="client-logo-wrap">
+        <label class="f-label">Logo</label>
+        ${mediaDropZoneHTML(`cl-logo-${i}`, '', cl.logo || '', false)}
+      </div>
+      <div class="item-card-fields">
+        <div class="f-group"><label class="f-label">Name</label><input type="text" value="${esc(cl.name||'')}" oninput="clientsData[${i}].name=this.value;markDirty()"/></div>
+        <div class="f-group"><label class="f-label">Website URL</label><input type="url" value="${esc(cl.url||'')}" oninput="clientsData[${i}].url=this.value;markDirty()"/></div>
+      </div>
+      <button class="btn-danger-sm" onclick="removeClient(${i})" title="Delete" style="margin-top:4px">✕</button>
+    </div>`).join('')
+  c.innerHTML = `<div class="page-editor">${items}<button class="btn btn-ghost" onclick="addClient()" style="margin-top:4px">+ Add Client</button></div>`
+}
+
+async function saveClients() {
+  clientsData.forEach((cl, i) => {
+    const inp = document.getElementById(`cl-logo-${i}`)
+    if (inp) cl.logo = inp.value
+  })
+  const r = await fetch(`${API}/clients`, {
+    method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-token': TOKEN },
+    body: JSON.stringify(clientsData)
+  })
+  if (!r.ok) throw new Error('Server error')
+}
+
+function addClient() {
+  clientsData.push({ id: Date.now().toString(), name: '', logo: '', url: '' })
+  renderClientsView(); markDirty()
+}
+function removeClient(i) {
+  if (!confirm('Delete this client?')) return
+  clientsData.splice(i, 1); renderClientsView(); markDirty()
+}
+
+// ══════════════════════════════════════════════════════════
+// SLIDESHOW
+// ══════════════════════════════════════════════════════════
+let slidesData = []
+
+async function loadSlideshow() {
+  try {
+    const r = await fetch(`${API}/slides`)
+    slidesData = r.ok ? await r.json() : []
+  } catch { slidesData = [] }
+  renderSlideshowView()
+}
+
+function renderSlideshowView() {
+  const c = document.getElementById('content')
+  const items = slidesData.map((s, i) => {
+    const url = s.url || ''
+    const isVideo = /\.(mp4|webm|mov|avi|mkv)$/i.test(url)
+    const isGif = /\.gif$/i.test(url)
+    const mediaType = url ? (isGif ? 'GIF' : isVideo ? 'Video' : 'Image') : ''
+    const preview = url
+      ? (isVideo
+          ? `<video src="${esc(url)}" muted playsinline style="width:100%;max-height:200px;object-fit:contain;background:#111"></video>`
+          : `<img src="${esc(url)}" style="width:100%;max-height:200px;object-fit:contain"/>`)
+      : `<div class="slide-preview-empty">No media set</div>`
+    return `<div class="slide-card">
+      <div class="slide-card-top">
+        <div class="slide-preview-wrap" id="slide-prev-${i}">${preview}</div>
+        <div class="slide-actions">
+          ${i > 0 ? `<button class="btn btn-ghost" style="padding:4px 8px" onclick="moveSlide(${i},-1)">↑</button>` : '<span style="width:32px"></span>'}
+          ${i < slidesData.length-1 ? `<button class="btn btn-ghost" style="padding:4px 8px" onclick="moveSlide(${i},1)">↓</button>` : '<span style="width:32px"></span>'}
+          ${mediaType ? `<span class="dz-type-badge" style="margin-top:4px">${mediaType}</span>` : ''}
+          <button class="btn-danger-sm" onclick="removeSlide(${i})">✕</button>
+        </div>
+      </div>
+      <div class="slide-url-row">
+        <input type="url" id="slide-url-${i}" value="${esc(url)}" placeholder="https://… or upload" oninput="slidesData[${i}].url=this.value;markDirty();updateSlidePreview(${i})"/>
+        <label class="btn btn-ghost" style="cursor:pointer;font-size:10px;padding:6px 10px;white-space:nowrap">
+          Upload<input type="file" accept="${MEDIA_ACCEPT}" style="display:none" onchange="uploadSlideMedia(this,${i})"/>
+        </label>
+      </div>
+    </div>`
+  }).join('')
+  c.innerHTML = `<div class="page-editor">
+    <div class="card">
+      <div class="card-head"><div class="card-title">Hero Slideshow</div><div class="card-desc">These media items cycle through in the hero section of the home page.</div></div>
+      <div class="card-body">
+        ${items || '<div style="color:#aaa;font-size:12px;padding:16px 0">No slides yet. Add one below.</div>'}
+        <button class="btn btn-ghost mt12" onclick="addSlide()">+ Add Slide</button>
+      </div>
+    </div>
+  </div>`
+}
+
+async function saveSlideshow() {
+  slidesData.forEach((s, i) => {
+    const inp = document.getElementById(`slide-url-${i}`)
+    if (inp) s.url = inp.value
+  })
+  const r = await fetch(`${API}/slides`, {
+    method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-token': TOKEN },
+    body: JSON.stringify(slidesData)
+  })
+  if (!r.ok) throw new Error('Server error')
+}
+
+function addSlide() { slidesData.push({ url: '' }); renderSlideshowView(); markDirty() }
+function removeSlide(i) { if (!confirm('Remove this slide?')) return; slidesData.splice(i,1); renderSlideshowView(); markDirty() }
+function moveSlide(i, dir) {
+  const j = i + dir
+  if (j < 0 || j >= slidesData.length) return
+  ;[slidesData[i], slidesData[j]] = [slidesData[j], slidesData[i]]
+  renderSlideshowView(); markDirty()
+}
+function updateSlidePreview(i) {
+  const inp = document.getElementById(`slide-url-${i}`)
+  if (!inp) return
+  const url = inp.value.trim()
+  const wrap = document.getElementById(`slide-prev-${i}`)
+  if (!wrap) return
+  const isVideo = /\.(mp4|webm|mov|avi|mkv)$/i.test(url)
+  wrap.innerHTML = url
+    ? (isVideo
+        ? `<video src="${esc(url)}" muted playsinline style="width:100%;max-height:200px;object-fit:contain;background:#111"></video>`
+        : `<img src="${esc(url)}" style="width:100%;max-height:200px;object-fit:contain"/>`)
+    : '<div class="slide-preview-empty">No media set</div>'
+}
+async function uploadSlideMedia(input, i) {
   if (!input.files[0]) return
   const fd = new FormData(); fd.append('file', input.files[0])
   try {
     const r = await fetch(`${API}/upload`, { method:'POST', headers:{'x-token':TOKEN}, body:fd })
     const d = await r.json()
     if (!r.ok) throw new Error(d.error)
-    document.getElementById(fieldId).value = d.url
-    updateImgThumb(fieldId); markDirty()
-    toast('Uploaded', 'ok')
+    slidesData[i].url = d.url
+    renderSlideshowView(); markDirty()
+    toast('Uploaded','ok')
   } catch(e) { toast(e.message||'Upload failed','err') }
 }
 
-// ─────────────────────────────────────────────────────────
-// PAGE EDITORS
-// ─────────────────────────────────────────────────────────
-function renderEditor(page, data) {
-  document.getElementById('save-btn').classList.remove('hidden')
-  const builders = { home: homeEditor, about: aboutEditor, work: workEditor, insights: insightsEditor, contact: contactEditor }
-  const fn = builders[page]
-  document.getElementById('content').innerHTML = fn ? `<div class="page-editor">${fn(data)}</div>` : '<div class="empty"><h2>Coming soon</h2></div>'
-}
+// ══════════════════════════════════════════════════════════
+// CATEGORIES
+// ══════════════════════════════════════════════════════════
+let catsData = []
 
-// ── HOME ──────────────────────────────────────────────────
-function homeEditor(data) {
-  return section('01', 'Hero', 'First screen',
-    row('hero_kicker',    'Kicker label',   'Top label above headline', fv('hero_kicker','Strategy & Design')) +
-    row('hero_title_l1',  'Headline — line 1', 'Large display type', fv('hero_title_l1','Design as Strategy.')) +
-    row('hero_title_l2',  'Headline — line 2', 'Accent line', fv('hero_title_l2','Identity as System.')) +
-    row('hero_subtitle',  'Subtitle paragraph', 'Below headline', fv('hero_subtitle','We build brands that think before they look. Strategic systems, not surface decoration — visual authority for brands that mean to lead.'), 'textarea') +
-    row('hero_cta',       'CTA label', 'Button text', fv('hero_cta','View Work')) +
-    row('hero_cta_url',   'CTA link', 'Button URL', fv('hero_cta_url','/work.html'))
-  ) +
-  section('02', 'Featured Project', '01 / Selected Works — large card',
-    row('feat_label',   'Section label',   '01 / Selected Works', fv('feat_label','01 / Selected Works')) +
-    row('feat_title',   'Project title',   'Large display heading', fv('feat_title','Nexus Dashboard')) +
-    row('feat_cat',     'Category tag',    'Top-left label', fv('feat_cat','Branding & UI')) +
-    row('feat_year',    'Year',            '', fv('feat_year','2024')) +
-    row('feat_desc',    'Description',     'Under title', fv('feat_desc','A high-performance SaaS interface designed for complex data visualization and seamless user workflows — precision at enterprise scale.'), 'textarea') +
-    row('feat_url',     'Project URL',     'Link to case study', fv('feat_url','/work/nexus-dashboard.html')) +
-    row('feat_img',     'Cover image',     '21:9 ratio', fv('feat_img'), 'image')
-  ) +
-  section('03', 'Grid Projects', '02 and 03 — smaller cards',
-    row('grid1_title',  'Project 2 title',  '', fv('grid1_title','Nexus Dashboard')) +
-    row('grid1_cat',    'Project 2 category','', fv('grid1_cat','Branding & UI')) +
-    row('grid1_desc',   'Project 2 description', '', fv('grid1_desc','A high-performance SaaS interface designed for complex data visualization.'), 'textarea') +
-    row('grid1_url',    'Project 2 URL', '', fv('grid1_url','/work/nexus-dashboard.html')) +
-    row('grid1_img',    'Project 2 image', '4:3 ratio', fv('grid1_img'), 'image') +
-    row('grid2_title',  'Project 3 title',  '', fv('grid2_title','Vanguard Capital')) +
-    row('grid2_cat',    'Project 3 category','', fv('grid2_cat','Identity System')) +
-    row('grid2_desc',   'Project 3 description', '', fv('grid2_desc','A comprehensive visual identity system for a category-defining brand. Structural rigour meets modern expression.'), 'textarea') +
-    row('grid2_url',    'Project 3 URL', '', fv('grid2_url','/work/vanguard-capital.html')) +
-    row('grid2_img',    'Project 3 image', '4:3 ratio', fv('grid2_img'), 'image')
-  ) +
-  section('04', 'Capabilities', '02 / Capabilities — three columns',
-    row('cap1_title',  'Capability 1 title', '', fv('cap1_title','Brand Strategy')) +
-    row('cap1_desc',   'Capability 1 description', '', fv('cap1_desc','Defining the core essence, positioning, and architectural narrative of your brand through rigorous analysis.'), 'textarea') +
-    row('cap2_title',  'Capability 2 title', '', fv('cap2_title','Identity Design')) +
-    row('cap2_desc',   'Capability 2 description', '', fv('cap2_desc','Visual systems built on grid-based precision and timeless modernist principles for lasting impact.'), 'textarea') +
-    row('cap3_title',  'Capability 3 title', '', fv('cap3_title','Digital Build')) +
-    row('cap3_desc',   'Capability 3 description', '', fv('cap3_desc','High-performance digital experiences that prioritize clarity, structural integrity, and user flow.'), 'textarea')
-  ) +
-  section('05', 'CTA Section', 'Full-width call to action',
-    row('cta_heading', 'CTA headline', 'Large display type', fv('cta_heading','Define your visual authority.')) +
-    row('cta_sub',     'Above headline', 'Small label', fv('cta_sub','Ready to build something lasting?')) +
-    row('cta_btn',     'Button label', '', fv('cta_btn','Start a Project'))
-  ) +
-  section('06', 'Clients Bar', 'Logo / client name strip',
-    row('client1', 'Client 1', '', fv('client1','Nexus Technologies')) +
-    row('client2', 'Client 2', '', fv('client2','Vanguard Capital')) +
-    row('client3', 'Client 3', '', fv('client3','Orion Group')) +
-    row('client4', 'Client 4', '', fv('client4','Meridian Studio')) +
-    row('client5', 'Client 5', '', fv('client5','Apex Ventures')) +
-    row('client6', 'Client 6', '', fv('client6','Summit Advisory'))
-  ) +
-  section('07', 'Footer', 'Contact details in footer',
-    row('footer_email',    'Email address',  '', fv('footer_email','hello@eyuelmulat.com')) +
-    row('footer_phone',    'Phone number',   '', fv('footer_phone','+251 95 355 3856')) +
-    row('footer_location', 'Location',       '', fv('footer_location','Addis Ababa, Ethiopia')) +
-    row('footer_ig',       'Instagram URL',  '', fv('footer_ig','#')) +
-    row('footer_li',       'LinkedIn URL',   '', fv('footer_li','#')) +
-    row('footer_be',       'Behance URL',    '', fv('footer_be','#')) +
-    row('footer_copy',     'Copyright text', '', fv('footer_copy','© 2024 Eyuel Mulat'))
-  )
-}
-
-// ── ABOUT ─────────────────────────────────────────────────
-function aboutEditor(data) {
-  return section('01', 'Hero', 'Page header',
-    row('hero_label',    'Kicker label',   'Top label', fv('hero_label','Creative Director')) +
-    row('hero_h1_l1',    'Headline line 1','', fv('hero_h1_l1','Making brands')) +
-    row('hero_h1_l2',    'Headline line 2','Accent line', fv('hero_h1_l2','that endure.')) +
-    row('hero_intro',    'Introduction',   'Below headline', fv('hero_intro',"I'm a creative director and brand strategist working at the intersection of visual identity and strategic thinking. Every project is an opportunity to build something that lasts."), 'textarea') +
-    row('hero_img',      'Profile image',  'Large hero photo', fv('hero_img'), 'image')
-  ) +
-  section('02', 'Philosophy', '01 / Philosophy — three principles',
-    row('phil1_title', 'Principle 1 title', '', fv('phil1_title','Listen before designing')) +
-    row('phil1_body',  'Principle 1 body',  '', fv('phil1_body',"Understanding the problem space deeply before reaching for solutions. The best visual systems emerge from genuine understanding of a brand's truth — not from decoration applied over uncertainty."), 'textarea') +
-    row('phil2_title', 'Principle 2 title', '', fv('phil2_title','Build systems, not assets')) +
-    row('phil2_body',  'Principle 2 body',  '', fv('phil2_body','Every visual decision exists within a framework. Scalable identity systems outlast individual deliverables — they adapt to every touchpoint with consistency, from digital to print to environment.'), 'textarea') +
-    row('phil3_title', 'Principle 3 title', '', fv('phil3_title','Precision over decoration')) +
-    row('phil3_body',  'Principle 3 body',  '', fv('phil3_body',"Remove everything that doesn't earn its place. Architectural restraint isn't minimalism by default — it's intentionality at every scale, knowing when to add and when to hold back."), 'textarea')
-  ) +
-  section('03', 'Services', '02 / Expertise — six services',
-    row('svc1_title', 'Service 1 title', '', fv('svc1_title','Brand Strategy')) +
-    row('svc1_desc',  'Service 1 description', '', fv('svc1_desc','Positioning audits, competitive landscapes, brand architecture, and the narrative frameworks that guide every visual and verbal decision.'), 'textarea') +
-    row('svc2_title', 'Service 2 title', '', fv('svc2_title','Visual Identity')) +
-    row('svc2_desc',  'Service 2 description', '', fv('svc2_desc','Logo systems, color palettes, typeface selection, and the full visual language that makes a brand instantly recognisable across every touchpoint.'), 'textarea') +
-    row('svc3_title', 'Service 3 title', '', fv('svc3_title','Creative Direction')) +
-    row('svc3_desc',  'Service 3 description', '', fv('svc3_desc','Art directing photo shoots, campaign visuals, and cross-channel brand moments — ensuring every image and execution is consistent with the brand\'s core idea.'), 'textarea') +
-    row('svc4_title', 'Service 4 title', '', fv('svc4_title','Typography')) +
-    row('svc4_desc',  'Service 4 description', '', fv('svc4_desc','Type system design, custom lettering, and hierarchical scales that carry meaning and voice — from display headlines to dense body copy.'), 'textarea') +
-    row('svc5_title', 'Service 5 title', '', fv('svc5_title','Digital Systems')) +
-    row('svc5_desc',  'Service 5 description', '', fv('svc5_desc','Design systems, component libraries, and UI frameworks that translate brand logic into scalable digital products with precision and consistency.'), 'textarea') +
-    row('svc6_title', 'Service 6 title', '', fv('svc6_title','Editorial Design')) +
-    row('svc6_desc',  'Service 6 description', '', fv('svc6_desc','Annual reports, brand books, and publication design — structured grid layouts that give written content the authority and clarity it deserves.'), 'textarea')
-  ) +
-  section('04', 'Process', '03 / Process — methodology steps',
-    row('step1_label', 'Step 1 label', '', fv('step1_label','00-1 Step')) +
-    row('step1_title', 'Step 1 title', '', fv('step1_title','Choose the Strategy')) +
-    row('step1_desc',  'Step 1 description', '', fv('step1_desc','Selecting the optimal path for brand growth through intensive research and structural auditing of market landscapes.'), 'textarea') +
-    row('step2_label', 'Step 2 label', '', fv('step2_label','00-2 Step')) +
-    row('step2_title', 'Step 2 title', '', fv('step2_title','Define the Identity')) +
-    row('step2_desc',  'Step 2 description', '', fv('step2_desc','Developing the core visual grammar and systemic logic that will underpin every future brand touchpoint.'), 'textarea')
-  ) +
-  section('05', 'CTA', 'End-of-page call to action',
-    row('cta_kicker', 'Kicker', '', fv('cta_kicker','Have a project in mind?')) +
-    row('cta_h2_l1',  'Headline line 1', '', fv('cta_h2_l1',"Let's build it")) +
-    row('cta_h2_l2',  'Headline line 2', 'Accent', fv('cta_h2_l2','together.'))
-  )
-}
-
-// ── WORK ──────────────────────────────────────────────────
-function workEditor(data) {
-  return `<div style="margin-bottom:28px;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
-    <div><div style="font-size:22px;font-weight:300;letter-spacing:-0.03em;margin-bottom:4px">Work</div><div style="font-size:12px;color:var(--ink-3)">Edit page header, then manage individual projects below.</div></div>
-    <button class="btn btn-ink" onclick="openM('m-project')">+ New Project</button>
-  </div>` +
-  section('01', 'Page Header', '',
-    row('hero_label', 'Label', 'Above "Work"', fv('hero_label','Selected Work')) +
-    row('hero_h1',    'Headline', 'Large "WORK"', fv('hero_h1','Work'))
-  ) +
-  section('02', 'Filter Labels', 'Category filter tabs',
-    row('f_all',    'All label',    '', fv('f_all','All Work')) +
-    row('f_brand',  'Brand label',  '', fv('f_brand','Brand')) +
-    row('f_web',    'Web label',    '', fv('f_web','Web')) +
-    row('f_motion', 'Motion label', '', fv('f_motion','Motion'))
-  ) +
-  section('03', 'CTA', 'Bottom call to action',
-    row('cta_kicker', 'Kicker', '', fv('cta_kicker','Have a project in mind?')) +
-    row('cta_h2_l1',  'Headline line 1', '', fv('cta_h2_l1',"Let's create")) +
-    row('cta_h2_l2',  'Headline line 2', 'Accent', fv('cta_h2_l2','the next one.'))
-  )
-}
-
-// ── INSIGHTS ──────────────────────────────────────────────
-function insightsEditor(data) {
-  return `<div style="margin-bottom:28px;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
-    <div><div style="font-size:22px;font-weight:300;letter-spacing:-0.03em;margin-bottom:4px">Insights</div><div style="font-size:12px;color:var(--ink-3)">Edit page copy, then manage individual articles below.</div></div>
-    <button class="btn btn-ink" onclick="openM('m-article')">+ New Article</button>
-  </div>` +
-  section('01', 'Page Header', '',
-    row('hero_label',   'Label',    'Above headline', fv('hero_label','Ideas & Thinking')) +
-    row('hero_h1',      'Headline', 'Large display', fv('hero_h1','Insights')) +
-    row('hero_subtitle','Subtitle', 'Below headline', fv('hero_subtitle','Perspectives on brand, identity, and the discipline of visual thinking.'), 'textarea')
-  ) +
-  section('02', 'Article Listings', 'Three featured articles on index page',
-    row('a1_cat',     'Article 1 category', '', fv('a1_cat','Brand Systems')) +
-    row('a1_title',   'Article 1 title',    '', fv('a1_title','Why Brand Systems Outlast Assets')) +
-    row('a1_excerpt', 'Article 1 excerpt',  '', fv('a1_excerpt','The difference between a logo and a brand system is the difference between a sentence and a language.'), 'textarea') +
-    row('a1_url',     'Article 1 URL',      '', fv('a1_url','/insights/why-brand-systems-outlast-assets.html')) +
-    row('a2_cat',     'Article 2 category', '', fv('a2_cat','Spatial Design')) +
-    row('a2_title',   'Article 2 title',    '', fv('a2_title','The Grid Beneath Everything')) +
-    row('a2_excerpt', 'Article 2 excerpt',  '', fv('a2_excerpt','Every lasting visual system has an invisible structure beneath it. Learn to see the grid and you start to see everything.'), 'textarea') +
-    row('a2_url',     'Article 2 URL',      '', fv('a2_url','/insights/the-grid-beneath-everything.html')) +
-    row('a3_cat',     'Article 3 category', '', fv('a3_cat','Design Strategy')) +
-    row('a3_title',   'Article 3 title',    '', fv('a3_title','Restraint as a Design Strategy')) +
-    row('a3_excerpt', 'Article 3 excerpt',  '', fv('a3_excerpt','Removing something is often harder — and more impactful — than adding it. On the discipline of knowing when to stop.'), 'textarea') +
-    row('a3_url',     'Article 3 URL',      '', fv('a3_url','/insights/restraint-as-a-design-strategy.html'))
-  )
-}
-
-// ── CONTACT ───────────────────────────────────────────────
-function contactEditor(data) {
-  return section('01', 'Page Header', '',
-    row('hero_label',    'Label',    'Above "Let\'s work together"', fv('hero_label','Get in Touch')) +
-    row('hero_h1_l1',    'Headline line 1', '', fv('hero_h1_l1',"Let's work")) +
-    row('hero_h1_l2',    'Headline line 2', 'Accent', fv('hero_h1_l2','together.')) +
-    row('hero_subtitle', 'Subtitle paragraph', 'Left column body text', fv('hero_subtitle',"Whether you're building a brand from the ground up, redefining an existing one, or need a creative director to lead a project — let's talk."), 'textarea')
-  ) +
-  section('02', 'Contact Details', 'Left column info',
-    row('email',    'Email address',  '', fv('email','hello@eyuelmulat.com')) +
-    row('phone',    'Phone number',   '', fv('phone','+251 95 355 3856')) +
-    row('location', 'Location',       '', fv('location','Addis Ababa, Ethiopia')) +
-    row('ig_url',   'Instagram URL',  '', fv('ig_url','#')) +
-    row('li_url',   'LinkedIn URL',   '', fv('li_url','#')) +
-    row('be_url',   'Behance URL',    '', fv('be_url','#'))
-  ) +
-  section('03', 'Enquiry Form', 'Right column form labels',
-    row('form_heading',       'Form heading',          '"Your Details" title', fv('form_heading','Your Details')) +
-    row('form_services_head', 'Services section title','', fv('form_services_head','Services Needed')) +
-    row('form_timeline_head', 'Timeline section title','', fv('form_timeline_head','Delivery Timeline')) +
-    row('form_brief_head',    'Brief section title',   '', fv('form_brief_head','Project Brief')) +
-    row('form_submit',        'Submit button label',   '', fv('form_submit','Send Enquiry'))
-  ) +
-  section('04', 'Services Checklist', 'Checkbox options in the form',
-    row('svc_opt1', 'Option 1', '', fv('svc_opt1','Brand Strategy')) +
-    row('svc_opt2', 'Option 2', '', fv('svc_opt2','Visual Identity')) +
-    row('svc_opt3', 'Option 3', '', fv('svc_opt3','Creative Direction')) +
-    row('svc_opt4', 'Option 4', '', fv('svc_opt4','Typography')) +
-    row('svc_opt5', 'Option 5', '', fv('svc_opt5','Digital Systems')) +
-    row('svc_opt6', 'Option 6', '', fv('svc_opt6','Editorial Design')) +
-    row('svc_opt7', 'Option 7', '', fv('svc_opt7','Campaign & Art Direction')) +
-    row('svc_opt8', 'Option 8', '', fv('svc_opt8','Print & Packaging'))
-  )
-}
-
-// ─────────────────────────────────────────────────────────
-// PROJECTS LIST
-// ─────────────────────────────────────────────────────────
-async function renderProjects() {
-  const c = document.getElementById('content')
+async function loadCategories() {
   try {
-    const r = await fetch(`${API}/projects`, ah())
-    const items = r.ok ? await r.json() : []
-    const rows = items.map(p => `
-      <div class="items-row" style="grid-template-columns:2fr 1fr 1fr 80px" onclick="openProjectEditor('${esc(p.slug)}')">
-        <span class="item-title">${esc(p.title)}</span>
-        <span class="item-cat">${esc(p.category||'—')}</span>
-        <span class="item-meta">${esc(p.client||'—')}</span>
-        <span class="item-meta">${esc(p.year||'—')}</span>
-      </div>`).join('')
-    const head = `<div class="items-table-head" style="grid-template-columns:2fr 1fr 1fr 80px"><span>Title</span><span>Category</span><span>Client</span><span>Year</span></div>`
-    c.innerHTML = `<div class="list-page">
-      <div class="list-header">
-        <div class="list-header-text"><h1>Projects</h1><p>${items.length} project${items.length===1?'':'s'}</p></div>
-        <button class="btn btn-ink" onclick="openM('m-project')">+ New Project</button>
+    const r = await fetch(`${API}/categories`)
+    catsData = r.ok ? await r.json() : []
+  } catch { catsData = [] }
+  renderCategoriesView()
+}
+
+function renderCategoriesView() {
+  const c = document.getElementById('content')
+  const items = catsData.map((cat, i) => `
+    <div class="simple-item">
+      <input type="text" value="${esc(cat.name||'')}" placeholder="Category name" oninput="catsData[${i}].name=this.value;markDirty()"/>
+      <input type="text" value="${esc(cat.slug||'')}" placeholder="slug" style="max-width:160px" oninput="catsData[${i}].slug=this.value;markDirty()"/>
+      <button class="btn-danger-sm" onclick="removeCat(${i})">✕</button>
+    </div>`).join('')
+  c.innerHTML = `<div class="page-editor">
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Categories</div><div class="card-desc">Project categories — used for filtering on the work page</div></div>
       </div>
-      <div class="items-table">${head}${rows}</div>
-      <button class="add-row-btn" onclick="openM('m-project')">+ Add New Project</button>
+      <div class="card-body">
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <span class="f-label" style="flex:1">Name</span>
+          <span class="f-label" style="width:160px">Slug</span>
+          <span style="width:28px"></span>
+        </div>
+        ${items}
+        <button class="btn btn-ghost mt8" onclick="addCat()">+ Add Category</button>
+      </div>
+    </div>
+  </div>`
+}
+
+async function saveCategories() {
+  const r = await fetch(`${API}/categories`, {
+    method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-token': TOKEN },
+    body: JSON.stringify(catsData)
+  })
+  if (!r.ok) throw new Error('Server error')
+}
+
+function addCat() {
+  const id = Date.now().toString()
+  catsData.push({ id, name: '', slug: '' })
+  renderCategoriesView(); markDirty()
+}
+function removeCat(i) {
+  if (!confirm('Delete this category?')) return
+  catsData.splice(i,1); renderCategoriesView(); markDirty()
+}
+
+// ══════════════════════════════════════════════════════════
+// CONTACT
+// ══════════════════════════════════════════════════════════
+let contactData = {}
+let contactSvcs = []
+
+async function loadContact() {
+  try {
+    const [r1, r2] = await Promise.all([
+      fetch(`${API}/content/contact`, { headers: ah() }),
+      fetch(`${API}/contact-services`)
+    ])
+    contactData = r1.ok ? await r1.json() : {}
+    contactSvcs = r2.ok ? await r2.json() : []
+  } catch { contactData = {}; contactSvcs = [] }
+  renderContactView()
+}
+
+function renderContactView() {
+  const f = (k, label, fallback, type = 'text') => {
+    const val = (contactData.fields && contactData.fields[k]) || fallback
+    const id = 'cf-' + k
+    let inp
+    if (type === 'textarea') inp = `<textarea id="${id}" data-ck="${k}" oninput="markDirty()">${esc(val)}</textarea>`
+    else inp = `<input type="text" id="${id}" data-ck="${k}" value="${esc(val)}" oninput="markDirty()"/>`
+    return `<div class="f-group"><label class="f-label">${label}</label>${inp}</div>`
+  }
+  const svcs = contactSvcs.map((s, i) => `
+    <div class="simple-item">
+      <input type="text" value="${esc(s)}" oninput="contactSvcs[${i}]=this.value;markDirty()"/>
+      <button class="btn-danger-sm" onclick="removeSvc(${i})">✕</button>
+    </div>`).join('')
+  document.getElementById('content').innerHTML = `<div class="page-editor">
+    ${cardSection('Page Header', '',
+      `<div class="field-grid">
+        ${f('hero_label','Label','Get in Touch')}
+        ${f('hero_h1_l1','Headline Line 1',"Let's work")}
+        ${f('hero_h1_l2','Headline Line 2','together.')}
+      </div>
+      ${f('hero_subtitle','Subtitle paragraph',"Whether you're building a brand from the ground up…",'textarea')}`)}
+    ${cardSection('Contact Details', 'Displayed in the left column',
+      `<div class="field-grid">
+        ${f('email','Email','hello@eyuelmulat.com')}
+        ${f('phone','Phone','+251 95 355 3856')}
+        ${f('location','Location','Addis Ababa, Ethiopia')}
+        ${f('ig_url','Instagram URL','#')}
+        ${f('li_url','LinkedIn URL','#')}
+        ${f('be_url','Behance URL','#')}
+      </div>`)}
+    <div class="card">
+      <div class="card-head"><div class="card-title">Services Checklist</div><div class="card-desc">Options shown in the contact form</div></div>
+      <div class="card-body">
+        <div id="svcs-list">${svcs}</div>
+        <button class="btn btn-ghost mt8" onclick="addSvc()">+ Add Service</button>
+      </div>
+    </div>
+  </div>`
+}
+
+async function saveContact() {
+  // collect contact fields
+  const fields = {}
+  document.querySelectorAll('[data-ck]').forEach(el => { fields[el.dataset.ck] = el.value })
+  contactData.fields = fields
+  const [r1, r2] = await Promise.all([
+    fetch(`${API}/content/contact`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-token': TOKEN },
+      body: JSON.stringify(contactData)
+    }),
+    fetch(`${API}/contact-services`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-token': TOKEN },
+      body: JSON.stringify(contactSvcs)
+    })
+  ])
+  if (!r1.ok || !r2.ok) throw new Error('Server error')
+}
+
+function addSvc() { contactSvcs.push(''); renderContactView(); markDirty() }
+function removeSvc(i) { contactSvcs.splice(i,1); renderContactView(); markDirty() }
+
+// ══════════════════════════════════════════════════════════
+// PROJECTS
+// ══════════════════════════════════════════════════════════
+let projectsData = []
+let projectPageData = {}  // slug -> content data
+
+async function loadProjects() {
+  try {
+    const r = await fetch(`${API}/projects`, { headers: ah() })
+    projectsData = r.ok ? await r.json() : []
+  } catch { projectsData = [] }
+  renderProjectsList()
+}
+
+function renderProjectsList() {
+  const c = document.getElementById('content')
+  if (!projectsData.length) {
+    c.innerHTML = `<div class="list-page">
+      <div class="list-top"><div><h2>Projects</h2><p>No projects yet</p></div><button class="btn btn-navy" onclick="openM('m-project')">+ Add New Project</button></div>
+      <div class="empty-state" style="padding:40px 0"><p>Create your first project using the button above.</p></div>
     </div>`
-  } catch {
-    c.innerHTML = `<div class="empty"><h2>Could not load projects</h2><p>Make sure the server is running.</p></div>`
+    return
+  }
+  const cards = projectsData.map((p, i) => buildProjectCard(p, i)).join('')
+  c.innerHTML = `<div class="list-page">
+    <div class="list-top">
+      <div><h2>Projects</h2><p>${projectsData.length} project${projectsData.length===1?'':'s'}</p></div>
+      <button class="btn btn-navy" onclick="openM('m-project')">+ Add New Project</button>
+    </div>
+    <div id="projects-list">${cards}</div>
+  </div>`
+}
+
+function buildProjectCard(p, i) {
+  const slug = p.slug || ''
+  const pd = projectPageData[slug] || {}
+  const blocks = pd.blocks || []
+  const blocksHTML = blocks.map((b, bi) => buildBlockCard(b, bi, slug)).join('')
+  return `<div class="proj-card" id="pcard-${slug}">
+    <div class="proj-header" onclick="toggleProjCard('${slug}')">
+      <span class="proj-toggle">▼</span>
+      <span class="proj-cat-tag">${esc(p.category||'—')}</span>
+      <span class="proj-title">${esc(p.title||slug)}</span>
+      <span class="proj-year">${esc(p.year||'')}</span>
+      <div class="proj-actions" onclick="event.stopPropagation()">
+        <a href="/work/${slug}.html" target="_blank" class="btn btn-ghost" style="padding:4px 8px;font-size:10px" title="View">↗</a>
+        <button class="btn-danger-sm" onclick="deleteProject('${slug}')" title="Delete">✕</button>
+      </div>
+    </div>
+    <div class="proj-body" id="pbody-${slug}">
+      <div id="pform-${slug}">Loading…</div>
+    </div>
+  </div>`
+}
+
+async function toggleProjCard(slug) {
+  const card = document.getElementById(`pcard-${slug}`)
+  if (!card) return
+  const wasOpen = card.classList.contains('open')
+  card.classList.toggle('open')
+  if (!wasOpen && !projectPageData[slug]) {
+    await loadProjectData(slug)
   }
 }
 
-// ─────────────────────────────────────────────────────────
-// PROJECT EDITOR (detail)
-// ─────────────────────────────────────────────────────────
-async function openProjectEditor(slug) {
-  activePage = slug
-  document.getElementById('tb-title').textContent = slug
-  document.getElementById('save-btn').classList.remove('hidden')
-  const c = document.getElementById('content')
-  c.innerHTML = '<div style="padding:40px;font-size:12px;color:var(--ink-4)">Loading…</div>'
+async function loadProjectData(slug) {
+  const formEl = document.getElementById(`pform-${slug}`)
+  if (!formEl) return
   try {
-    const r = await fetch(`${API}/content/${slug}`, ah())
-    pageData = r.ok ? await r.json() : {}
-    const v = (k,d='') => fv(k,d)
-    c.innerHTML = `<div class="page-editor">
-      <button class="back-link" onclick="go('projects')">Back to Projects</button>
-      <div class="detail-heading"><h1>${esc(slug)}</h1><p>Edit project metadata and content blocks</p></div>
-      ${section('01','Project Meta','Header fields',
-        row('title',       'Title',       'Page headline', v('title',slug)) +
-        row('category',    'Category',    'e.g. Brand Identity', v('category')) +
-        row('year',        'Year',        '', v('year','2024')) +
-        row('client',      'Client',      '', v('client')) +
-        row('scope',       'Scope',       'Services delivered', v('scope')) +
-        row('role',        'Role',        'Your role', v('role','Creative Director')) +
-        row('description', 'Description', 'Overview paragraph', v('description'), 'textarea') +
-        row('hero_img',    'Hero image',  '16:9 cover', v('hero_img'), 'image')
-      )}
-      <div class="section-block blocks-section">
-        <div class="section-head">
-          <span class="section-num">02</span>
-          <span class="section-name">Content Blocks</span>
-          <span class="section-desc">Drag to reorder</span>
-        </div>
-        <div class="blocks-list" id="blocks-list">${renderBlocksList(pageData.blocks||[])}</div>
-        <div class="add-blocks">
-          <button class="add-block" onclick="addBlock('text')">+ Text</button>
-          <button class="add-block" onclick="addBlock('image')">+ Image</button>
-          <button class="add-block" onclick="addBlock('image-text')">+ Image + Text</button>
-          <button class="add-block" onclick="addBlock('gallery')">+ Gallery</button>
-          <button class="add-block" onclick="addBlock('quote')">+ Quote</button>
-          <button class="add-block" onclick="addBlock('spacer')">+ Spacer</button>
-        </div>
-      </div>
-    </div>`
-  } catch { c.innerHTML = '<div class="empty"><h2>Could not load project</h2></div>' }
+    const [pr, cr] = await Promise.all([
+      fetch(`${API}/projects`, { headers: ah() }),
+      fetch(`${API}/content/${slug}`, { headers: ah() })
+    ])
+    const projects = pr.ok ? await pr.json() : []
+    const content = cr.ok ? await cr.json() : {}
+    const meta = projects.find(p => p.slug === slug) || {}
+    projectPageData[slug] = content
+    renderProjectForm(slug, meta, content)
+  } catch(e) {
+    if (formEl) formEl.innerHTML = `<div style="color:red;font-size:12px">Error loading: ${e.message}</div>`
+  }
 }
 
-// ─────────────────────────────────────────────────────────
-// BLOCKS
-// ─────────────────────────────────────────────────────────
-function renderBlocksList(blocks) {
-  return blocks.map((b,i) => blockHTML(b,i)).join('')
+let catOptions = []
+async function getCatOptions() {
+  if (catOptions.length) return catOptions
+  try {
+    const r = await fetch(`${API}/categories`)
+    catOptions = r.ok ? await r.json() : []
+  } catch {}
+  return catOptions
 }
-function blockHTML(b,i) {
-  const preview = b.type==='text'?String(b.text||'').slice(0,60):b.type==='quote'?String(b.text||'').slice(0,50):b.type==='image'?(b.url?'Has image':'No image set'):b.type==='gallery'?`${(b.images||[]).length} images`:b.type==='spacer'?`${b.height||80}px gap`:b.type==='image-text'?String(b.text||'').slice(0,40):''
-  return `<div class="block-row" id="blk-${i}">
-    <div class="block-row-header" onclick="toggleBlock(${i})">
-      <span class="block-handle">⠿</span>
-      <span class="block-type-tag">${b.type}</span>
-      <span class="block-preview-text">${esc(preview)}</span>
-      <button class="btn-danger" onclick="event.stopPropagation();removeBlock(${i})" title="Remove">✕</button>
+
+async function renderProjectForm(slug, meta, content) {
+  const formEl = document.getElementById(`pform-${slug}`)
+  if (!formEl) return
+  const cats = await getCatOptions()
+  const catSelect = cats.map(c => `<option value="${esc(c.name)}" ${meta.category===c.name?'selected':''}>${esc(c.name)}</option>`).join('')
+  const blocks = content.blocks || []
+  const blocksHTML = blocks.map((b, bi) => buildBlockCard(b, bi, slug)).join('')
+  const bgVal = meta.bg_image || content.fields?.bg_image || ''
+  const thumbVal = meta.thumbnail || content.fields?.thumbnail || ''
+  formEl.innerHTML = `
+    <div class="field-grid">
+      <div class="f-group"><label class="f-label">Project Title</label><input type="text" id="pm-title-${slug}" value="${esc(meta.title||'')}" oninput="markDirty()"/></div>
+      <div class="f-group"><label class="f-label">URL Slug</label><input type="text" id="pm-slug-${slug}" value="${esc(slug)}" oninput="markDirty()" readonly style="background:#f5f5f5;color:#888"/></div>
+      <div class="f-group"><label class="f-label">Category</label>
+        <select id="pm-cat-${slug}" oninput="markDirty()">
+          <option value="">— Select —</option>${catSelect}
+          <option value="${esc(meta.category||'')}" ${meta.category?'':'selected'}>${esc(meta.category||'Custom…')}</option>
+        </select>
+      </div>
+      <div class="f-group"><label class="f-label">Client</label><input type="text" id="pm-client-${slug}" value="${esc(meta.client||'')}" oninput="markDirty()"/></div>
+      <div class="f-group"><label class="f-label">Year</label><input type="text" id="pm-year-${slug}" value="${esc(meta.year||'')}" oninput="markDirty()"/></div>
+      <div class="f-group"><label class="f-label">Tags (comma-separated)</label><input type="text" id="pm-tags-${slug}" value="${esc(meta.tags||meta.scope||'')}" oninput="markDirty()"/></div>
     </div>
-    <div class="block-body">${blockBodyHTML(b,i)}</div>
+    <div class="f-group full"><label class="f-label">Description</label><textarea id="pm-desc-${slug}" style="min-height:80px" oninput="markDirty()">${esc(meta.description||'')}</textarea></div>
+    <div class="field-grid">
+      <div class="f-group"><label class="f-label">Background Image</label>${mediaDropZoneHTML(`pm-bg-${slug}`, '', bgVal)}</div>
+      <div class="f-group"><label class="f-label">Preview Thumbnail</label>${mediaDropZoneHTML(`pm-thumb-${slug}`, '', thumbVal)}</div>
+    </div>
+    <div class="blocks-section">
+      <div class="sec-div">Gallery &amp; Content Blocks</div>
+      <div class="blocks-list" id="blocks-${slug}">${blocksHTML || '<div style="color:#bbb;font-size:12px;padding:8px 0">No blocks yet.</div>'}</div>
+      <div class="add-blocks">
+        <button class="add-block-btn" onclick="addProjBlock('${slug}','full-image')">+ Full-Width Image</button>
+        <button class="add-block-btn" onclick="addProjBlock('${slug}','text')">+ Text</button>
+        <button class="add-block-btn" onclick="addProjBlock('${slug}','quote')">+ Quote</button>
+        <button class="add-block-btn" onclick="addProjBlock('${slug}','gallery')">+ Gallery</button>
+        <button class="add-block-btn" onclick="addProjBlock('${slug}','video')">+ Video/GIF</button>
+        <button class="add-block-btn" onclick="addProjBlock('${slug}','image-text')">+ Image+Text</button>
+        <button class="add-block-btn" onclick="addProjBlock('${slug}','spacer')">+ Spacer</button>
+      </div>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:8px">
+      <button class="btn btn-navy" onclick="saveProject('${slug}')">Save Project</button>
+      <button class="btn btn-ghost" onclick="deleteProject('${slug}')" style="color:var(--danger);border-color:var(--danger)">Delete</button>
+    </div>`
+}
+
+function buildBlockCard(b, bi, slug) {
+  const preview = getBlockPreview(b)
+  const typeLabel = b.type === 'full-image' ? 'Full-Width Image' :
+    b.type === 'image-text' ? 'Image + Text' :
+    b.type === 'video' ? 'Video/GIF' :
+    (b.type || 'block').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+  return `<div class="block-card" id="blk-${slug}-${bi}">
+    <div class="block-card-header" onclick="toggleBlockCard('${slug}',${bi})">
+      <span class="block-type-pill">${typeLabel}</span>
+      <span class="block-preview">${esc(preview)}</span>
+      <div class="block-reorder">
+        <button onclick="event.stopPropagation();moveProjBlock('${slug}',${bi},-1)">↑</button>
+        <button onclick="event.stopPropagation();moveProjBlock('${slug}',${bi},1)">↓</button>
+      </div>
+      <button class="btn-danger-sm" onclick="event.stopPropagation();removeProjBlock('${slug}',${bi})">✕</button>
+    </div>
+    <div class="block-card-body">${buildBlockBody(b, bi, slug)}</div>
   </div>`
 }
-function blockBodyHTML(b,i) {
-  if (b.type==='text') return `<div class="f-group"><label class="f-label">Text</label><textarea oninput="pageData.blocks[${i}].text=this.value;markDirty()">${esc(b.text||'')}</textarea></div>`
-  if (b.type==='quote') return `<div class="f-group"><label class="f-label">Quote</label><textarea oninput="pageData.blocks[${i}].text=this.value;markDirty()">${esc(b.text||'')}</textarea></div><div class="f-group"><label class="f-label">Attribution</label><input type="text" value="${esc(b.attribution||'')}" oninput="pageData.blocks[${i}].attribution=this.value;markDirty()"/></div>`
-  if (b.type==='spacer') return `<div class="f-group"><label class="f-label">Height (px)</label><div class="range-row"><input type="range" min="20" max="300" value="${b.height||80}" oninput="pageData.blocks[${i}].height=+this.value;markDirty();this.nextElementSibling.textContent=this.value+'px'"/><span class="range-val">${b.height||80}px</span></div></div>`
-  if (b.type==='image') return `<div class="f-group"><label class="f-label">Image</label><div class="img-field"><div class="img-thumb-wrap">${b.url?`<img src="${esc(b.url)}" id="bimg-${i}" style="width:100%;height:100%;object-fit:cover"/>`:`<div class="img-thumb-empty" id="bimg-${i}">▭</div>`}</div><div class="img-field-inputs"><input type="url" value="${esc(b.url||'')}" placeholder="https://…" oninput="pageData.blocks[${i}].url=this.value;markDirty();updateBlockThumb(${i},this.value)"/><label class="img-upload-btn">↑ Upload<input type="file" accept="image/*" style="display:none" onchange="uploadBlockImg(this,${i})"/></label></div></div></div><div class="f-group"><label class="f-label">Caption</label><input type="text" value="${esc(b.caption||'')}" oninput="pageData.blocks[${i}].caption=this.value;markDirty()"/></div>`
-  if (b.type==='image-text') return `<div class="f-group"><label class="f-label">Image</label><div class="img-field"><div class="img-thumb-wrap">${b.img?`<img src="${esc(b.img)}" id="bimg-${i}" style="width:100%;height:100%;object-fit:cover"/>`:`<div class="img-thumb-empty" id="bimg-${i}">▭</div>`}</div><div class="img-field-inputs"><input type="url" value="${esc(b.img||'')}" placeholder="https://…" oninput="pageData.blocks[${i}].img=this.value;markDirty();updateBlockThumb(${i},this.value,true)"/><label class="img-upload-btn">↑ Upload<input type="file" accept="image/*" style="display:none" onchange="uploadBlockImg(this,${i},true)"/></label></div></div></div><div class="f-group"><label class="f-label">Text</label><textarea oninput="pageData.blocks[${i}].text=this.value;markDirty()">${esc(b.text||'')}</textarea></div><div class="f-group"><label class="f-label">Image side</label><select onchange="pageData.blocks[${i}].side=this.value;markDirty()"><option value="left" ${b.side==='left'?'selected':''}>Left</option><option value="right" ${b.side==='right'?'selected':''}>Right</option></select></div>`
-  if (b.type==='gallery') {
-    const imgs = (b.images||[]).map((img,j)=>`<div class="row" style="margin-bottom:8px"><div class="img-thumb-wrap" style="width:56px;height:40px">${img?`<img src="${esc(img)}" style="width:100%;height:100%;object-fit:cover"/>`:`<div class="img-thumb-empty">▭</div>`}</div><input type="url" value="${esc(img)}" style="flex:1" oninput="pageData.blocks[${i}].images[${j}]=this.value;markDirty()"/><button class="btn-danger" onclick="removeGalleryImg(${i},${j})">✕</button></div>`).join('')
-    return `<div class="f-group"><label class="f-label">Images</label><div id="gal-${i}">${imgs}</div><label class="img-upload-btn mt1">↑ Upload Images<input type="file" accept="image/*" multiple style="display:none" onchange="uploadGallery(this,${i})"/></label></div>`
+
+function getBlockPreview(b) {
+  if (!b) return ''
+  if (b.type === 'text') return String(b.text||'').slice(0,60)
+  if (b.type === 'quote') return '"' + String(b.text||'').slice(0,50) + '"'
+  if (b.type === 'full-image' || b.type === 'video') return b.url ? 'Has media' : 'No media set'
+  if (b.type === 'image-text') return String(b.text||'').slice(0,40)
+  if (b.type === 'gallery') return `${(b.images||[]).length} images`
+  if (b.type === 'spacer') return `${b.height||80}px gap`
+  return ''
+}
+
+function buildBlockBody(b, bi, slug) {
+  const sid = `${slug}-${bi}`
+  if (b.type === 'text') return `
+    <div class="f-group"><label class="f-label">Text Content</label>
+      <textarea oninput="setBlockProp('${slug}',${bi},'text',this.value)">${esc(b.text||'')}</textarea></div>`
+
+  if (b.type === 'quote') return `
+    <div class="f-group"><label class="f-label">Quote Text</label>
+      <textarea oninput="setBlockProp('${slug}',${bi},'text',this.value)">${esc(b.text||'')}</textarea></div>
+    <div class="f-group"><label class="f-label">Attribution</label>
+      <input type="text" value="${esc(b.attribution||'')}" oninput="setBlockProp('${slug}',${bi},'attribution',this.value)"/></div>`
+
+  if (b.type === 'spacer') return `
+    <div class="f-group"><label class="f-label">Height</label>
+      <div class="range-row">
+        <input type="range" min="20" max="400" value="${b.height||80}" oninput="setBlockProp('${slug}',${bi},'height',+this.value);this.nextElementSibling.textContent=this.value+'px'"/>
+        <span class="range-val">${b.height||80}px</span>
+      </div></div>`
+
+  if (b.type === 'full-image') return `
+    <div class="f-group"><label class="f-label">Image / Video</label>
+      ${mediaDropZoneHTML(`bfull-${sid}`, '', b.url||'')}</div>
+    <div class="sec-div" style="font-size:10px;margin-top:12px">Margin (px)</div>
+    <div class="field-grid">
+      <div class="f-group"><label class="f-label">Top</label>
+        <div class="range-row"><input type="range" min="0" max="200" value="${b.mt||0}" oninput="setBlockProp('${slug}',${bi},'mt',+this.value);this.nextElementSibling.textContent=this.value+'px'"/><span class="range-val">${b.mt||0}px</span></div></div>
+      <div class="f-group"><label class="f-label">Bottom</label>
+        <div class="range-row"><input type="range" min="0" max="200" value="${b.mb||0}" oninput="setBlockProp('${slug}',${bi},'mb',+this.value);this.nextElementSibling.textContent=this.value+'px'"/><span class="range-val">${b.mb||0}px</span></div></div>
+      <div class="f-group"><label class="f-label">Left</label>
+        <div class="range-row"><input type="range" min="0" max="200" value="${b.ml||0}" oninput="setBlockProp('${slug}',${bi},'ml',+this.value);this.nextElementSibling.textContent=this.value+'px'"/><span class="range-val">${b.ml||0}px</span></div></div>
+      <div class="f-group"><label class="f-label">Right</label>
+        <div class="range-row"><input type="range" min="0" max="200" value="${b.mr||0}" oninput="setBlockProp('${slug}',${bi},'mr',+this.value);this.nextElementSibling.textContent=this.value+'px'"/><span class="range-val">${b.mr||0}px</span></div></div>
+    </div>`
+
+  if (b.type === 'video') return `
+    <div class="f-group"><label class="f-label">Video / GIF</label>
+      ${mediaDropZoneHTML(`bvid-${sid}`, '', b.url||'')}</div>
+    <div class="f-group"><label class="f-label">Caption</label>
+      <input type="text" value="${esc(b.caption||'')}" oninput="setBlockProp('${slug}',${bi},'caption',this.value)"/></div>`
+
+  if (b.type === 'image-text') return `
+    <div class="f-group"><label class="f-label">Image</label>
+      ${mediaDropZoneHTML(`bit-${sid}`, '', b.img||'')}</div>
+    <div class="f-group"><label class="f-label">Text</label>
+      <textarea oninput="setBlockProp('${slug}',${bi},'text',this.value)">${esc(b.text||'')}</textarea></div>
+    <div class="f-group"><label class="f-label">Image Side</label>
+      <select onchange="setBlockProp('${slug}',${bi},'side',this.value)">
+        <option value="left" ${b.side==='left'?'selected':''}>Left</option>
+        <option value="right" ${b.side==='right'?'selected':''}>Right</option>
+      </select></div>`
+
+  if (b.type === 'gallery') {
+    const imgs = (b.images||[]).map((img, j) => `
+      <div class="flex-row" style="margin-bottom:8px">
+        ${img ? `<img src="${esc(img)}" style="width:52px;height:36px;object-fit:cover;border-radius:3px;border:1px solid var(--border)"/>` : '<div style="width:52px;height:36px;background:#f0f0f0;border-radius:3px;border:1px solid var(--border)"></div>'}
+        <input type="url" value="${esc(img)}" style="flex:1" oninput="setBlockGalleryImg('${slug}',${bi},${j},this.value)"/>
+        <button class="btn-danger-sm" onclick="removeGalleryImgProj('${slug}',${bi},${j})">✕</button>
+      </div>`).join('')
+    return `<div class="f-group"><label class="f-label">Gallery Images</label>
+      <div id="gal-${sid}">${imgs}</div>
+      <label class="btn btn-ghost" style="cursor:pointer;margin-top:8px">
+        ↑ Upload Images<input type="file" accept="${MEDIA_ACCEPT}" multiple style="display:none" onchange="uploadGalleryProj(this,'${slug}',${bi})"/>
+      </label></div>`
   }
   return ''
 }
-function toggleBlock(i) {
-  const el = document.getElementById(`blk-${i}`)
-  if (el) el.classList.toggle('open')
+
+function toggleBlockCard(slug, bi) {
+  document.getElementById(`blk-${slug}-${bi}`)?.classList.toggle('open')
 }
-function addBlock(type) {
-  if (!pageData.blocks) pageData.blocks = []
-  const defaults = { text:{type:'text',text:''}, image:{type:'image',url:'',caption:''}, quote:{type:'quote',text:'',attribution:''}, gallery:{type:'gallery',images:[]}, spacer:{type:'spacer',height:80}, 'image-text':{type:'image-text',img:'',text:'',side:'left'} }
-  pageData.blocks.push({...defaults[type]})
-  markDirty(); rerenderBlocks()
+
+function setBlockProp(slug, bi, key, val) {
+  if (!projectPageData[slug]) return
+  if (!projectPageData[slug].blocks) projectPageData[slug].blocks = []
+  if (projectPageData[slug].blocks[bi]) {
+    projectPageData[slug].blocks[bi][key] = val
+    // sync drop zone url if applicable
+    if (key === 'url') {
+      const sid = `${slug}-${bi}`
+      const inp = document.getElementById(`bfull-${sid}`) || document.getElementById(`bvid-${sid}`)
+      // already set via input event
+    }
+  }
+  markDirty()
 }
-function removeBlock(i) { pageData.blocks.splice(i,1); markDirty(); rerenderBlocks() }
-function rerenderBlocks() {
-  const el = document.getElementById('blocks-list')
-  if (el) el.innerHTML = renderBlocksList(pageData.blocks||[])
+
+function setBlockGalleryImg(slug, bi, j, val) {
+  if (projectPageData[slug]?.blocks?.[bi]?.images) {
+    projectPageData[slug].blocks[bi].images[j] = val
+    markDirty()
+  }
 }
-function updateBlockThumb(i, url, isImg=false) {
-  const el = document.getElementById(`bimg-${i}`)
+
+function addProjBlock(slug, type) {
+  if (!projectPageData[slug]) projectPageData[slug] = { blocks: [] }
+  if (!projectPageData[slug].blocks) projectPageData[slug].blocks = []
+  const defaults = {
+    'full-image': { type:'full-image', url:'', mt:0, mb:0, ml:0, mr:0 },
+    'text': { type:'text', text:'' },
+    'quote': { type:'quote', text:'', attribution:'' },
+    'gallery': { type:'gallery', images:[] },
+    'video': { type:'video', url:'', caption:'' },
+    'image-text': { type:'image-text', img:'', text:'', side:'left' },
+    'spacer': { type:'spacer', height:80 },
+  }
+  projectPageData[slug].blocks.push({ ...defaults[type] })
+  markDirty()
+  rerenderProjBlocks(slug)
+}
+
+function removeProjBlock(slug, bi) {
+  if (!confirm('Remove this block?')) return
+  projectPageData[slug]?.blocks?.splice(bi, 1)
+  markDirty()
+  rerenderProjBlocks(slug)
+}
+
+function moveProjBlock(slug, bi, dir) {
+  const blocks = projectPageData[slug]?.blocks
+  if (!blocks) return
+  const j = bi + dir
+  if (j < 0 || j >= blocks.length) return
+  ;[blocks[bi], blocks[j]] = [blocks[j], blocks[bi]]
+  markDirty()
+  rerenderProjBlocks(slug)
+}
+
+function rerenderProjBlocks(slug) {
+  const el = document.getElementById(`blocks-${slug}`)
   if (!el) return
-  const replacement = url ? `<img src="${url}" id="bimg-${i}" style="width:100%;height:100%;object-fit:cover"/>` : `<div class="img-thumb-empty" id="bimg-${i}">▭</div>`
-  el.outerHTML = replacement
+  const blocks = projectPageData[slug]?.blocks || []
+  el.innerHTML = blocks.map((b, bi) => buildBlockCard(b, bi, slug)).join('') || '<div style="color:#bbb;font-size:12px;padding:8px 0">No blocks yet.</div>'
 }
-async function uploadBlockImg(input, i, isImg=false) {
-  if (!input.files[0]) return
-  const fd = new FormData(); fd.append('file', input.files[0])
-  try {
-    const r = await fetch(`${API}/upload`, { method:'POST', headers:{'x-token':TOKEN}, body:fd })
-    const d = await r.json()
-    if (!r.ok) throw new Error(d.error)
-    const key = isImg ? 'img' : 'url'
-    pageData.blocks[i][key] = d.url
-    updateBlockThumb(i, d.url, isImg); markDirty(); toast('Uploaded','ok')
-  } catch(e) { toast(e.message||'Upload failed','err') }
-}
-function removeGalleryImg(i,j) { pageData.blocks[i].images.splice(j,1); markDirty(); rerenderBlocks() }
-async function uploadGallery(input, i) {
+
+async function uploadGalleryProj(input, slug, bi) {
   for (const file of input.files) {
     const fd = new FormData(); fd.append('file', file)
     try {
       const r = await fetch(`${API}/upload`, { method:'POST', headers:{'x-token':TOKEN}, body:fd })
       const d = await r.json()
       if (!r.ok) continue
-      if (!pageData.blocks[i].images) pageData.blocks[i].images = []
-      pageData.blocks[i].images.push(d.url)
+      if (!projectPageData[slug].blocks[bi].images) projectPageData[slug].blocks[bi].images = []
+      projectPageData[slug].blocks[bi].images.push(d.url)
     } catch {}
   }
-  markDirty(); rerenderBlocks(); toast('Images uploaded','ok')
+  markDirty()
+  rerenderProjBlocks(slug)
+  toast('Images uploaded','ok')
 }
 
-// ─────────────────────────────────────────────────────────
-// ARTICLES LIST
-// ─────────────────────────────────────────────────────────
-async function renderArticles() {
-  const c = document.getElementById('content')
-  try {
-    const r = await fetch(`${API}/content/articles`, ah())
-    const data = r.ok ? await r.json() : {}
-    const items = data.items || []
-    const rows = items.map(a => `
-      <div class="items-row" style="grid-template-columns:2fr 1fr 1fr 100px">
-        <span class="item-title">${esc(a.title)}</span>
-        <span class="item-cat">${esc(a.category||'—')}</span>
-        <span class="item-meta">${esc(a.date||'—')}</span>
-        <span class="item-meta">${esc(a.slug)}</span>
-      </div>`).join('')
-    const head = `<div class="items-table-head" style="grid-template-columns:2fr 1fr 1fr 100px"><span>Title</span><span>Category</span><span>Date</span><span>Slug</span></div>`
-    c.innerHTML = `<div class="list-page">
-      <div class="list-header">
-        <div class="list-header-text"><h1>Articles</h1><p>${items.length} article${items.length===1?'':'s'}</p></div>
-        <button class="btn btn-ink" onclick="openM('m-article')">+ New Article</button>
-      </div>
-      <div class="items-table">${head}${rows}</div>
-      <button class="add-row-btn" onclick="openM('m-article')">+ Add New Article</button>
-    </div>`
-  } catch {
-    c.innerHTML = '<div class="empty"><h2>Could not load articles</h2></div>'
+function removeGalleryImgProj(slug, bi, j) {
+  projectPageData[slug]?.blocks?.[bi]?.images?.splice(j, 1)
+  markDirty()
+  rerenderProjBlocks(slug)
+}
+
+async function saveProject(slug) {
+  const g = id => { const el = document.getElementById(id); return el ? el.value : '' }
+  // Sync block media urls from drop zone inputs
+  const blocks = projectPageData[slug]?.blocks || []
+  blocks.forEach((b, bi) => {
+    const sid = `${slug}-${bi}`
+    if (b.type === 'full-image') { const inp = document.getElementById(`bfull-${sid}`); if (inp) b.url = inp.value }
+    if (b.type === 'video') { const inp = document.getElementById(`bvid-${sid}`); if (inp) b.url = inp.value }
+    if (b.type === 'image-text') { const inp = document.getElementById(`bit-${sid}`); if (inp) b.img = inp.value }
+  })
+  const meta = {
+    title: g(`pm-title-${slug}`),
+    category: g(`pm-cat-${slug}`),
+    client: g(`pm-client-${slug}`),
+    year: g(`pm-year-${slug}`),
+    tags: g(`pm-tags-${slug}`),
+    description: g(`pm-desc-${slug}`),
+    bg_image: g(`pm-bg-${slug}`),
+    thumbnail: g(`pm-thumb-${slug}`),
   }
+  const content = { ...projectPageData[slug], fields: meta }
+  try {
+    const [r1, r2] = await Promise.all([
+      fetch(`${API}/project/${slug}`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-token': TOKEN },
+        body: JSON.stringify(meta)
+      }),
+      fetch(`${API}/content/${slug}`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-token': TOKEN },
+        body: JSON.stringify(content)
+      })
+    ])
+    if (!r1.ok || !r2.ok) throw new Error('Server error')
+    toast(`"${meta.title || slug}" saved`, 'ok')
+    // Update local data
+    const idx = projectsData.findIndex(p => p.slug === slug)
+    if (idx >= 0) projectsData[idx] = { ...projectsData[idx], ...meta }
+  } catch(e) { toast(e.message || 'Save failed', 'err') }
 }
 
-// ─────────────────────────────────────────────────────────
-// CREATE PROJECT / ARTICLE
-// ─────────────────────────────────────────────────────────
-function slugify(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') }
-document.getElementById('mp-title').addEventListener('input', function() { const s=document.getElementById('mp-slug'); if(!s._t) s.value=slugify(this.value) })
-document.getElementById('mp-slug').addEventListener('input', function() { this._t=true })
-document.getElementById('ma-title').addEventListener('input', function() { const s=document.getElementById('ma-slug'); if(!s._t) s.value=slugify(this.value) })
-document.getElementById('ma-slug').addEventListener('input', function() { this._t=true })
+async function deleteProject(slug) {
+  if (!confirm(`Delete project "${slug}"? This cannot be undone.`)) return
+  try {
+    const r = await fetch(`${API}/project/${slug}`, { method:'DELETE', headers:ah() })
+    if (!r.ok) throw new Error()
+    toast('Project deleted', 'ok')
+    projectsData = projectsData.filter(p => p.slug !== slug)
+    delete projectPageData[slug]
+    renderProjectsList()
+  } catch { toast('Delete failed', 'err') }
+}
 
 async function createProject() {
-  const g = id => document.getElementById(id).value.trim()
-  const slug=g('mp-slug'), title=g('mp-title')
-  if (!slug||!title) { toast('Title and slug required','err'); return }
+  const g = id => document.getElementById(id)?.value.trim() || ''
+  const slug = g('mp-slug'), title = g('mp-title')
+  if (!slug || !title) { toast('Title and slug required', 'err'); return }
   try {
-    const r = await fetch(`${API}/project`, { method:'POST', headers:{'Content-Type':'application/json','x-token':TOKEN}, body:JSON.stringify({slug,title,category:g('mp-cat'),year:g('mp-year'),client:g('mp-client'),scope:g('mp-scope'),role:g('mp-role'),description:g('mp-desc')}) })
+    const r = await fetch(`${API}/project`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-token': TOKEN },
+      body: JSON.stringify({ slug, title, category: g('mp-cat'), year: g('mp-year'), client: g('mp-client'), scope: g('mp-scope'), role: g('mp-role'), description: g('mp-desc') })
+    })
     const d = await r.json()
     if (!r.ok) throw new Error(d.error)
     closeM('m-project')
-    toast(`"${title}" created`,'ok')
-    renderProjects()
-  } catch(e) { toast(e.message||'Failed','err') }
+    toast(`"${title}" created`, 'ok')
+    await loadProjects()
+  } catch(e) { toast(e.message || 'Failed', 'err') }
 }
-async function createArticle() {
-  const g = id => document.getElementById(id).value.trim()
-  const slug=g('ma-slug'), title=g('ma-title')
-  if (!slug||!title) { toast('Title and slug required','err'); return }
+
+// ══════════════════════════════════════════════════════════
+// ARTICLES
+// ══════════════════════════════════════════════════════════
+let articlesData = []
+let articlePageData = {}
+
+async function loadArticles() {
   try {
-    const r = await fetch(`${API}/insight`, { method:'POST', headers:{'Content-Type':'application/json','x-token':TOKEN}, body:JSON.stringify({slug,title,category:g('ma-cat'),date:g('ma-date'),excerpt:g('ma-excerpt'),body:g('ma-body')}) })
+    const r = await fetch(`${API}/insights`, { headers: ah() })
+    articlesData = r.ok ? await r.json() : []
+  } catch { articlesData = [] }
+  renderArticlesList()
+}
+
+function renderArticlesList() {
+  const c = document.getElementById('content')
+  if (!articlesData.length) {
+    c.innerHTML = `<div class="list-page">
+      <div class="list-top"><div><h2>Articles</h2><p>No articles yet</p></div><button class="btn btn-navy" onclick="openM('m-article')">+ Add New Article</button></div>
+      <div class="empty-state" style="padding:40px 0"><p>Create your first article using the button above.</p></div>
+    </div>`
+    return
+  }
+  const cards = articlesData.map((a, i) => buildArticleCard(a, i)).join('')
+  c.innerHTML = `<div class="list-page">
+    <div class="list-top">
+      <div><h2>Articles</h2><p>${articlesData.length} article${articlesData.length===1?'':'s'}</p></div>
+      <button class="btn btn-navy" onclick="openM('m-article')">+ Add New Article</button>
+    </div>
+    <div id="articles-list">${cards}</div>
+  </div>`
+}
+
+function buildArticleCard(a, i) {
+  const slug = a.slug || ''
+  return `<div class="proj-card" id="acard-${slug}">
+    <div class="proj-header" onclick="toggleArticleCard('${slug}')">
+      <span class="proj-toggle">▼</span>
+      <span class="proj-cat-tag">${esc(a.category||'Article')}</span>
+      <span class="proj-title">${esc(a.title||slug)}</span>
+      <span class="proj-year">${esc(a.date||'')}</span>
+      <div class="proj-actions" onclick="event.stopPropagation()">
+        <a href="/insights/${slug}.html" target="_blank" class="btn btn-ghost" style="padding:4px 8px;font-size:10px" title="View">↗</a>
+        <button class="btn-danger-sm" onclick="deleteArticle('${slug}')" title="Delete">✕</button>
+      </div>
+    </div>
+    <div class="proj-body" id="abody-${slug}">
+      <div id="aform-${slug}">Loading…</div>
+    </div>
+  </div>`
+}
+
+async function toggleArticleCard(slug) {
+  const card = document.getElementById(`acard-${slug}`)
+  if (!card) return
+  const wasOpen = card.classList.contains('open')
+  card.classList.toggle('open')
+  if (!wasOpen && !articlePageData[slug]) {
+    await loadArticleData(slug)
+  }
+}
+
+async function loadArticleData(slug) {
+  const formEl = document.getElementById(`aform-${slug}`)
+  if (!formEl) return
+  try {
+    const r = await fetch(`${API}/content/${slug}`, { headers: ah() })
+    const content = r.ok ? await r.json() : {}
+    articlePageData[slug] = content
+    renderArticleForm(slug, articlesData.find(a => a.slug === slug) || {}, content)
+  } catch(e) {
+    if (formEl) formEl.innerHTML = `<div style="color:red;font-size:12px">Error: ${e.message}</div>`
+  }
+}
+
+function renderArticleForm(slug, meta, content) {
+  const formEl = document.getElementById(`aform-${slug}`)
+  if (!formEl) return
+  const blocks = content.blocks || []
+  const blocksHTML = blocks.map((b, bi) => buildBlockCard(b, bi, `a-${slug}`)).join('')
+  formEl.innerHTML = `
+    <div class="field-grid">
+      <div class="f-group"><label class="f-label">Title</label><input type="text" id="am-title-${slug}" value="${esc(meta.title||'')}" oninput="markDirty()"/></div>
+      <div class="f-group"><label class="f-label">Slug</label><input type="text" id="am-slug-${slug}" value="${esc(slug)}" readonly style="background:#f5f5f5;color:#888"/></div>
+      <div class="f-group"><label class="f-label">Category</label><input type="text" id="am-cat-${slug}" value="${esc(meta.category||'')}" oninput="markDirty()"/></div>
+      <div class="f-group"><label class="f-label">Date</label><input type="date" id="am-date-${slug}" value="${esc(meta.date||'')}" oninput="markDirty()"/></div>
+    </div>
+    <div class="f-group full"><label class="f-label">Excerpt</label><textarea id="am-excerpt-${slug}" style="min-height:60px" oninput="markDirty()">${esc(meta.excerpt||'')}</textarea></div>
+    <div class="f-group full"><label class="f-label">Body HTML</label><textarea id="am-body-${slug}" style="min-height:160px;font-family:monospace;font-size:12px" oninput="markDirty()">${esc(content.fields?.body || meta.body || '')}</textarea></div>
+    <div class="blocks-section">
+      <div class="sec-div">Content Blocks</div>
+      <div class="blocks-list" id="blocks-a-${slug}">${blocksHTML || '<div style="color:#bbb;font-size:12px;padding:8px 0">No blocks yet.</div>'}</div>
+      <div class="add-blocks">
+        <button class="add-block-btn" onclick="addArticleBlock('${slug}','full-image')">+ Full-Width Image</button>
+        <button class="add-block-btn" onclick="addArticleBlock('${slug}','text')">+ Text</button>
+        <button class="add-block-btn" onclick="addArticleBlock('${slug}','quote')">+ Quote</button>
+        <button class="add-block-btn" onclick="addArticleBlock('${slug}','gallery')">+ Gallery</button>
+        <button class="add-block-btn" onclick="addArticleBlock('${slug}','video')">+ Video/GIF</button>
+        <button class="add-block-btn" onclick="addArticleBlock('${slug}','image-text')">+ Image+Text</button>
+        <button class="add-block-btn" onclick="addArticleBlock('${slug}','spacer')">+ Spacer</button>
+      </div>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:8px">
+      <button class="btn btn-navy" onclick="saveArticle('${slug}')">Save Article</button>
+      <button class="btn btn-ghost" onclick="deleteArticle('${slug}')" style="color:var(--danger);border-color:var(--danger)">Delete</button>
+    </div>`
+  // wire up article blocks
+  articlePageData[slug] = { ...articlePageData[slug], blocks }
+}
+
+function addArticleBlock(slug, type) {
+  const key = `a-${slug}`
+  if (!articlePageData[slug]) articlePageData[slug] = { blocks: [] }
+  if (!articlePageData[slug].blocks) articlePageData[slug].blocks = []
+  const defaults = {
+    'full-image': { type:'full-image', url:'', mt:0, mb:0, ml:0, mr:0 },
+    'text': { type:'text', text:'' },
+    'quote': { type:'quote', text:'', attribution:'' },
+    'gallery': { type:'gallery', images:[] },
+    'video': { type:'video', url:'', caption:'' },
+    'image-text': { type:'image-text', img:'', text:'', side:'left' },
+    'spacer': { type:'spacer', height:80 },
+  }
+  articlePageData[slug].blocks.push({ ...defaults[type] })
+  markDirty()
+  rerenderArticleBlocks(slug)
+}
+
+function rerenderArticleBlocks(slug) {
+  const el = document.getElementById(`blocks-a-${slug}`)
+  if (!el) return
+  const blocks = articlePageData[slug]?.blocks || []
+  el.innerHTML = blocks.map((b, bi) => buildBlockCard(b, bi, `a-${slug}`)).join('') || '<div style="color:#bbb;font-size:12px;padding:8px 0">No blocks yet.</div>'
+}
+
+// Article blocks reuse proj block functions by mapping 'a-{slug}' keys
+// We override setBlockProp and related to handle article prefix:
+function getArticleSlugFromKey(key) {
+  // key format: 'a-{slug}'
+  return key.startsWith('a-') ? key.slice(2) : null
+}
+
+// Patch setBlockProp to handle article slugs
+const _origSetBlockProp = setBlockProp
+function setBlockProp(slug, bi, key, val) {
+  const realSlug = slug.startsWith('a-') ? slug.slice(2) : null
+  if (realSlug) {
+    if (!articlePageData[realSlug]) return
+    if (!articlePageData[realSlug].blocks) articlePageData[realSlug].blocks = []
+    if (articlePageData[realSlug].blocks[bi]) {
+      articlePageData[realSlug].blocks[bi][key] = val
+    }
+    markDirty()
+  } else {
+    if (!projectPageData[slug]) return
+    if (!projectPageData[slug].blocks) projectPageData[slug].blocks = []
+    if (projectPageData[slug].blocks[bi]) {
+      projectPageData[slug].blocks[bi][key] = val
+    }
+    markDirty()
+  }
+}
+
+function toggleBlockCard(slug, bi) {
+  document.getElementById(`blk-${slug}-${bi}`)?.classList.toggle('open')
+}
+
+function moveProjBlock(slug, bi, dir) {
+  const realSlug = slug.startsWith('a-') ? slug.slice(2) : null
+  const data = realSlug ? articlePageData[realSlug] : projectPageData[slug]
+  const blocks = data?.blocks
+  if (!blocks) return
+  const j = bi + dir
+  if (j < 0 || j >= blocks.length) return
+  ;[blocks[bi], blocks[j]] = [blocks[j], blocks[bi]]
+  markDirty()
+  if (realSlug) rerenderArticleBlocks(realSlug)
+  else rerenderProjBlocks(slug)
+}
+
+function removeProjBlock(slug, bi) {
+  if (!confirm('Remove this block?')) return
+  const realSlug = slug.startsWith('a-') ? slug.slice(2) : null
+  const data = realSlug ? articlePageData[realSlug] : projectPageData[slug]
+  data?.blocks?.splice(bi, 1)
+  markDirty()
+  if (realSlug) rerenderArticleBlocks(realSlug)
+  else rerenderProjBlocks(slug)
+}
+
+function setBlockGalleryImg(slug, bi, j, val) {
+  const realSlug = slug.startsWith('a-') ? slug.slice(2) : null
+  const data = realSlug ? articlePageData[realSlug] : projectPageData[slug]
+  if (data?.blocks?.[bi]?.images) { data.blocks[bi].images[j] = val; markDirty() }
+}
+
+function removeGalleryImgProj(slug, bi, j) {
+  const realSlug = slug.startsWith('a-') ? slug.slice(2) : null
+  const data = realSlug ? articlePageData[realSlug] : projectPageData[slug]
+  data?.blocks?.[bi]?.images?.splice(j, 1)
+  markDirty()
+  if (realSlug) rerenderArticleBlocks(realSlug)
+  else rerenderProjBlocks(slug)
+}
+
+async function uploadGalleryProj(input, slug, bi) {
+  const realSlug = slug.startsWith('a-') ? slug.slice(2) : null
+  const data = realSlug ? articlePageData[realSlug] : projectPageData[slug]
+  for (const file of input.files) {
+    const fd = new FormData(); fd.append('file', file)
+    try {
+      const r = await fetch(`${API}/upload`, { method:'POST', headers:{'x-token':TOKEN}, body:fd })
+      const d = await r.json()
+      if (!r.ok) continue
+      if (!data.blocks[bi].images) data.blocks[bi].images = []
+      data.blocks[bi].images.push(d.url)
+    } catch {}
+  }
+  markDirty()
+  if (realSlug) rerenderArticleBlocks(realSlug)
+  else rerenderProjBlocks(slug)
+  toast('Images uploaded','ok')
+}
+
+async function saveArticle(slug) {
+  const g = id => document.getElementById(id)?.value || ''
+  // Sync block urls
+  const blocks = articlePageData[slug]?.blocks || []
+  blocks.forEach((b, bi) => {
+    const sid = `a-${slug}-${bi}`
+    if (b.type === 'full-image') { const inp = document.getElementById(`bfull-${sid}`); if (inp) b.url = inp.value }
+    if (b.type === 'video') { const inp = document.getElementById(`bvid-${sid}`); if (inp) b.url = inp.value }
+    if (b.type === 'image-text') { const inp = document.getElementById(`bit-${sid}`); if (inp) b.img = inp.value }
+  })
+  const meta = {
+    title: g(`am-title-${slug}`),
+    category: g(`am-cat-${slug}`),
+    date: g(`am-date-${slug}`),
+    excerpt: g(`am-excerpt-${slug}`),
+  }
+  const content = {
+    ...articlePageData[slug],
+    fields: { ...meta, body: g(`am-body-${slug}`) }
+  }
+  try {
+    const r = await fetch(`${API}/content/${slug}`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-token': TOKEN },
+      body: JSON.stringify(content)
+    })
+    if (!r.ok) throw new Error('Server error')
+    // Also update insights list
+    await fetch(`${API}/insight`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-token': TOKEN },
+      body: JSON.stringify({ slug, ...meta, body: g(`am-body-${slug}`) })
+    })
+    toast(`"${meta.title || slug}" saved`, 'ok')
+    const idx = articlesData.findIndex(a => a.slug === slug)
+    if (idx >= 0) articlesData[idx] = { ...articlesData[idx], ...meta }
+  } catch(e) { toast(e.message || 'Save failed', 'err') }
+}
+
+async function deleteArticle(slug) {
+  if (!confirm(`Delete article "${slug}"? This cannot be undone.`)) return
+  try {
+    const r = await fetch(`${API}/insight/${slug}`, { method:'DELETE', headers:ah() })
+    if (!r.ok) throw new Error()
+    toast('Article deleted', 'ok')
+    articlesData = articlesData.filter(a => a.slug !== slug)
+    delete articlePageData[slug]
+    renderArticlesList()
+  } catch { toast('Delete failed', 'err') }
+}
+
+async function createArticle() {
+  const g = id => document.getElementById(id)?.value.trim() || ''
+  const slug = g('ma-slug'), title = g('ma-title')
+  if (!slug || !title) { toast('Title and slug required', 'err'); return }
+  try {
+    const r = await fetch(`${API}/insight`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-token': TOKEN },
+      body: JSON.stringify({ slug, title, category: g('ma-cat'), date: g('ma-date'), excerpt: g('ma-excerpt'), body: g('ma-body') })
+    })
     const d = await r.json()
     if (!r.ok) throw new Error(d.error)
     closeM('m-article')
-    toast(`"${title}" created`,'ok')
-    renderArticles()
-  } catch(e) { toast(e.message||'Failed','err') }
+    toast(`"${title}" created`, 'ok')
+    await loadArticles()
+  } catch(e) { toast(e.message || 'Failed', 'err') }
 }
 
-// ─────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════
 // MODAL
-// ─────────────────────────────────────────────────────────
-function openM(id)  { document.getElementById(id).classList.add('open') }
-function closeM(id) { document.getElementById(id).classList.remove('open') }
+// ══════════════════════════════════════════════════════════
+function openM(id)  { document.getElementById(id)?.classList.add('open') }
+function closeM(id) { document.getElementById(id)?.classList.remove('open') }
 
-// ─────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════
 // TOAST
-// ─────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════
 let _tt
-function toast(msg, type='') {
+function toast(msg, type = '') {
   const el = document.getElementById('toast')
-  el.textContent = msg; el.className = 'show' + (type ? ' '+type : '')
-  clearTimeout(_tt); _tt = setTimeout(() => el.className='', 2600)
+  el.textContent = msg; el.className = 'show' + (type ? ' ' + type : '')
+  clearTimeout(_tt); _tt = setTimeout(() => el.className = '', 2600)
 }
-
-// ─────────────────────────────────────────────────────────
-// KEYBOARD
-// ─────────────────────────────────────────────────────────
-document.addEventListener('keydown', e => { if ((e.metaKey||e.ctrlKey) && e.key==='s') { e.preventDefault(); savePage() } })
 </script>
 </body>
 </html>

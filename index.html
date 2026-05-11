@@ -156,60 +156,164 @@
     </section>
 
     <!-- ── Capabilities (02) ──────────────────────────────────────────────── -->
-    <section class="px-10 md:px-[80px] mb-40">
+    <section class="px-10 md:px-[80px] mb-40" id="caps-section">
       <div class="section-header reveal">
         <span class="label-caps tracking-[0.4em]">02 / Capabilities</span>
         <span class="label-caps opacity-40">Expertise</span>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-24">
+      <!-- Scroll container wrapper (arrows injected by JS when > 3 caps) -->
+      <div id="caps-scroll-wrapper" style="position:relative">
+        <!-- Arrow buttons — hidden by default, shown when >3 caps exist -->
+        <button id="caps-arrow-left" onclick="scrollCaps(-1)" style="display:none;position:absolute;left:-20px;top:50%;transform:translateY(-50%);z-index:10;width:44px;height:44px;border-radius:50%;border:1px solid #0C0C0C;background:#fff;cursor:pointer;font-size:16px;line-height:1;align-items:center;justify-content:center">←</button>
+        <button id="caps-arrow-right" onclick="scrollCaps(1)" style="display:none;position:absolute;right:-20px;top:50%;transform:translateY(-50%);z-index:10;width:44px;height:44px;border-radius:50%;border:1px solid #0C0C0C;background:#fff;cursor:pointer;font-size:16px;line-height:1;align-items:center;justify-content:center">→</button>
 
-        <div class="flex flex-col items-start gap-10 group reveal">
-          <div class="w-16 h-16 text-on-surface/30 group-hover:text-accent transition-colors duration-500">
-            <svg class="w-full h-full stroke-current fill-none" style="stroke-width:1.5" viewBox="0 0 100 100">
-              <circle cx="50" cy="50" r="40"/>
-              <circle cx="50" cy="50" r="25"/>
-              <line x1="50" x2="50" y1="10" y2="90"/>
-              <line x1="10" x2="90" y1="50" y2="50"/>
-            </svg>
+        <div id="caps-grid" class="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-24">
+
+          <div class="flex flex-col items-start gap-10 group reveal" data-cap-item>
+            <div class="w-16 h-16 text-on-surface/30 group-hover:text-accent transition-colors duration-500" data-cap-icon>
+              <svg class="w-full h-full stroke-current fill-none" style="stroke-width:1.5" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40"/>
+                <circle cx="50" cy="50" r="25"/>
+                <line x1="50" x2="50" y1="10" y2="90"/>
+                <line x1="10" x2="90" y1="50" y2="50"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-display text-4xl uppercase mb-4" data-cap-title>Brand Strategy</h3>
+              <p class="text-base text-on-surface-variant leading-relaxed" data-cap-desc>Defining the core essence, positioning, and architectural narrative of your brand through rigorous analysis.</p>
+            </div>
           </div>
-          <div>
-            <h3 class="font-display text-4xl uppercase mb-4">Brand Strategy</h3>
-            <p class="text-base text-on-surface-variant leading-relaxed">Defining the core essence, positioning, and architectural narrative of your brand through rigorous analysis.</p>
+
+          <div class="flex flex-col items-start gap-10 group reveal reveal-delay-2" data-cap-item>
+            <div class="w-16 h-16 text-on-surface/30 group-hover:text-accent transition-colors duration-500" data-cap-icon>
+              <svg class="w-full h-full stroke-current fill-none" style="stroke-width:1.5" viewBox="0 0 100 100">
+                <rect x="20" y="20" width="60" height="60"/>
+                <rect x="10" y="10" width="80" height="80" opacity="0.3"/>
+                <path d="M20 20 L80 80"/>
+                <path d="M80 20 L20 80"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-display text-4xl uppercase mb-4" data-cap-title>Identity Design</h3>
+              <p class="text-base text-on-surface-variant leading-relaxed" data-cap-desc>Visual systems built on grid-based precision and timeless modernist principles for lasting impact.</p>
+            </div>
           </div>
+
+          <div class="flex flex-col items-start gap-10 group reveal reveal-delay-3" data-cap-item>
+            <div class="w-16 h-16 text-on-surface/30 group-hover:text-accent transition-colors duration-500" data-cap-icon>
+              <svg class="w-full h-full stroke-current fill-none" style="stroke-width:1.5" viewBox="0 0 100 100">
+                <path d="M50 10 L90 80 H10 Z"/>
+                <path d="M50 30 L75 70 H25 Z" opacity="0.5"/>
+                <circle cx="50" cy="55" r="5" fill="currentColor" stroke="none"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-display text-4xl uppercase mb-4" data-cap-title>Digital Build</h3>
+              <p class="text-base text-on-surface-variant leading-relaxed" data-cap-desc>High-performance digital experiences that prioritize clarity, structural integrity, and user flow.</p>
+            </div>
+          </div>
+
         </div>
-
-        <div class="flex flex-col items-start gap-10 group reveal reveal-delay-2">
-          <div class="w-16 h-16 text-on-surface/30 group-hover:text-accent transition-colors duration-500">
-            <svg class="w-full h-full stroke-current fill-none" style="stroke-width:1.5" viewBox="0 0 100 100">
-              <rect x="20" y="20" width="60" height="60"/>
-              <rect x="10" y="10" width="80" height="80" opacity="0.3"/>
-              <path d="M20 20 L80 80"/>
-              <path d="M80 20 L20 80"/>
-            </svg>
-          </div>
-          <div>
-            <h3 class="font-display text-4xl uppercase mb-4">Identity Design</h3>
-            <p class="text-base text-on-surface-variant leading-relaxed">Visual systems built on grid-based precision and timeless modernist principles for lasting impact.</p>
-          </div>
-        </div>
-
-        <div class="flex flex-col items-start gap-10 group reveal reveal-delay-3">
-          <div class="w-16 h-16 text-on-surface/30 group-hover:text-accent transition-colors duration-500">
-            <svg class="w-full h-full stroke-current fill-none" style="stroke-width:1.5" viewBox="0 0 100 100">
-              <path d="M50 10 L90 80 H10 Z"/>
-              <path d="M50 30 L75 70 H25 Z" opacity="0.5"/>
-              <circle cx="50" cy="55" r="5" fill="currentColor" stroke="none"/>
-            </svg>
-          </div>
-          <div>
-            <h3 class="font-display text-4xl uppercase mb-4">Digital Build</h3>
-            <p class="text-base text-on-surface-variant leading-relaxed">High-performance digital experiences that prioritize clarity, structural integrity, and user flow.</p>
-          </div>
-        </div>
-
       </div>
     </section>
+
+    <script>
+    (async function initCaps() {
+      try {
+        const r = await fetch('/api/capabilities')
+        if (!r.ok) return
+        const caps = await r.json()
+        if (!caps || !caps.length) return
+
+        const grid = document.getElementById('caps-grid')
+        if (!grid) return
+
+        // If API has caps data, replace the static items
+        const existingItems = grid.querySelectorAll('[data-cap-item]')
+        if (caps.length > 0) {
+          // Replace static content with API data
+          existingItems.forEach((el, i) => {
+            if (caps[i]) {
+              const titleEl = el.querySelector('[data-cap-title]')
+              const descEl = el.querySelector('[data-cap-desc]')
+              const iconEl = el.querySelector('[data-cap-icon]')
+              if (titleEl) titleEl.textContent = caps[i].title || ''
+              if (descEl) descEl.textContent = caps[i].description || ''
+              if (iconEl && caps[i].icon) {
+                const isVideo = /\.(mp4|webm|mov)$/i.test(caps[i].icon)
+                iconEl.innerHTML = isVideo
+                  ? `<video src="${caps[i].icon}" autoplay muted loop playsinline class="w-full h-full object-contain"></video>`
+                  : `<img src="${caps[i].icon}" class="w-full h-full object-contain" alt="${caps[i].title}"/>`
+              }
+            }
+          })
+          // Add extra items if API has more than static HTML
+          if (caps.length > existingItems.length) {
+            for (let i = existingItems.length; i < caps.length; i++) {
+              const cap = caps[i]
+              const div = document.createElement('div')
+              div.className = 'flex flex-col items-start gap-10 group reveal'
+              div.setAttribute('data-cap-item', '')
+              div.innerHTML = `
+                <div class="w-16 h-16 text-on-surface/30 group-hover:text-accent transition-colors duration-500">
+                  ${cap.icon
+                    ? (/\.(mp4|webm|mov)$/i.test(cap.icon)
+                        ? `<video src="${cap.icon}" autoplay muted loop playsinline class="w-full h-full object-contain"></video>`
+                        : `<img src="${cap.icon}" class="w-full h-full object-contain" alt="${cap.title}"/>`)
+                    : `<svg class="w-full h-full stroke-current fill-none" style="stroke-width:1.5" viewBox="0 0 100 100"><rect x="20" y="20" width="60" height="60"/><line x1="20" x2="80" y1="20" y2="80"/></svg>`}
+                </div>
+                <div>
+                  <h3 class="font-display text-4xl uppercase mb-4">${cap.title || ''}</h3>
+                  <p class="text-base text-on-surface-variant leading-relaxed">${cap.description || ''}</p>
+                </div>`
+              grid.appendChild(div)
+            }
+          }
+        }
+
+        // Enable scroll mode if more than 3
+        if (caps.length > 3) {
+          const wrapper = document.getElementById('caps-scroll-wrapper')
+          const leftBtn = document.getElementById('caps-arrow-left')
+          const rightBtn = document.getElementById('caps-arrow-right')
+
+          // Switch grid to horizontal scroll
+          grid.style.display = 'flex'
+          grid.style.overflowX = 'auto'
+          grid.style.scrollBehavior = 'smooth'
+          grid.style.scrollSnapType = 'x mandatory'
+          grid.style.gap = '48px'
+          grid.style.paddingBottom = '8px'
+          grid.style.scrollbarWidth = 'none'
+          // Hide scrollbar webkit
+          grid.style.msOverflowStyle = 'none'
+
+          const allItems = grid.querySelectorAll('[data-cap-item]')
+          allItems.forEach(item => {
+            item.style.minWidth = 'calc(33.333% - 32px)'
+            item.style.scrollSnapAlign = 'start'
+            item.style.flexShrink = '0'
+          })
+
+          // Show arrow buttons
+          leftBtn.style.display = 'flex'
+          rightBtn.style.display = 'flex'
+
+          wrapper.style.padding = '0 30px'
+        }
+      } catch(e) {
+        // silently fail — static content remains
+      }
+    })()
+
+    function scrollCaps(dir) {
+      const grid = document.getElementById('caps-grid')
+      if (!grid) return
+      const itemWidth = grid.querySelector('[data-cap-item]')?.offsetWidth || 400
+      grid.scrollBy({ left: dir * (itemWidth + 48), behavior: 'smooth' })
+    }
+    </script>
 
     <!-- ── CTA ────────────────────────────────────────────────────────────── -->
     <section class="py-40 px-10 md:px-[80px] border-t border-black/10 text-center bg-background dot-grid">

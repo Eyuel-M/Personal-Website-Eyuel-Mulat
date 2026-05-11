@@ -44,11 +44,20 @@
       </div>
     </section>
 
+    <!-- ── Category Filter Tabs ─────────────────────────────────────────── -->
+    <section class="px-10 md:px-[80px] py-8 border-b border-black/10">
+      <div id="work-filters" class="flex flex-wrap gap-6 items-center">
+        <button class="work-filter-btn active" data-cat="all" onclick="filterWork('all', this)">
+          <span class="label-caps text-[10px] tracking-[0.3em]">All Work</span>
+        </button>
+      </div>
+    </section>
+
     <!-- ── Projects ──────────────────────────────────────────────────────── -->
-    <section class="px-10 md:px-[80px]">
+    <section class="px-10 md:px-[80px]" id="work-projects">
 
       <!-- Project 01 -->
-      <a href="/work/nexus-dashboard.html" class="block border-b border-black/10 py-16 md:py-24 group reveal" data-work-item>
+      <a href="/work/nexus-dashboard.html" class="block border-b border-black/10 py-16 md:py-24 group reveal" data-work-item data-category="branding-ui">
         <div class="grid grid-cols-12 gap-8 md:gap-12 items-center">
           <div class="col-span-12 md:col-span-5 overflow-hidden bg-surface-container-low aspect-[4/3]">
             <img
@@ -80,7 +89,7 @@
       </a>
 
       <!-- Project 02 -->
-      <a href="/work/vanguard-capital.html" class="block border-b border-black/10 py-16 md:py-24 group reveal" data-work-item>
+      <a href="/work/vanguard-capital.html" class="block border-b border-black/10 py-16 md:py-24 group reveal" data-work-item data-category="identity">
         <div class="grid grid-cols-12 gap-8 md:gap-12 items-center">
           <div class="col-span-12 md:col-span-7 order-2 md:order-1 flex flex-col gap-8">
             <div class="flex items-center justify-between">
@@ -112,7 +121,7 @@
       </a>
 
       <!-- Project 03 -->
-      <a href="#" class="block border-b border-black/10 py-16 md:py-24 group reveal" data-work-item>
+      <a href="#" class="block border-b border-black/10 py-16 md:py-24 group reveal" data-work-item data-category="motion">
         <div class="grid grid-cols-12 gap-8 md:gap-12 items-center">
           <div class="col-span-12 md:col-span-5 overflow-hidden bg-surface-container-low aspect-[4/3]">
             <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOWQNwCA_Sy3BPn64hPnpoO02uP_2_I6oW5rpYeyhmhbJcwdODE21QCKmNBnLYpjNRQvkZI7H-37UsPWD4dPdVF7KLHyKL4fMT6LjMz1R1Riqe4PDbEd8ECAxfvke5UBMQ2RnMElW_xDtjq2oan1PCWh863-eSkEa-k_8ihQV0Ww3edsCB43nZJJJqts4HseBRGEvomTagI29z3PqwNDUNQddqSueZb4rURX2KArszCjq8N-BVQXNl1h9vIjUAO0ihvRIynh-y3AM" alt="Orbit Studio" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"/>
@@ -137,7 +146,7 @@
       </a>
 
       <!-- Project 04 -->
-      <a href="#" class="block border-b border-black/10 py-16 md:py-24 group reveal" data-work-item>
+      <a href="#" class="block border-b border-black/10 py-16 md:py-24 group reveal" data-work-item data-category="brand">
         <div class="grid grid-cols-12 gap-8 md:gap-12 items-center">
           <div class="col-span-12 md:col-span-7 order-2 md:order-1 flex flex-col gap-8">
             <div class="flex items-center justify-between">
@@ -162,7 +171,7 @@
       </a>
 
       <!-- Project 05 -->
-      <a href="#" class="block border-b border-black/10 py-16 md:py-24 group reveal" data-work-item>
+      <a href="#" class="block border-b border-black/10 py-16 md:py-24 group reveal" data-work-item data-category="editorial">
         <div class="grid grid-cols-12 gap-8 md:gap-12 items-center">
           <div class="col-span-12 md:col-span-5 overflow-hidden bg-surface-container-low aspect-[4/3]">
             <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuApiyh_3aaVjPbYqtnEYBYYCxdU270rhO_lQ0MlcPYGhxDlpPR1GJwvBolsdfXepO0m06UPWAFYvjKsHqwNyFnFZ8UzBq5qUYEMMzTm-PNLwhrRHkmHx-0UsTIVuo9CyfbyQq9j_TjkVdQJRQWNO7S__j6X-y8v3yxbf9p0MDfFO-3s9aIJzbpP4pDagWdhgpBHAFHN_BxkoMOkfgk9ur5yvt6DpaCaGorEo70Rhca1Zi8Pwd7VKUoRiXpeOMhV3pwXoZA8xxFUikw" alt="Forma Creative" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"/>
@@ -187,7 +196,7 @@
       </a>
 
       <!-- Project 06 — page 2 starts here -->
-      <a href="#" class="block border-b border-black/10 py-16 md:py-24 group reveal" data-work-item>
+      <a href="#" class="block border-b border-black/10 py-16 md:py-24 group reveal" data-work-item data-category="web">
         <div class="grid grid-cols-12 gap-8 md:gap-12 items-center">
           <div class="col-span-12 md:col-span-7 order-2 md:order-1 flex flex-col gap-8">
             <div class="flex items-center justify-between">
@@ -212,7 +221,7 @@
       </a>
 
       <!-- Project 07 — page 2 -->
-      <a href="#" class="block border-b border-black/10 py-16 md:py-24 group reveal" data-work-item>
+      <a href="#" class="block border-b border-black/10 py-16 md:py-24 group reveal" data-work-item data-category="brand">
         <div class="grid grid-cols-12 gap-8 md:gap-12 items-center">
           <div class="col-span-12 md:col-span-5 overflow-hidden bg-surface-container-low aspect-[4/3]">
             <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBga90sr654rVPGPEaB3kJeifl98bSDxlZBsKWfUjsSFqSEteMcDzxZ2X8DI9wNnkiRQXmSPw2yPmztXBYxqj0GuDwUG1Acgtf8ZsPJYMCoHKuPOAdAK38hAzLpvGLwdL5W3U-6cG6Sc8hV6n30pgK_smwSP8kievA0z2dr8GJOsyctxdUC5RCqkfCnoZM-gaS6sG0aXQwWmbDLjY9nGrNFCRA_fLcJJEN4pNxaLHdDkwIZkpTEijUa6bP7s3cbA-WYecL_HK6Yg_0" alt="Lumen Studio" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"/>
@@ -296,5 +305,51 @@
 
   <script type="module" src="/src/js/main.js"></script>
   <script type="module" src="/src/js/content-loader.js"></script>
+  <style>
+    .work-filter-btn {
+      background: none; border: none; cursor: pointer; padding: 6px 0;
+      color: rgba(0,0,0,0.35); font-family: inherit; transition: color 0.15s;
+      border-bottom: 2px solid transparent; padding-bottom: 4px;
+    }
+    .work-filter-btn:hover { color: rgba(0,0,0,0.7); }
+    .work-filter-btn.active { color: #0C0C0C; border-bottom-color: #0C0C0C; }
+    .work-filter-btn .label-caps { pointer-events: none; }
+    [data-work-item] { transition: opacity 0.25s, height 0.25s; }
+    [data-work-item].hidden-item { display: none; }
+  </style>
+  <script>
+    // Load categories and build filter tabs
+    (async function() {
+      try {
+        const r = await fetch('/api/categories')
+        const cats = r.ok ? await r.json() : []
+        const bar = document.getElementById('work-filters')
+        if (!bar) return
+        cats.forEach(cat => {
+          const btn = document.createElement('button')
+          btn.className = 'work-filter-btn'
+          btn.dataset.cat = cat.slug
+          btn.innerHTML = `<span class="label-caps text-[10px] tracking-[0.3em]">${cat.name}</span>`
+          btn.addEventListener('click', () => filterWork(cat.slug, btn))
+          bar.appendChild(btn)
+        })
+      } catch {}
+    })()
+
+    function filterWork(cat, btn) {
+      // Update active state
+      document.querySelectorAll('.work-filter-btn').forEach(b => b.classList.remove('active'))
+      if (btn) btn.classList.add('active')
+      // Show/hide project items
+      document.querySelectorAll('[data-work-item]').forEach(item => {
+        if (cat === 'all') {
+          item.classList.remove('hidden-item')
+        } else {
+          const itemCat = (item.dataset.category || '').toLowerCase()
+          item.classList.toggle('hidden-item', itemCat !== cat.toLowerCase())
+        }
+      })
+    }
+  </script>
 </body>
 </html>
