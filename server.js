@@ -36,9 +36,9 @@ export function createApiApp() {
   })
   const upload = multer({
     storage,
-    limits: { fileSize: 30 * 1024 * 1024 },
+    limits: { fileSize: 50 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
-      const ok = /\.(jpe?g|png|gif|webp|svg|mp4|webm|mov)$/i.test(file.originalname)
+      const ok = /\.(jpe?g|png|gif|webp|svg|mp4|webm|mov|avi|mkv)$/i.test(file.originalname)
       cb(ok ? null : new Error('Unsupported file type'), ok)
     },
   })
@@ -133,6 +133,122 @@ app.post('/api/insight', auth, (req, res) => {
   fs.writeFileSync(insightsFile, JSON.stringify(articles, null, 2))
 
   res.json({ ok: true, url: `/insights/${slug}.html` })
+  })
+
+  // ── Categories ────────────────────────────────────────────────────────────
+  const defaultCats = [
+    { id: 'brand', name: 'Brand Identity', slug: 'brand' },
+    { id: 'web', name: 'Web Design', slug: 'web' },
+    { id: 'motion', name: 'Motion', slug: 'motion' },
+    { id: 'editorial', name: 'Editorial', slug: 'editorial' },
+    { id: 'branding-ui', name: 'Branding & UI', slug: 'branding-ui' },
+    { id: 'identity', name: 'Identity System', slug: 'identity' },
+  ]
+  app.get('/api/categories', (req, res) => {
+    const f = path.join(CONTENT_DIR, 'categories.json')
+    res.json(fs.existsSync(f) ? JSON.parse(fs.readFileSync(f)) : defaultCats)
+  })
+  app.put('/api/categories', auth, (req, res) => {
+    fs.writeFileSync(path.join(CONTENT_DIR, 'categories.json'), JSON.stringify(req.body, null, 2))
+    res.json({ ok: true })
+  })
+
+  // ── Clients ───────────────────────────────────────────────────────────────
+  const defaultClients = [
+    { id: '1', name: 'Nexus Technologies', logo: '', url: '' },
+    { id: '2', name: 'Vanguard Capital', logo: '', url: '' },
+    { id: '3', name: 'Orion Group', logo: '', url: '' },
+    { id: '4', name: 'Meridian Studio', logo: '', url: '' },
+    { id: '5', name: 'Apex Ventures', logo: '', url: '' },
+    { id: '6', name: 'Summit Advisory', logo: '', url: '' },
+  ]
+  app.get('/api/clients', (req, res) => {
+    const f = path.join(CONTENT_DIR, 'clients.json')
+    res.json(fs.existsSync(f) ? JSON.parse(fs.readFileSync(f)) : defaultClients)
+  })
+  app.put('/api/clients', auth, (req, res) => {
+    fs.writeFileSync(path.join(CONTENT_DIR, 'clients.json'), JSON.stringify(req.body, null, 2))
+    res.json({ ok: true })
+  })
+
+  // ── Capabilities ──────────────────────────────────────────────────────────
+  const defaultCaps = [
+    { id: '1', icon: '', title: 'Brand Strategy', description: 'Defining the core essence, positioning, and architectural narrative of your brand through rigorous analysis.' },
+    { id: '2', icon: '', title: 'Identity Design', description: 'Visual systems built on grid-based precision and timeless modernist principles for lasting impact.' },
+    { id: '3', icon: '', title: 'Digital Build', description: 'High-performance digital experiences that prioritize clarity, structural integrity, and user flow.' },
+  ]
+  app.get('/api/capabilities', (req, res) => {
+    const f = path.join(CONTENT_DIR, 'capabilities.json')
+    res.json(fs.existsSync(f) ? JSON.parse(fs.readFileSync(f)) : defaultCaps)
+  })
+  app.put('/api/capabilities', auth, (req, res) => {
+    fs.writeFileSync(path.join(CONTENT_DIR, 'capabilities.json'), JSON.stringify(req.body, null, 2))
+    res.json({ ok: true })
+  })
+
+  // ── Slides ────────────────────────────────────────────────────────────────
+  app.get('/api/slides', (req, res) => {
+    const f = path.join(CONTENT_DIR, 'slides.json')
+    res.json(fs.existsSync(f) ? JSON.parse(fs.readFileSync(f)) : [])
+  })
+  app.put('/api/slides', auth, (req, res) => {
+    fs.writeFileSync(path.join(CONTENT_DIR, 'slides.json'), JSON.stringify(req.body, null, 2))
+    res.json({ ok: true })
+  })
+
+  // ── Contact Services ──────────────────────────────────────────────────────
+  const defaultSvcs = ['Brand Strategy','Visual Identity','Creative Direction','Typography','Digital Systems','Editorial Design','Campaign & Art Direction','Print & Packaging']
+  app.get('/api/contact-services', (req, res) => {
+    const f = path.join(CONTENT_DIR, 'contact-services.json')
+    res.json(fs.existsSync(f) ? JSON.parse(fs.readFileSync(f)) : defaultSvcs)
+  })
+  app.put('/api/contact-services', auth, (req, res) => {
+    fs.writeFileSync(path.join(CONTENT_DIR, 'contact-services.json'), JSON.stringify(req.body, null, 2))
+    res.json({ ok: true })
+  })
+
+  // ── Delete / Update project ───────────────────────────────────────────────
+  app.put('/api/project/:slug', auth, (req, res) => {
+    const { slug } = req.params
+    const pf = path.join(CONTENT_DIR, 'projects.json')
+    if (!fs.existsSync(pf)) return res.status(404).json({ error: 'Not found' })
+    const ps = JSON.parse(fs.readFileSync(pf))
+    const idx = ps.findIndex(p => p.slug === slug)
+    if (idx < 0) return res.status(404).json({ error: 'Not found' })
+    ps[idx] = { ...ps[idx], ...req.body, slug }
+    fs.writeFileSync(pf, JSON.stringify(ps, null, 2))
+    res.json({ ok: true })
+  })
+  app.delete('/api/project/:slug', auth, (req, res) => {
+    const { slug } = req.params
+    const htmlFile = path.join(__dirname, 'work', `${slug}.html`)
+    if (fs.existsSync(htmlFile)) fs.unlinkSync(htmlFile)
+    const pf = path.join(CONTENT_DIR, 'projects.json')
+    if (fs.existsSync(pf)) {
+      const ps = JSON.parse(fs.readFileSync(pf))
+      fs.writeFileSync(pf, JSON.stringify(ps.filter(p => p.slug !== slug), null, 2))
+    }
+    const cf = path.join(CONTENT_DIR, `${slug}.json`)
+    if (fs.existsSync(cf)) fs.unlinkSync(cf)
+    res.json({ ok: true })
+  })
+
+  // ── Delete insight ────────────────────────────────────────────────────────
+  app.delete('/api/insight/:slug', auth, (req, res) => {
+    const { slug } = req.params
+    const htmlFile = path.join(__dirname, 'insights', `${slug}.html`)
+    if (fs.existsSync(htmlFile)) fs.unlinkSync(htmlFile)
+    const af = path.join(CONTENT_DIR, 'insights.json')
+    if (fs.existsSync(af)) {
+      const as_ = JSON.parse(fs.readFileSync(af))
+      fs.writeFileSync(af, JSON.stringify(as_.filter(a => a.slug !== slug), null, 2))
+    }
+    res.json({ ok: true })
+  })
+  // ── List insights ─────────────────────────────────────────────────────────
+  app.get('/api/insights', auth, (req, res) => {
+    const f = path.join(CONTENT_DIR, 'insights.json')
+    res.json(fs.existsSync(f) ? JSON.parse(fs.readFileSync(f)) : [])
   })
 
   return app
