@@ -108,28 +108,6 @@ if (fileInput && fileZone && fileLabel) {
   })
 }
 
-// ─── Home: limit to 3 visible projects, "Show More" reveals the rest ─────────
-;(function () {
-  const HOME_LIMIT = 3
-  const items = [...document.querySelectorAll('[data-home-project]')]
-  const wrap  = document.getElementById('show-more-wrap')
-  const btn   = document.getElementById('show-more-projects')
-  if (!items.length) return
-
-  items.forEach((el, i) => { if (i >= HOME_LIMIT) el.classList.add('hidden') })
-
-  if (!wrap || items.length <= HOME_LIMIT) { wrap?.classList.add('hidden'); return }
-
-  btn.addEventListener('click', () => {
-    items.slice(HOME_LIMIT).forEach((el, i) => {
-      el.classList.remove('hidden')
-      void el.offsetWidth
-      setTimeout(() => el.classList.add('is-visible'), i * 100)
-    })
-    wrap.classList.add('hidden')
-  })
-})()
-
 // ─── Work: paginate at 5 per page with numbered buttons ──────────────────────
 ;(function () {
   const PER_PAGE = 5
