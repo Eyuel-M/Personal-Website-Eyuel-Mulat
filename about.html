@@ -32,13 +32,13 @@
     <section class="px-10 md:px-[80px] pt-48 pb-24 dot-grid">
       <div class="grid grid-cols-12 gap-8 items-end">
         <div class="col-span-12 lg:col-span-8">
-          <span class="label-caps text-accent tracking-[0.4em] mb-8 block reveal-hero">Creative Director</span>
-          <h1 class="font-display text-[72px] md:text-[120px] leading-[0.88] uppercase reveal-hero delay-1">
+          <span class="label-caps text-accent tracking-[0.4em] mb-8 block reveal-hero" data-editable="about-hero-label">Creative Director</span>
+          <h1 class="font-display text-[72px] md:text-[120px] leading-[0.88] uppercase reveal-hero delay-1" data-editable="about-h1">
             Making brands<br><span class="text-accent">that endure.</span>
           </h1>
         </div>
         <div class="col-span-12 lg:col-span-4 lg:pb-3">
-          <p class="text-xl leading-relaxed text-on-surface-variant reveal-hero delay-2">
+          <p class="text-xl leading-relaxed text-on-surface-variant reveal-hero delay-2" data-editable="about-intro">
             I'm a creative director and brand strategist working at the intersection of visual identity and strategic thinking. Every project is an opportunity to build something that lasts.
           </p>
         </div>
@@ -52,6 +52,7 @@
           src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOWQNwCA_Sy3BPn64hPnpoO02uP_2_I6oW5rpYeyhmhbJcwdODE21QCKmNBnLYpjNRQvkZI7H-37UsPWD4dPdVF7KLHyKL4fMT6LjMz1R1Riqe4PDbEd8ECAxfvke5UBMQ2RnMElW_xDtjq2oan1PCWh863-eSkEa-k_8ihQV0Ww3edsCB43nZJJJqts4HseBRGEvomTagI29z3PqwNDUNQddqSueZb4rURX2KArszCjq8N-BVQXNl1h9vIjUAO0ihvRIynh-y3AM"
           alt="Studio visual"
           class="w-full h-full object-cover"
+          data-editable="about-img" data-editable-type="image"
         />
       </div>
     </section>
@@ -118,7 +119,7 @@
 
         <div class="border-t border-black/10 group cursor-default reveal">
           <div class="py-8 flex justify-between items-center">
-            <h3 class="font-display text-[28px] uppercase group-hover:text-accent transition-colors duration-300">Brand Strategy</h3>
+            <h3 class="font-display text-[28px] uppercase group-hover:text-accent transition-colors duration-300" data-editable="service-1-title">Brand Strategy</h3>
             <span class="text-accent transition-transform duration-300 group-hover:rotate-45 inline-block">+</span>
           </div>
           <div class="max-h-0 overflow-hidden transition-[max-height] duration-500 ease-out group-hover:max-h-40">
@@ -128,7 +129,7 @@
 
         <div class="border-t border-black/10 group cursor-default reveal">
           <div class="py-8 flex justify-between items-center">
-            <h3 class="font-display text-[28px] uppercase group-hover:text-accent transition-colors duration-300">Visual Identity</h3>
+            <h3 class="font-display text-[28px] uppercase group-hover:text-accent transition-colors duration-300" data-editable="service-2-title">Visual Identity</h3>
             <span class="text-accent transition-transform duration-300 group-hover:rotate-45 inline-block">+</span>
           </div>
           <div class="max-h-0 overflow-hidden transition-[max-height] duration-500 ease-out group-hover:max-h-40">
@@ -138,7 +139,7 @@
 
         <div class="border-t border-black/10 group cursor-default reveal">
           <div class="py-8 flex justify-between items-center">
-            <h3 class="font-display text-[28px] uppercase group-hover:text-accent transition-colors duration-300">Creative Direction</h3>
+            <h3 class="font-display text-[28px] uppercase group-hover:text-accent transition-colors duration-300" data-editable="service-3-title">Creative Direction</h3>
             <span class="text-accent transition-transform duration-300 group-hover:rotate-45 inline-block">+</span>
           </div>
           <div class="max-h-0 overflow-hidden transition-[max-height] duration-500 ease-out group-hover:max-h-40">
@@ -233,6 +234,9 @@
 
   </main>
 
+  <!-- Custom blocks injected by admin -->
+  <div id="admin-blocks" class="px-10 md:px-[80px]"></div>
+
   <!-- Footer -->
   <footer class="bg-primary text-background px-10 md:px-[80px]">
     <div class="pt-20 pb-16 grid grid-cols-12 gap-8">
@@ -270,5 +274,6 @@
   </footer>
 
   <script type="module" src="/src/js/main.js"></script>
+  <script type="module" src="/src/js/content-loader.js"></script>
 </body>
 </html>

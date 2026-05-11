@@ -34,7 +34,7 @@
         <span class="block font-sans text-[10px] font-semibold tracking-[0.4em] uppercase text-on-surface-variant/40 -rotate-90 translate-y-20 origin-right">Branding & Identity</span>
       </div>
       <div class="reveal-hero">
-        <span class="label-caps text-accent tracking-[0.4em] mb-8 block">Strategy & Design</span>
+        <span class="label-caps text-accent tracking-[0.4em] mb-8 block" data-editable="hero-label">Strategy & Design</span>
       </div>
       <h1 class="font-display text-[64px] md:text-[120px] leading-[0.88] uppercase mb-14 reveal-hero delay-1">
         Design as <span class="text-on-surface/25">Strategy.</span><br>
@@ -43,7 +43,7 @@
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-10 reveal-hero delay-2">
         <div class="flex items-start gap-6 max-w-xl">
           <div class="w-10 h-px bg-primary mt-3 flex-shrink-0"></div>
-          <p class="text-xl leading-relaxed text-on-surface-variant">
+          <p class="text-xl leading-relaxed text-on-surface-variant" data-editable="hero-subtitle">
             Creative Direction &amp; Brand Identity for forward-thinking brands. Building architectural visual systems that transcend temporary trends through geometric precision.
           </p>
         </div>
@@ -83,12 +83,13 @@
             src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOWQNwCA_Sy3BPn64hPnpoO02uP_2_I6oW5rpYeyhmhbJcwdODE21QCKmNBnLYpjNRQvkZI7H-37UsPWD4dPdVF7KLHyKL4fMT6LjMz1R1Riqe4PDbEd8ECAxfvke5UBMQ2RnMElW_xDtjq2oan1PCWh863-eSkEa-k_8ihQV0Ww3edsCB43nZJJJqts4HseBRGEvomTagI29z3PqwNDUNQddqSueZb4rURX2KArszCjq8N-BVQXNl1h9vIjUAO0ihvRIynh-y3AM"
             alt="Nexus Dashboard — Featured"
             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
+            data-editable="featured-img" data-editable-type="image"
           />
         </a>
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <h2 class="font-display text-[56px] md:text-[80px] uppercase leading-none mb-4 group-hover:text-accent transition-colors duration-300">Nexus Dashboard</h2>
-            <p class="text-base text-on-surface-variant max-w-xl leading-relaxed">A high-performance SaaS interface designed for complex data visualization and seamless user workflows — precision at enterprise scale.</p>
+            <h2 class="font-display text-[56px] md:text-[80px] uppercase leading-none mb-4 group-hover:text-accent transition-colors duration-300" data-editable="featured-title">Nexus Dashboard</h2>
+            <p class="text-base text-on-surface-variant max-w-xl leading-relaxed" data-editable="featured-desc">A high-performance SaaS interface designed for complex data visualization and seamless user workflows — precision at enterprise scale.</p>
           </div>
           <a href="/work/nexus-dashboard.html" class="btn-link flex-shrink-0">
             View Project
@@ -213,7 +214,7 @@
     <!-- ── CTA ────────────────────────────────────────────────────────────── -->
     <section class="py-40 px-10 md:px-[80px] border-t border-black/10 text-center bg-background dot-grid">
       <p class="label-caps text-on-surface-variant tracking-[0.4em] mb-10 reveal">Ready to build something lasting?</p>
-      <h2 class="font-display text-[48px] md:text-[80px] uppercase leading-[0.9] mb-16 max-w-4xl mx-auto reveal reveal-delay-1">
+      <h2 class="font-display text-[48px] md:text-[80px] uppercase leading-[0.9] mb-16 max-w-4xl mx-auto reveal reveal-delay-1" data-editable="cta-h2">
         Define your<br><span class="text-accent">visual authority.</span>
       </h2>
       <a href="/contact.html" class="btn-link text-lg reveal reveal-delay-2">
@@ -259,6 +260,9 @@
 
   </main>
 
+  <!-- Custom blocks injected by admin -->
+  <div id="admin-blocks" class="px-10 md:px-[80px]"></div>
+
   <!-- Footer -->
   <footer class="bg-primary text-background px-10 md:px-[80px]">
     <div class="pt-20 pb-16 grid grid-cols-12 gap-8">
@@ -296,5 +300,6 @@
   </footer>
 
   <script type="module" src="/src/js/main.js"></script>
+  <script type="module" src="/src/js/content-loader.js"></script>
 </body>
 </html>

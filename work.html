@@ -32,8 +32,8 @@
     <section class="px-10 md:px-[80px] pt-48 pb-20 border-b border-black/10 dot-grid">
       <div class="grid grid-cols-12 gap-8 items-end">
         <div class="col-span-12 md:col-span-8">
-          <span class="label-caps text-on-surface-variant tracking-[0.4em] mb-8 block reveal-hero">Selected Work</span>
-          <h1 class="font-display text-[100px] md:text-[160px] leading-[0.85] uppercase reveal-hero delay-1">Work</h1>
+          <span class="label-caps text-on-surface-variant tracking-[0.4em] mb-8 block reveal-hero" data-editable="work-hero-label">Selected Work</span>
+          <h1 class="font-display text-[100px] md:text-[160px] leading-[0.85] uppercase reveal-hero delay-1" data-editable="work-h1">Work</h1>
         </div>
         <div class="col-span-12 md:col-span-4 md:pb-4">
           <div class="reveal-hero delay-2">
@@ -255,6 +255,9 @@
 
   </main>
 
+  <!-- Custom blocks injected by admin -->
+  <div id="admin-blocks" class="px-10 md:px-[80px]"></div>
+
   <!-- Footer -->
   <footer class="bg-primary text-background px-10 md:px-[80px]">
     <div class="pt-20 pb-16 grid grid-cols-12 gap-8">
@@ -292,5 +295,6 @@
   </footer>
 
   <script type="module" src="/src/js/main.js"></script>
+  <script type="module" src="/src/js/content-loader.js"></script>
 </body>
 </html>

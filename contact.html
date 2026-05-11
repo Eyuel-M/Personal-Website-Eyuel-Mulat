@@ -30,7 +30,7 @@
 
     <!-- ── Hero ──────────────────────────────────────────────────────────── -->
     <section class="px-10 md:px-[80px] pt-48 pb-24 dot-grid">
-      <span class="label-caps text-accent tracking-[0.4em] mb-8 block reveal-hero">Get in Touch</span>
+      <span class="label-caps text-accent tracking-[0.4em] mb-8 block reveal-hero" data-editable="contact-h1">Get in Touch</span>
       <h1 class="font-display text-[64px] md:text-[120px] leading-[0.88] uppercase reveal-hero delay-1">
         Let's work<br><span class="text-accent">together.</span>
       </h1>
@@ -42,14 +42,14 @@
 
         <!-- Left: Info -->
         <div class="lg:col-span-4 reveal">
-          <p class="text-base text-on-surface-variant leading-relaxed mb-14 max-w-sm">
+          <p class="text-base text-on-surface-variant leading-relaxed mb-14 max-w-sm" data-editable="contact-subtitle">
             Available for brand strategy, visual identity, and digital build projects. Working with forward-thinking brands worldwide.
           </p>
 
           <div class="mb-14">
             <span class="label-caps text-[10px] text-on-surface-variant/50 tracking-[0.3em] block mb-5">Direct</span>
-            <a href="mailto:hello@eyuelmulat.com" class="font-display text-[24px] md:text-[28px] uppercase text-primary hover:text-accent transition-colors duration-300 block leading-tight mb-3">hello@eyuelmulat.com</a>
-            <span class="label-caps text-[11px] tracking-[0.2em] text-on-surface-variant">+251 95 355 3856</span>
+            <a href="mailto:hello@eyuelmulat.com" class="font-display text-[24px] md:text-[28px] uppercase text-primary hover:text-accent transition-colors duration-300 block leading-tight mb-3" data-editable="contact-email">hello@eyuelmulat.com</a>
+            <span class="label-caps text-[11px] tracking-[0.2em] text-on-surface-variant" data-editable="contact-phone">+251 95 355 3856</span>
           </div>
 
           <div>
@@ -307,6 +307,9 @@
 
   </main>
 
+  <!-- Custom blocks injected by admin -->
+  <div id="admin-blocks" class="px-10 md:px-[80px]"></div>
+
   <!-- Footer -->
   <footer class="bg-primary text-background px-10 md:px-[80px]">
     <div class="pt-20 pb-16 grid grid-cols-12 gap-8">
@@ -344,5 +347,6 @@
   </footer>
 
   <script type="module" src="/src/js/main.js"></script>
+  <script type="module" src="/src/js/content-loader.js"></script>
 </body>
 </html>

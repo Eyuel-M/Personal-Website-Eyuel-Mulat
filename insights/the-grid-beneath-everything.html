@@ -37,9 +37,9 @@
       </a>
 
       <div class="flex flex-wrap items-center gap-6 mb-12 reveal-hero">
-        <span class="label-caps text-[10px] text-accent tracking-[0.3em]">Typography</span>
+        <span class="label-caps text-[10px] text-accent tracking-[0.3em]" data-editable="grid-category">Typography</span>
         <span class="w-px h-4 bg-black/20"></span>
-        <span class="label-caps text-[10px] text-on-surface-variant tracking-[0.3em]">Feb 2024</span>
+        <span class="label-caps text-[10px] text-on-surface-variant tracking-[0.3em]" data-editable="grid-date">Feb 2024</span>
         <span class="w-px h-4 bg-black/20"></span>
         <span class="label-caps text-[10px] text-on-surface-variant tracking-[0.3em]">6 min read</span>
       </div>
@@ -64,6 +64,7 @@
           src="https://lh3.googleusercontent.com/aida-public/AB6AXuBga90sr654rVPGPEaB3kJeifl98bSDxlZBsKWfUjsSFqSEteMcDzxZ2X8DI9wNnkiRQXmSPw2yPmztXBYxqj0GuDwUG1Acgtf8ZsPJYMCoHKuPOAdAK38hAzLpvGLwdL5W3U-6cG6Sc8hV6n30pgK_smwSP8kievA0z2dr8GJOsyctxdUC5RCqkfCnoZM-gaS6sG0aXQwWmbDLjY9nGrNFCRA_fLcJJEN4pNxaLHdDkwIZkpTEijUa6bP7s3cbA-WYecL_HK6Yg_0"
           alt="Typography Grid"
           class="w-full h-full object-cover"
+        data-editable="grid-hero-img" data-editable-type="image"
         />
       </div>
     </section>
@@ -110,6 +111,9 @@
 
   </main>
 
+  <!-- Custom blocks injected by admin -->
+  <div id="admin-blocks" class="px-10 md:px-[80px]"></div>
+
   <!-- Footer -->
   <footer class="bg-primary text-background px-10 md:px-[80px]">
     <div class="pt-20 pb-16 grid grid-cols-12 gap-8">
@@ -147,5 +151,6 @@
   </footer>
 
   <script type="module" src="/src/js/main.js"></script>
+  <script type="module" src="/src/js/content-loader.js"></script>
 </body>
 </html>

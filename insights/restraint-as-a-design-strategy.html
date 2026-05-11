@@ -37,9 +37,9 @@
       </a>
 
       <div class="flex flex-wrap items-center gap-6 mb-12 reveal-hero">
-        <span class="label-caps text-[10px] text-accent tracking-[0.3em]">Identity Design</span>
+        <span class="label-caps text-[10px] text-accent tracking-[0.3em]" data-editable="restraint-category">Identity Design</span>
         <span class="w-px h-4 bg-black/20"></span>
-        <span class="label-caps text-[10px] text-on-surface-variant tracking-[0.3em]">Oct 2023</span>
+        <span class="label-caps text-[10px] text-on-surface-variant tracking-[0.3em]" data-editable="restraint-date">Oct 2023</span>
         <span class="w-px h-4 bg-black/20"></span>
         <span class="label-caps text-[10px] text-on-surface-variant tracking-[0.3em]">7 min read</span>
       </div>
@@ -64,6 +64,7 @@
           src="https://lh3.googleusercontent.com/aida-public/AB6AXuApiyh_3aaVjPbYqtnEYBYYCxdU270rhO_lQ0MlcPYGhxDlpPR1GJwvBolsdfXepO0m06UPWAFYvjKsHqwNyFnFZ8UzBq5qUYEMMzTm-PNLwhrRHkmHx-0UsTIVuo9CyfbyQq9j_TjkVdQJRQWNO7S__j6X-y8v3yxbf9p0MDfFO-3s9aIJzbpP4pDagWdhgpBHAFHN_BxkoMOkfgk9ur5yvt6DpaCaGorEo70Rhca1Zi8Pwd7VKUoRiXpeOMhV3pwXoZA8xxFUikw"
           alt="Restraint in Design"
           class="w-full h-full object-cover"
+        data-editable="restraint-hero-img" data-editable-type="image"
         />
       </div>
     </section>
@@ -115,6 +116,9 @@
 
   </main>
 
+  <!-- Custom blocks injected by admin -->
+  <div id="admin-blocks" class="px-10 md:px-[80px]"></div>
+
   <!-- Footer -->
   <footer class="bg-primary text-background px-10 md:px-[80px]">
     <div class="pt-20 pb-16 grid grid-cols-12 gap-8">
@@ -152,5 +156,6 @@
   </footer>
 
   <script type="module" src="/src/js/main.js"></script>
+  <script type="module" src="/src/js/content-loader.js"></script>
 </body>
 </html>

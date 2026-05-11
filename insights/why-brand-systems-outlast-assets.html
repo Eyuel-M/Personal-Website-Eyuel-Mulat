@@ -37,9 +37,9 @@
       </a>
 
       <div class="flex flex-wrap items-center gap-6 mb-12 reveal-hero">
-        <span class="label-caps text-[10px] text-accent tracking-[0.3em]">Brand Strategy</span>
+        <span class="label-caps text-[10px] text-accent tracking-[0.3em]" data-editable="brand-systems-category">Brand Strategy</span>
         <span class="w-px h-4 bg-black/20"></span>
-        <span class="label-caps text-[10px] text-on-surface-variant tracking-[0.3em]">May 2024</span>
+        <span class="label-caps text-[10px] text-on-surface-variant tracking-[0.3em]" data-editable="brand-systems-date">May 2024</span>
         <span class="w-px h-4 bg-black/20"></span>
         <span class="label-caps text-[10px] text-on-surface-variant tracking-[0.3em]">8 min read</span>
       </div>
@@ -64,6 +64,7 @@
           src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOWQNwCA_Sy3BPn64hPnpoO02uP_2_I6oW5rpYeyhmhbJcwdODE21QCKmNBnLYpjNRQvkZI7H-37UsPWD4dPdVF7KLHyKL4fMT6LjMz1R1Riqe4PDbEd8ECAxfvke5UBMQ2RnMElW_xDtjq2oan1PCWh863-eSkEa-k_8ihQV0Ww3edsCB43nZJJJqts4HseBRGEvomTagI29z3PqwNDUNQddqSueZb4rURX2KArszCjq8N-BVQXNl1h9vIjUAO0ihvRIynh-y3AM"
           alt="Brand Systems"
           class="w-full h-full object-cover"
+        data-editable="brand-systems-hero-img" data-editable-type="image"
         />
       </div>
     </section>
@@ -116,6 +117,9 @@
 
   </main>
 
+  <!-- Custom blocks injected by admin -->
+  <div id="admin-blocks" class="px-10 md:px-[80px]"></div>
+
   <!-- Footer -->
   <footer class="bg-primary text-background px-10 md:px-[80px]">
     <div class="pt-20 pb-16 grid grid-cols-12 gap-8">
@@ -153,5 +157,6 @@
   </footer>
 
   <script type="module" src="/src/js/main.js"></script>
+  <script type="module" src="/src/js/content-loader.js"></script>
 </body>
 </html>

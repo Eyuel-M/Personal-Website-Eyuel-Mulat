@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EM Admin</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0F0F0F;
+      --surface: #1A1A1A;
+      --surface2: #222222;
+      --border: #2A2A2A;
+      --accent: #FF4F00;
+      --accent-dim: rgba(255,79,0,0.15);
+      --text: #E8E8E8;
+      --muted: #666666;
+      --muted2: #444444;
+      --success: #22C55E;
+      --danger: #EF4444;
+      --topbar-h: 48px;
+      --sidebar-w: 220px;
+      --props-w: 300px;
+    }
+
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 13px; line-height: 1.5; }
+
+    /* ─── TYPOGRAPHY ─── */
+    .label-caps { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+    .label-caps.accent { color: var(--accent); }
+
+    /* ─── SCROLLBARS ─── */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* ─── LOGIN ─── */
+    #login-view {
+      display: flex; align-items: center; justify-content: center;
+      height: 100%; background: var(--bg);
+    }
+    .login-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+      padding: 40px; width: 360px;
+    }
+    .login-card .logo { font-size: 11px; font-weight: 700; letter-spacing: 0.2em; color: var(--accent); margin-bottom: 32px; }
+    .login-card h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 8px; }
+    .login-card p { color: var(--muted); font-size: 12px; margin-bottom: 28px; }
+    .login-card .error-msg { color: var(--danger); font-size: 12px; margin-top: 12px; min-height: 18px; }
+
+    /* ─── DASHBOARD ─── */
+    #dashboard-view { display: flex; flex-direction: column; height: 100%; }
+
+    /* TOP BAR */
+    #topbar {
+      height: var(--topbar-h); min-height: var(--topbar-h);
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; padding: 0 16px; gap: 16px; z-index: 100;
+    }
+    #topbar .logo { font-size: 11px; font-weight: 800; letter-spacing: 0.2em; color: var(--accent); white-space: nowrap; }
+    #topbar .save-status { flex: 1; text-align: center; font-size: 11px; color: var(--muted); letter-spacing: 0.05em; }
+    #topbar .save-status.saved { color: var(--success); }
+    #topbar .save-status.error { color: var(--danger); }
+    #topbar .tb-actions { display: flex; gap: 8px; align-items: center; }
+
+    /* MAIN LAYOUT */
+    #main {
+      display: flex; flex: 1; overflow: hidden;
+    }
+
+    /* SIDEBAR */
+    #sidebar {
+      width: var(--sidebar-w); min-width: var(--sidebar-w);
+      background: var(--surface); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .sidebar-section { padding: 16px 12px 8px; }
+    .sidebar-section .section-label { font-size: 9px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted2); padding: 0 4px; margin-bottom: 4px; }
+    .sidebar-divider { border: none; border-top: 1px solid var(--border); margin: 8px 12px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 12px; border-radius: 6px; cursor: pointer;
+      font-size: 12px; font-weight: 500; color: var(--muted);
+      transition: background 0.15s, color 0.15s; user-select: none;
+      border: none; background: none; width: 100%; text-align: left;
+    }
+    .nav-item:hover { background: var(--surface2); color: var(--text); }
+    .nav-item.active { background: var(--accent-dim); color: var(--accent); }
+    .nav-item .nav-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+    .nav-item-url { font-size: 9px; color: var(--muted2); margin-left: auto; }
+    .sidebar-actions { padding: 8px 12px 16px; display: flex; flex-direction: column; gap: 6px; margin-top: auto; }
+
+    /* CENTER PANEL */
+    #center {
+      flex: 1; display: flex; flex-direction: column; overflow: hidden;
+      background: var(--bg);
+    }
+    #center-empty {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 12px; color: var(--muted);
+    }
+    #center-empty .empty-icon { font-size: 40px; opacity: 0.3; }
+    #center-empty p { font-size: 12px; }
+
+    /* SECTION TABS */
+    #section-tabs {
+      display: flex; gap: 2px; padding: 12px 16px 0;
+      border-bottom: 1px solid var(--border); flex-shrink: 0;
+      overflow-x: auto; background: var(--bg);
+    }
+    .section-tab {
+      padding: 7px 14px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+      text-transform: uppercase; cursor: pointer; border-radius: 6px 6px 0 0;
+      color: var(--muted); border: 1px solid transparent; border-bottom: none;
+      background: none; transition: color 0.15s, background 0.15s; white-space: nowrap;
+    }
+    .section-tab:hover { color: var(--text); background: var(--surface2); }
+    .section-tab.active { color: var(--accent); background: var(--surface); border-color: var(--border); border-bottom-color: var(--surface); position: relative; bottom: -1px; }
+
+    /* FIELDS LIST */
+    #fields-list {
+      flex: 1; overflow-y: auto; padding: 16px;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .field-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+      padding: 12px 14px; cursor: pointer; transition: border-color 0.15s, background 0.15s;
+      display: flex; align-items: center; gap: 12px; border-left: 3px solid transparent;
+    }
+    .field-card:hover { border-color: var(--muted2); }
+    .field-card.active { border-left-color: var(--accent); background: var(--surface2); }
+    .field-card .fc-info { flex: 1; min-width: 0; }
+    .field-card .fc-label { font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+    .field-card .fc-preview { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .field-card .fc-thumb { width: 60px; height: 45px; border-radius: 4px; object-fit: cover; background: var(--surface2); flex-shrink: 0; border: 1px solid var(--border); }
+    .field-card .fc-thumb-placeholder { width: 60px; height: 45px; border-radius: 4px; background: var(--surface2); flex-shrink: 0; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--muted2); font-size: 18px; }
+    .type-badge { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; background: var(--surface2); color: var(--muted); flex-shrink: 0; }
+    .type-badge.image { background: rgba(99,102,241,0.15); color: #818CF8; }
+    .type-badge.text { background: rgba(34,197,94,0.1); color: #4ADE80; }
+    .type-badge.textarea { background: rgba(251,191,36,0.1); color: #FCD34D; }
+    .type-badge.block { background: rgba(255,79,0,0.1); color: var(--accent); }
+
+    /* BLOCKS SECTION */
+    .blocks-header { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding: 8px 0 6px; border-top: 1px solid var(--border); margin-top: 8px; }
+    .block-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; cursor: pointer; border-left: 3px solid transparent; display: flex; align-items: center; gap: 10px; }
+    .block-card:hover { border-color: var(--muted2); }
+    .block-card.active { border-left-color: var(--accent); background: var(--surface2); }
+
+    /* CENTER FOOTER */
+    #center-footer { padding: 12px 16px; border-top: 1px solid var(--border); background: var(--bg); flex-shrink: 0; }
+
+    /* RIGHT PANEL */
+    #props {
+      width: var(--props-w); min-width: var(--props-w);
+      background: var(--surface); border-left: 1px solid var(--border);
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    #props-empty {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 8px; color: var(--muted); padding: 20px;
+    }
+    #props-empty p { font-size: 11px; text-align: center; line-height: 1.6; }
+    #props-content { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+    .props-header { display: flex; align-items: center; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+    .props-header .ph-label { font-size: 13px; font-weight: 600; flex: 1; }
+
+    /* SPACING GRID */
+    .spacing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .spacing-input-wrap { display: flex; align-items: center; gap: 6px; }
+    .spacing-input-wrap .sp-label { font-size: 9px; font-weight: 700; color: var(--muted); width: 10px; flex-shrink: 0; text-transform: uppercase; }
+
+    /* FORMS & INPUTS */
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+    input[type="text"], input[type="password"], input[type="number"], textarea, select {
+      background: var(--bg); border: 1px solid var(--border); color: var(--text);
+      border-radius: 6px; padding: 8px 10px; font-size: 12px; width: 100%;
+      outline: none; transition: border-color 0.15s; font-family: inherit; resize: vertical;
+    }
+    input[type="text"]:focus, input[type="password"]:focus, input[type="number"]:focus, textarea:focus, select:focus {
+      border-color: var(--accent);
+    }
+    input[type="number"] { -moz-appearance: textfield; }
+    input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+    select option { background: var(--surface); }
+
+    /* FILE DROP */
+    .file-drop {
+      border: 1px dashed var(--border); border-radius: 6px; padding: 16px;
+      text-align: center; cursor: pointer; transition: border-color 0.15s, background 0.15s;
+    }
+    .file-drop:hover, .file-drop.drag-over { border-color: var(--accent); background: var(--accent-dim); }
+    .file-drop input[type="file"] { display: none; }
+    .file-drop p { font-size: 11px; color: var(--muted); }
+    .file-drop p strong { color: var(--accent); }
+    .img-preview { width: 100%; max-height: 140px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 8px; }
+    .img-preview-placeholder { width: 100%; height: 80px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface2); display: flex; align-items: center; justify-content: center; color: var(--muted2); font-size: 24px; margin-bottom: 8px; }
+    .url-input-wrap { display: flex; gap: 6px; align-items: center; }
+    .url-input-wrap .or-sep { font-size: 10px; color: var(--muted); white-space: nowrap; }
+
+    /* BUTTONS */
+    .btn {
+      padding: 8px 16px; border-radius: 6px; font-size: 11px; font-weight: 600;
+      letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer;
+      border: 1px solid transparent; transition: opacity 0.15s, background 0.15s;
+      font-family: inherit;
+    }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-primary:hover:not(:disabled) { opacity: 0.85; }
+    .btn-secondary { background: var(--surface2); color: var(--text); border-color: var(--border); }
+    .btn-secondary:hover:not(:disabled) { border-color: var(--muted); }
+    .btn-ghost { background: none; color: var(--muted); border-color: var(--border); }
+    .btn-ghost:hover:not(:disabled) { color: var(--text); border-color: var(--muted2); }
+    .btn-danger { background: rgba(239,68,68,0.1); color: var(--danger); border-color: rgba(239,68,68,0.2); }
+    .btn-danger:hover:not(:disabled) { background: rgba(239,68,68,0.2); }
+    .btn-full { width: 100%; text-align: center; }
+    .btn-sm { padding: 5px 10px; font-size: 10px; }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex;
+      align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+    }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      width: 100%; max-width: 480px; max-height: 90vh; display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .modal-header { padding: 18px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .modal-header h2 { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; }
+    .modal-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 18px; line-height: 1; padding: 2px; }
+    .modal-close:hover { color: var(--text); }
+    .modal-body { padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+    .modal-footer { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; flex-shrink: 0; }
+    .modal-error { color: var(--danger); font-size: 11px; margin-top: -6px; }
+
+    /* TOAST */
+    #toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 2000; pointer-events: none; }
+    .toast {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+      padding: 10px 16px; font-size: 12px; color: var(--text); min-width: 200px;
+      animation: slideIn 0.2s ease; border-left: 3px solid var(--accent);
+    }
+    .toast.success { border-left-color: var(--success); }
+    .toast.error { border-left-color: var(--danger); }
+    .toast.fade-out { animation: fadeOut 0.3s ease forwards; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes fadeOut { to { opacity: 0; transform: translateX(20px); } }
+
+    /* UPLOAD PROGRESS */
+    .upload-progress { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--muted); }
+    .progress-bar { flex: 1; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.2s; }
+
+    /* HIDDEN */
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<!-- ─── LOGIN VIEW ─── -->
+<div id="login-view">
+  <div class="login-card">
+    <div class="logo">EM ADMIN</div>
+    <h1>Admin Access</h1>
+    <p>Enter your password to continue</p>
+    <div class="form-group">
+      <label for="login-pw">Password</label>
+      <input type="password" id="login-pw" placeholder="••••••••" autocomplete="current-password" />
+    </div>
+    <div class="error-msg" id="login-error"></div>
+    <button class="btn btn-primary btn-full" style="margin-top:16px" id="login-btn">Sign In</button>
+  </div>
+</div>
+
+<!-- ─── DASHBOARD VIEW ─── -->
+<div id="dashboard-view" class="hidden">
+
+  <!-- TOP BAR -->
+  <div id="topbar">
+    <span class="logo">EM ADMIN</span>
+    <span class="save-status" id="save-status"></span>
+    <div class="tb-actions">
+      <a id="preview-link" href="#" target="_blank" class="btn btn-ghost btn-sm">Preview Page</a>
+      <button class="btn btn-secondary btn-sm" id="save-btn">Save</button>
+      <button class="btn btn-ghost btn-sm" id="logout-btn">Logout</button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div id="main">
+
+    <!-- SIDEBAR -->
+    <div id="sidebar">
+      <div class="sidebar-section">
+        <div class="section-label">Pages</div>
+        <div id="pages-nav"></div>
+      </div>
+      <hr class="sidebar-divider" />
+      <div class="sidebar-actions">
+        <button class="btn btn-secondary btn-full" id="new-project-btn">+ New Project</button>
+        <button class="btn btn-secondary btn-full" id="new-insight-btn">+ New Insight</button>
+      </div>
+    </div>
+
+    <!-- CENTER PANEL -->
+    <div id="center">
+      <div id="center-empty">
+        <div class="empty-icon">&#9783;</div>
+        <p>Select a page from the sidebar<br />to start editing</p>
+      </div>
+      <div id="center-content" class="hidden" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+        <div id="section-tabs"></div>
+        <div id="fields-list"></div>
+        <div id="center-footer">
+          <button class="btn btn-ghost btn-sm" id="add-block-btn">+ Add Custom Block</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div id="props">
+      <div id="props-empty">
+        <p>Click a field card<br />to edit its properties</p>
+      </div>
+      <div id="props-content" class="hidden"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── TOAST CONTAINER ─── -->
+<div id="toast-container"></div>
+
+<!-- ─── MODALS (rendered dynamically) ─── -->
+<div id="modal-container"></div>
+
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════════════════════
+
+const API = 'http://localhost:3001';
+
+const SCHEMA = {
+  home: { label: 'Home', url: 'http://localhost:3000/', sections: {
+    hero: { label: 'Hero', fields: [
+      { id: 'hero-label', label: 'Label', type: 'text' },
+      { id: 'hero-h1', label: 'Headline', type: 'text' },
+      { id: 'hero-subtitle', label: 'Subtitle', type: 'textarea' },
+    ]},
+    featured: { label: 'Featured Project', fields: [
+      { id: 'featured-img', label: 'Image', type: 'image' },
+      { id: 'featured-title', label: 'Title', type: 'text' },
+      { id: 'featured-desc', label: 'Description', type: 'textarea' },
+    ]},
+    cta: { label: 'CTA', fields: [
+      { id: 'cta-h2', label: 'Heading', type: 'text' },
+    ]},
+  }},
+  about: { label: 'About', url: 'http://localhost:3000/about.html', sections: {
+    hero: { label: 'Hero', fields: [
+      { id: 'about-hero-label', label: 'Label', type: 'text' },
+      { id: 'about-h1', label: 'Headline', type: 'text' },
+      { id: 'about-hero-p', label: 'Intro', type: 'textarea' },
+    ]},
+    image: { label: 'Studio Image', fields: [
+      { id: 'about-main-img', label: 'Image', type: 'image' },
+    ]},
+    expertise: { label: 'Expertise', fields: [
+      { id: 'exp-1-title', label: 'Skill 1', type: 'text' }, { id: 'exp-1-text', label: 'Skill 1 Desc', type: 'textarea' },
+      { id: 'exp-2-title', label: 'Skill 2', type: 'text' }, { id: 'exp-2-text', label: 'Skill 2 Desc', type: 'textarea' },
+      { id: 'exp-3-title', label: 'Skill 3', type: 'text' }, { id: 'exp-3-text', label: 'Skill 3 Desc', type: 'textarea' },
+      { id: 'exp-4-title', label: 'Skill 4', type: 'text' }, { id: 'exp-4-text', label: 'Skill 4 Desc', type: 'textarea' },
+      { id: 'exp-5-title', label: 'Skill 5', type: 'text' }, { id: 'exp-5-text', label: 'Skill 5 Desc', type: 'textarea' },
+      { id: 'exp-6-title', label: 'Skill 6', type: 'text' }, { id: 'exp-6-text', label: 'Skill 6 Desc', type: 'textarea' },
+    ]},
+    process: { label: 'Process', fields: [
+      { id: 'proc-1-title', label: 'Step 1 Heading', type: 'text' }, { id: 'proc-1-text', label: 'Step 1 Body', type: 'textarea' },
+      { id: 'proc-2-title', label: 'Step 2 Heading', type: 'text' }, { id: 'proc-2-text', label: 'Step 2 Body', type: 'textarea' },
+    ]},
+  }},
+  work: { label: 'Work', url: 'http://localhost:3000/work.html', sections: {
+    hero: { label: 'Hero', fields: [
+      { id: 'work-h1', label: 'Headline', type: 'text' },
+      { id: 'work-count', label: 'Project Count Label', type: 'text' },
+    ]},
+  }},
+  contact: { label: 'Contact', url: 'http://localhost:3000/contact.html', sections: {
+    hero: { label: 'Hero', fields: [
+      { id: 'contact-h1', label: 'Headline', type: 'text' },
+      { id: 'contact-subtext', label: 'Availability Text', type: 'textarea' },
+    ]},
+    info: { label: 'Contact Info', fields: [
+      { id: 'contact-email', label: 'Email', type: 'text' },
+      { id: 'contact-phone', label: 'Phone', type: 'text' },
+    ]},
+  }},
+  insights: { label: 'Insights', url: 'http://localhost:3000/insights.html', sections: {
+    hero: { label: 'Hero', fields: [
+      { id: 'insights-h1', label: 'Headline', type: 'text' },
+    ]},
+    article1: { label: 'Article 1', fields: [
+      { id: 'art1-img', label: 'Image', type: 'image' },
+      { id: 'art1-title', label: 'Title', type: 'text' },
+      { id: 'art1-excerpt', label: 'Excerpt', type: 'textarea' },
+    ]},
+    article2: { label: 'Article 2', fields: [
+      { id: 'art2-img', label: 'Image', type: 'image' },
+      { id: 'art2-title', label: 'Title', type: 'text' },
+      { id: 'art2-excerpt', label: 'Excerpt', type: 'textarea' },
+    ]},
+    article3: { label: 'Article 3', fields: [
+      { id: 'art3-img', label: 'Image', type: 'image' },
+      { id: 'art3-title', label: 'Title', type: 'text' },
+      { id: 'art3-excerpt', label: 'Excerpt', type: 'textarea' },
+    ]},
+  }},
+};
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+
+const state = {
+  token: localStorage.getItem('admin_token'),
+  selectedPage: null,
+  selectedSection: null,
+  selectedField: null,    // { id, isBlock, blockIndex } or null
+  pageData: {},           // { [page]: { fields: {id: {value, margin, padding}}, blocks: [] } }
+  dirty: false,
+};
+
+// Pending edits in the right panel (before "Apply Changes")
+let pendingEdit = {
+  value: '',
+  margin: { t: 0, r: 0, b: 0, l: 0 },
+  padding: { t: 0, r: 0, b: 0, l: 0 },
+};
+
+// ═══════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════
+
+function $(sel, ctx = document) { return ctx.querySelector(sel); }
+function $$(sel, ctx = document) { return [...ctx.querySelectorAll(sel)]; }
+
+function emptySpacing() { return { t: 0, r: 0, b: 0, l: 0 }; }
+function defaultFieldData() { return { value: '', margin: emptySpacing(), padding: emptySpacing() }; }
+
+function slugify(str) {
+  return str.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/[\s]+/g, '-').replace(/-+/g, '-');
+}
+
+function cloneSpacing(sp) { return { t: sp.t||0, r: sp.r||0, b: sp.b||0, l: sp.l||0 }; }
+
+function getFieldData(page, fieldId) {
+  const pd = state.pageData[page];
+  if (!pd) return defaultFieldData();
+  return pd.fields[fieldId] || defaultFieldData();
+}
+
+function getFieldSchema(page, fieldId) {
+  const ps = SCHEMA[page];
+  if (!ps) return null;
+  for (const secKey of Object.keys(ps.sections)) {
+    const sec = ps.sections[secKey];
+    for (const f of sec.fields) {
+      if (f.id === fieldId) return f;
+    }
+  }
+  return null;
+}
+
+function toast(msg, type = 'info') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  $('#toast-container').appendChild(el);
+  setTimeout(() => {
+    el.classList.add('fade-out');
+    setTimeout(() => el.remove(), 300);
+  }, 2800);
+}
+
+function setSaveStatus(msg, cls = '') {
+  const el = $('#save-status');
+  el.textContent = msg;
+  el.className = 'save-status' + (cls ? ' ' + cls : '');
+}
+
+function markDirty() {
+  state.dirty = true;
+  setSaveStatus('Unsaved changes', '');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// API
+// ═══════════════════════════════════════════════════════════════
+
+async function apiLogin(password) {
+  const r = await fetch(`${API}/api/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password }),
+  });
+  if (!r.ok) throw new Error('Invalid password');
+  return r.json();
+}
+
+async function apiGetContent(page) {
+  const r = await fetch(`${API}/api/content/${page}`, {
+    headers: { 'x-token': state.token || '' },
+  });
+  if (!r.ok) throw new Error(`Failed to load ${page}`);
+  return r.json();
+}
+
+async function apiSaveContent(page, data) {
+  const r = await fetch(`${API}/api/content/${page}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'x-token': state.token || '' },
+    body: JSON.stringify(data),
+  });
+  if (!r.ok) throw new Error('Save failed');
+  return r.json();
+}
+
+async function apiUpload(file, onProgress) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    const fd = new FormData();
+    fd.append('file', file);
+    xhr.open('POST', `${API}/api/upload`);
+    xhr.setRequestHeader('x-token', state.token || '');
+    if (onProgress) xhr.upload.onprogress = e => { if (e.lengthComputable) onProgress(e.loaded / e.total); };
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try { resolve(JSON.parse(xhr.responseText)); } catch { reject(new Error('Bad response')); }
+      } else { reject(new Error('Upload failed')); }
+    };
+    xhr.onerror = () => reject(new Error('Network error'));
+    xhr.send(fd);
+  });
+}
+
+async function apiCreateProject(data) {
+  const r = await fetch(`${API}/api/project`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-token': state.token || '' },
+    body: JSON.stringify(data),
+  });
+  if (!r.ok) throw new Error('Failed to create project');
+  return r.json();
+}
+
+async function apiCreateInsight(data) {
+  const r = await fetch(`${API}/api/insight`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-token': state.token || '' },
+    body: JSON.stringify(data),
+  });
+  if (!r.ok) throw new Error('Failed to create insight');
+  return r.json();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LOGIN
+// ═══════════════════════════════════════════════════════════════
+
+function initLogin() {
+  const btn = $('#login-btn');
+  const pw = $('#login-pw');
+  const err = $('#login-error');
+
+  async function doLogin() {
+    err.textContent = '';
+    btn.disabled = true;
+    btn.textContent = 'Signing in…';
+    try {
+      const res = await apiLogin(pw.value.trim());
+      state.token = res.token;
+      localStorage.setItem('admin_token', res.token);
+      showDashboard();
+    } catch (e) {
+      err.textContent = e.message || 'Login failed';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Sign In';
+    }
+  }
+
+  btn.addEventListener('click', doLogin);
+  pw.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DASHBOARD INIT
+// ═══════════════════════════════════════════════════════════════
+
+function showDashboard() {
+  $('#login-view').classList.add('hidden');
+  $('#dashboard-view').classList.remove('hidden');
+  buildSidebar();
+  bindTopbar();
+}
+
+function showLogin() {
+  $('#dashboard-view').classList.add('hidden');
+  $('#login-view').classList.remove('hidden');
+  $('#login-pw').value = '';
+  $('#login-error').textContent = '';
+}
+
+function bindTopbar() {
+  $('#logout-btn').addEventListener('click', () => {
+    localStorage.removeItem('admin_token');
+    state.token = null;
+    state.selectedPage = null;
+    state.selectedSection = null;
+    state.selectedField = null;
+    state.pageData = {};
+    showLogin();
+  });
+
+  $('#save-btn').addEventListener('click', savePage);
+  $('#new-project-btn').addEventListener('click', openNewProjectModal);
+  $('#new-insight-btn').addEventListener('click', openNewInsightModal);
+  $('#add-block-btn').addEventListener('click', openAddBlockModal);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SIDEBAR
+// ═══════════════════════════════════════════════════════════════
+
+function buildSidebar() {
+  const nav = $('#pages-nav');
+  nav.innerHTML = '';
+  Object.entries(SCHEMA).forEach(([key, ps]) => {
+    const btn = document.createElement('button');
+    btn.className = 'nav-item';
+    btn.dataset.page = key;
+    btn.innerHTML = `<span class="nav-dot"></span><span>${ps.label}</span>`;
+    btn.addEventListener('click', () => selectPage(key));
+    nav.appendChild(btn);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PAGE SELECTION
+// ═══════════════════════════════════════════════════════════════
+
+async function selectPage(pageKey) {
+  // Warn if dirty
+  if (state.dirty && state.selectedPage && state.selectedPage !== pageKey) {
+    if (!confirm('You have unsaved changes. Discard them?')) return;
+  }
+
+  // Update nav highlight
+  $$('.nav-item').forEach(el => el.classList.remove('active'));
+  $(`.nav-item[data-page="${pageKey}"]`)?.classList.add('active');
+
+  state.selectedPage = pageKey;
+  state.selectedSection = null;
+  state.selectedField = null;
+  state.dirty = false;
+
+  setSaveStatus('');
+
+  // Preview link
+  const ps = SCHEMA[pageKey];
+  const previewLink = $('#preview-link');
+  if (ps && ps.url) {
+    previewLink.href = ps.url;
+    previewLink.style.display = '';
+  } else {
+    previewLink.style.display = 'none';
+  }
+
+  // Show loading
+  showCenterLoading(true);
+
+  try {
+    const data = await apiGetContent(pageKey);
+    // Merge with defaults
+    const fields = {};
+    if (ps) {
+      Object.values(ps.sections).forEach(sec => {
+        sec.fields.forEach(f => {
+          const existing = data.fields && data.fields[f.id];
+          fields[f.id] = {
+            value: existing?.value ?? '',
+            margin: { ...emptySpacing(), ...(existing?.margin || {}) },
+            padding: { ...emptySpacing(), ...(existing?.padding || {}) },
+          };
+        });
+      });
+    }
+    // Preserve any extra fields from server
+    if (data.fields) {
+      Object.entries(data.fields).forEach(([id, val]) => {
+        if (!fields[id]) {
+          fields[id] = {
+            value: val?.value ?? val ?? '',
+            margin: { ...emptySpacing(), ...(val?.margin || {}) },
+            padding: { ...emptySpacing(), ...(val?.padding || {}) },
+          };
+        }
+      });
+    }
+    state.pageData[pageKey] = {
+      fields,
+      blocks: Array.isArray(data.blocks) ? data.blocks : [],
+    };
+  } catch (e) {
+    // Initialize empty if API fails
+    const fields = {};
+    if (ps) {
+      Object.values(ps.sections).forEach(sec => {
+        sec.fields.forEach(f => { fields[f.id] = defaultFieldData(); });
+      });
+    }
+    state.pageData[pageKey] = { fields, blocks: [] };
+    toast(`Could not load content: ${e.message}`, 'error');
+  }
+
+  showCenterLoading(false);
+
+  // Select first section by default
+  if (ps) {
+    const firstSection = Object.keys(ps.sections)[0];
+    renderCenter(pageKey, firstSection);
+  }
+}
+
+function showCenterLoading(loading) {
+  if (loading) {
+    $('#center-empty').classList.remove('hidden');
+    $('#center-content').classList.add('hidden');
+    $('#center-empty').innerHTML = '<div style="color:var(--muted);font-size:12px;">Loading…</div>';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CENTER PANEL
+// ═══════════════════════════════════════════════════════════════
+
+function renderCenter(pageKey, sectionKey) {
+  state.selectedSection = sectionKey;
+
+  const ps = SCHEMA[pageKey];
+  if (!ps) return;
+
+  $('#center-empty').classList.add('hidden');
+  $('#center-content').classList.remove('hidden');
+  $('#center-content').style.display = 'flex';
+
+  renderSectionTabs(pageKey, sectionKey);
+  renderFieldsList(pageKey, sectionKey);
+}
+
+function renderSectionTabs(pageKey, activeSectionKey) {
+  const ps = SCHEMA[pageKey];
+  const tabsEl = $('#section-tabs');
+  tabsEl.innerHTML = '';
+  Object.entries(ps.sections).forEach(([key, sec]) => {
+    const tab = document.createElement('button');
+    tab.className = 'section-tab' + (key === activeSectionKey ? ' active' : '');
+    tab.textContent = sec.label;
+    tab.addEventListener('click', () => {
+      state.selectedField = null;
+      renderCenter(pageKey, key);
+      renderPropsEmpty();
+    });
+    tabsEl.appendChild(tab);
+  });
+  // Blocks tab
+  const blocksTab = document.createElement('button');
+  blocksTab.className = 'section-tab' + (activeSectionKey === '__blocks__' ? ' active' : '');
+  blocksTab.textContent = 'Custom Blocks';
+  blocksTab.addEventListener('click', () => {
+    state.selectedSection = '__blocks__';
+    state.selectedField = null;
+    renderCenter(pageKey, '__blocks__');
+    renderPropsEmpty();
+  });
+  tabsEl.appendChild(blocksTab);
+}
+
+function renderFieldsList(pageKey, sectionKey) {
+  const listEl = $('#fields-list');
+  listEl.innerHTML = '';
+
+  const pd = state.pageData[pageKey];
+  const ps = SCHEMA[pageKey];
+
+  if (sectionKey === '__blocks__') {
+    const blocks = pd ? pd.blocks : [];
+    if (blocks.length === 0) {
+      const empty = document.createElement('div');
+      empty.style.cssText = 'color:var(--muted);font-size:12px;text-align:center;padding:32px 0;';
+      empty.textContent = 'No custom blocks. Click "+ Add Custom Block" below.';
+      listEl.appendChild(empty);
+    } else {
+      blocks.forEach((block, idx) => {
+        listEl.appendChild(buildBlockCard(block, idx, pageKey));
+      });
+    }
+    return;
+  }
+
+  const sec = ps?.sections[sectionKey];
+  if (!sec) return;
+
+  sec.fields.forEach(field => {
+    listEl.appendChild(buildFieldCard(field, pageKey));
+  });
+}
+
+function buildFieldCard(field, pageKey) {
+  const fd = getFieldData(pageKey, field.id);
+  const card = document.createElement('div');
+  const isActive = state.selectedField && !state.selectedField.isBlock && state.selectedField.id === field.id;
+  card.className = 'field-card' + (isActive ? ' active' : '');
+  card.dataset.fieldId = field.id;
+
+  let previewHtml = '';
+  let thumbHtml = '';
+
+  if (field.type === 'image') {
+    if (fd.value) {
+      thumbHtml = `<img class="fc-thumb" src="${escHtml(fd.value)}" alt="" onerror="this.style.display='none'" />`;
+    } else {
+      thumbHtml = `<div class="fc-thumb-placeholder">&#128247;</div>`;
+    }
+    previewHtml = fd.value ? escHtml(truncate(fd.value, 40)) : '<em style="color:var(--muted2)">No image</em>';
+  } else {
+    previewHtml = fd.value ? escHtml(truncate(fd.value, 60)) : '<em style="color:var(--muted2)">Empty</em>';
+  }
+
+  card.innerHTML = `
+    ${thumbHtml}
+    <div class="fc-info">
+      <div class="fc-label">${escHtml(field.label)}</div>
+      <div class="fc-preview">${previewHtml}</div>
+    </div>
+    <span class="type-badge ${field.type}">${field.type}</span>
+  `;
+
+  card.addEventListener('click', () => {
+    state.selectedField = { id: field.id, isBlock: false };
+    $$('.field-card').forEach(c => c.classList.remove('active'));
+    $$('.block-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+    renderPropsField(field, pageKey);
+  });
+
+  return card;
+}
+
+function buildBlockCard(block, idx, pageKey) {
+  const isActive = state.selectedField && state.selectedField.isBlock && state.selectedField.blockIndex === idx;
+  const card = document.createElement('div');
+  card.className = 'block-card' + (isActive ? ' active' : '');
+  card.innerHTML = `
+    <div class="fc-info">
+      <div class="fc-label">${escHtml(block.type || 'Block')} <span style="color:var(--muted);font-weight:400">#${idx + 1}</span></div>
+      <div class="fc-preview">${block.content ? escHtml(truncate(String(block.content), 50)) : '<em style="color:var(--muted2)">No content</em>'}</div>
+    </div>
+    <span class="type-badge block">${escHtml(block.section || '—')}</span>
+  `;
+  card.addEventListener('click', () => {
+    state.selectedField = { isBlock: true, blockIndex: idx };
+    $$('.field-card').forEach(c => c.classList.remove('active'));
+    $$('.block-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+    renderPropsBlock(block, idx, pageKey);
+  });
+  return card;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RIGHT PANEL (PROPERTIES)
+// ═══════════════════════════════════════════════════════════════
+
+function renderPropsEmpty() {
+  $('#props-empty').classList.remove('hidden');
+  $('#props-content').classList.add('hidden');
+}
+
+function renderPropsField(field, pageKey) {
+  const fd = getFieldData(pageKey, field.id);
+  pendingEdit = {
+    value: fd.value,
+    margin: cloneSpacing(fd.margin),
+    padding: cloneSpacing(fd.padding),
+  };
+
+  const container = $('#props-content');
+  container.innerHTML = '';
+  container.classList.remove('hidden');
+  $('#props-empty').classList.add('hidden');
+
+  // Header
+  const header = document.createElement('div');
+  header.className = 'props-header';
+  header.innerHTML = `<span class="ph-label">${escHtml(field.label)}</span><span class="type-badge ${field.type}">${field.type}</span>`;
+  container.appendChild(header);
+
+  // Content editor
+  const contentSection = buildContentEditor(field, fd);
+  container.appendChild(contentSection);
+
+  // Spacing
+  container.appendChild(buildSpacingSection('Margin', 'margin'));
+  container.appendChild(buildSpacingSection('Padding', 'padding'));
+
+  // Apply button
+  const applyBtn = document.createElement('button');
+  applyBtn.className = 'btn btn-primary btn-full';
+  applyBtn.textContent = 'Apply Changes';
+  applyBtn.addEventListener('click', () => applyFieldChanges(field.id, pageKey));
+  container.appendChild(applyBtn);
+}
+
+function buildContentEditor(field, fd) {
+  const wrap = document.createElement('div');
+  wrap.className = 'form-group';
+
+  const lbl = document.createElement('label');
+  lbl.textContent = 'Content';
+  wrap.appendChild(lbl);
+
+  if (field.type === 'text') {
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.value = fd.value || '';
+    inp.addEventListener('input', () => { pendingEdit.value = inp.value; });
+    wrap.appendChild(inp);
+  } else if (field.type === 'textarea') {
+    const ta = document.createElement('textarea');
+    ta.rows = 4;
+    ta.value = fd.value || '';
+    ta.addEventListener('input', () => { pendingEdit.value = ta.value; });
+    wrap.appendChild(ta);
+  } else if (field.type === 'image') {
+    wrap.appendChild(buildImageEditor(fd.value, (url) => { pendingEdit.value = url; }));
+  }
+
+  return wrap;
+}
+
+function buildImageEditor(currentUrl, onChange) {
+  const wrap = document.createElement('div');
+  wrap.style.display = 'flex';
+  wrap.style.flexDirection = 'column';
+  wrap.style.gap = '8px';
+
+  // Preview
+  const preview = document.createElement('div');
+  if (currentUrl) {
+    const img = document.createElement('img');
+    img.className = 'img-preview';
+    img.src = currentUrl;
+    img.onerror = () => { img.style.display = 'none'; };
+    preview.appendChild(img);
+  } else {
+    const ph = document.createElement('div');
+    ph.className = 'img-preview-placeholder';
+    ph.innerHTML = '&#128247;';
+    preview.appendChild(ph);
+  }
+  wrap.appendChild(preview);
+
+  // Drop zone
+  const dropZone = document.createElement('div');
+  dropZone.className = 'file-drop';
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = 'image/*';
+  dropZone.innerHTML = `<p><strong>Click to upload</strong> or drag & drop</p><p style="margin-top:4px;font-size:10px">PNG, JPG, GIF, WebP</p>`;
+  dropZone.appendChild(fileInput);
+
+  // Progress bar (hidden initially)
+  const progressWrap = document.createElement('div');
+  progressWrap.className = 'upload-progress hidden';
+  progressWrap.innerHTML = `<span>Uploading…</span><div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>`;
+  wrap.appendChild(progressWrap);
+
+  const updatePreview = (url) => {
+    preview.innerHTML = '';
+    if (url) {
+      const img = document.createElement('img');
+      img.className = 'img-preview';
+      img.src = url;
+      img.onerror = () => { img.style.display = 'none'; };
+      preview.appendChild(img);
+    }
+    onChange(url);
+  };
+
+  const doUpload = async (file) => {
+    progressWrap.classList.remove('hidden');
+    const fill = progressWrap.querySelector('.progress-fill');
+    try {
+      const res = await apiUpload(file, (pct) => { fill.style.width = (pct * 100) + '%'; });
+      updatePreview(res.url);
+      toast('Image uploaded', 'success');
+    } catch (e) {
+      toast(`Upload failed: ${e.message}`, 'error');
+    } finally {
+      progressWrap.classList.add('hidden');
+      fill.style.width = '0%';
+    }
+  };
+
+  dropZone.addEventListener('click', (e) => { if (e.target !== fileInput) fileInput.click(); });
+  fileInput.addEventListener('change', () => { if (fileInput.files[0]) doUpload(fileInput.files[0]); });
+  dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('drag-over'); });
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) doUpload(file);
+  });
+  wrap.appendChild(dropZone);
+  wrap.appendChild(progressWrap);
+
+  // URL input
+  const urlWrap = document.createElement('div');
+  urlWrap.className = 'url-input-wrap';
+  const orSep = document.createElement('span');
+  orSep.className = 'or-sep';
+  orSep.textContent = 'or URL:';
+  const urlInp = document.createElement('input');
+  urlInp.type = 'text';
+  urlInp.placeholder = 'https://…';
+  urlInp.value = currentUrl || '';
+  urlInp.style.flex = '1';
+  urlInp.addEventListener('input', () => {
+    pendingEdit.value = urlInp.value;
+    // Live preview on URL change
+    if (urlInp.value) {
+      updatePreview(urlInp.value);
+    }
+  });
+  urlInp.addEventListener('blur', () => { if (urlInp.value) updatePreview(urlInp.value); });
+  urlWrap.appendChild(orSep);
+  urlWrap.appendChild(urlInp);
+  wrap.appendChild(urlWrap);
+
+  return wrap;
+}
+
+function buildSpacingSection(title, key) {
+  const section = document.createElement('div');
+  section.style.display = 'flex';
+  section.style.flexDirection = 'column';
+  section.style.gap = '6px';
+
+  const lbl = document.createElement('label');
+  lbl.className = 'label-caps';
+  lbl.textContent = title;
+  section.appendChild(lbl);
+
+  const grid = document.createElement('div');
+  grid.className = 'spacing-grid';
+
+  const sides = [['T', 't'], ['R', 'r'], ['B', 'b'], ['L', 'l']];
+  sides.forEach(([label, prop]) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'spacing-input-wrap';
+    const sp = document.createElement('span');
+    sp.className = 'sp-label';
+    sp.textContent = label;
+    const inp = document.createElement('input');
+    inp.type = 'number';
+    inp.min = '0';
+    inp.value = pendingEdit[key][prop] || 0;
+    inp.style.flex = '1';
+    inp.addEventListener('input', () => { pendingEdit[key][prop] = parseInt(inp.value) || 0; });
+    wrap.appendChild(sp);
+    wrap.appendChild(inp);
+    grid.appendChild(wrap);
+  });
+
+  section.appendChild(grid);
+  return section;
+}
+
+function applyFieldChanges(fieldId, pageKey) {
+  const pd = state.pageData[pageKey];
+  if (!pd) return;
+  pd.fields[fieldId] = {
+    value: pendingEdit.value,
+    margin: cloneSpacing(pendingEdit.margin),
+    padding: cloneSpacing(pendingEdit.padding),
+  };
+  markDirty();
+  // Re-render just the card in the list
+  const section = state.selectedSection;
+  if (section && section !== '__blocks__') {
+    renderFieldsList(pageKey, section);
+    // Re-select the card
+    const card = $$(`.field-card`).find(c => c.dataset.fieldId === fieldId);
+    if (card) card.classList.add('active');
+  }
+  toast('Changes applied', 'success');
+}
+
+function renderPropsBlock(block, idx, pageKey) {
+  pendingEdit = {
+    value: block.content || '',
+    margin: cloneSpacing(block.margin || emptySpacing()),
+    padding: cloneSpacing(block.padding || emptySpacing()),
+  };
+
+  const container = $('#props-content');
+  container.innerHTML = '';
+  container.classList.remove('hidden');
+  $('#props-empty').classList.add('hidden');
+
+  const header = document.createElement('div');
+  header.className = 'props-header';
+  header.innerHTML = `<span class="ph-label">${escHtml(block.type || 'Block')}</span><span class="type-badge block">block</span>`;
+  container.appendChild(header);
+
+  // Content
+  const contentSection = document.createElement('div');
+  contentSection.className = 'form-group';
+  const contentLbl = document.createElement('label');
+  contentLbl.textContent = 'Content';
+  contentSection.appendChild(contentLbl);
+
+  if (block.type === 'Image') {
+    contentSection.appendChild(buildImageEditor(block.content, (url) => { pendingEdit.value = url; }));
+  } else if (block.type === 'Divider') {
+    const div = document.createElement('div');
+    div.style.cssText = 'background:var(--border);height:2px;border-radius:1px;margin:8px 0;';
+    contentSection.appendChild(div);
+  } else {
+    const ta = document.createElement('textarea');
+    ta.rows = 3;
+    ta.value = block.content || '';
+    ta.addEventListener('input', () => { pendingEdit.value = ta.value; });
+    contentSection.appendChild(ta);
+  }
+  container.appendChild(contentSection);
+
+  container.appendChild(buildSpacingSection('Margin', 'margin'));
+  container.appendChild(buildSpacingSection('Padding', 'padding'));
+
+  const applyBtn = document.createElement('button');
+  applyBtn.className = 'btn btn-primary btn-full';
+  applyBtn.textContent = 'Apply Changes';
+  applyBtn.addEventListener('click', () => {
+    const pd = state.pageData[pageKey];
+    if (!pd) return;
+    pd.blocks[idx] = {
+      ...pd.blocks[idx],
+      content: pendingEdit.value,
+      margin: cloneSpacing(pendingEdit.margin),
+      padding: cloneSpacing(pendingEdit.padding),
+    };
+    markDirty();
+    renderFieldsList(pageKey, '__blocks__');
+    toast('Block updated', 'success');
+  });
+  container.appendChild(applyBtn);
+
+  const deleteBtn = document.createElement('button');
+  deleteBtn.className = 'btn btn-danger btn-full';
+  deleteBtn.textContent = 'Delete Block';
+  deleteBtn.addEventListener('click', () => {
+    if (!confirm('Delete this block?')) return;
+    const pd = state.pageData[pageKey];
+    if (!pd) return;
+    pd.blocks.splice(idx, 1);
+    markDirty();
+    state.selectedField = null;
+    renderFieldsList(pageKey, '__blocks__');
+    renderPropsEmpty();
+    toast('Block deleted', 'info');
+  });
+  container.appendChild(deleteBtn);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SAVE
+// ═══════════════════════════════════════════════════════════════
+
+async function savePage() {
+  const page = state.selectedPage;
+  if (!page) { toast('No page selected', 'error'); return; }
+
+  const pd = state.pageData[page];
+  if (!pd) return;
+
+  const saveBtn = $('#save-btn');
+  saveBtn.disabled = true;
+  setSaveStatus('Saving…', '');
+
+  try {
+    await apiSaveContent(page, pd);
+    state.dirty = false;
+    setSaveStatus('Saved ✓', 'saved');
+    toast('Page saved successfully', 'success');
+    setTimeout(() => {
+      if (!state.dirty) setSaveStatus('');
+    }, 2000);
+  } catch (e) {
+    setSaveStatus('Save failed', 'error');
+    toast(`Save failed: ${e.message}`, 'error');
+  } finally {
+    saveBtn.disabled = false;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MODALS
+// ═══════════════════════════════════════════════════════════════
+
+function createModal(title, bodyHtml, footerHtml) {
+  const container = $('#modal-container');
+  container.innerHTML = `
+    <div class="modal-overlay" id="active-modal-overlay">
+      <div class="modal" role="dialog" aria-modal="true">
+        <div class="modal-header">
+          <h2>${escHtml(title)}</h2>
+          <button class="modal-close" id="modal-close-btn" aria-label="Close">&times;</button>
+        </div>
+        <div class="modal-body">${bodyHtml}</div>
+        <div class="modal-footer">${footerHtml}</div>
+      </div>
+    </div>
+  `;
+  $('#modal-close-btn').addEventListener('click', closeModal);
+  $('#active-modal-overlay').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closeModal();
+  });
+  document.addEventListener('keydown', handleModalEsc);
+}
+
+function closeModal() {
+  $('#modal-container').innerHTML = '';
+  document.removeEventListener('keydown', handleModalEsc);
+}
+
+function handleModalEsc(e) { if (e.key === 'Escape') closeModal(); }
+
+// ── ADD CUSTOM BLOCK MODAL ──
+
+function openAddBlockModal() {
+  if (!state.selectedPage) { toast('Select a page first', 'error'); return; }
+
+  const ps = SCHEMA[state.selectedPage];
+  const sectionOptions = ps
+    ? Object.entries(ps.sections).map(([k, s]) => `<option value="${escAttr(k)}">${escHtml(s.label)}</option>`).join('')
+    : '';
+
+  createModal('Add Custom Block', `
+    <div class="form-group">
+      <label>Block Type</label>
+      <select id="block-type-sel">
+        <option value="Text Block">Text Block</option>
+        <option value="Heading">Heading</option>
+        <option value="Image">Image</option>
+        <option value="Divider">Divider</option>
+      </select>
+    </div>
+    <div class="form-group" id="block-content-wrap">
+      <label>Content</label>
+      <textarea id="block-content" rows="3" placeholder="Enter content…"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Target Section</label>
+      <select id="block-section-sel">
+        ${sectionOptions}
+      </select>
+    </div>
+    <div class="modal-error" id="block-modal-error"></div>
+  `, `
+    <button class="btn btn-ghost" id="block-cancel-btn">Cancel</button>
+    <button class="btn btn-primary" id="block-add-btn">Add Block</button>
+  `);
+
+  const typeSel = $('#block-type-sel');
+  const contentWrap = $('#block-content-wrap');
+  const contentInput = $('#block-content');
+  let imageBlockUrl = '';
+
+  // Dynamic content based on type
+  typeSel.addEventListener('change', () => {
+    const type = typeSel.value;
+    contentWrap.innerHTML = '';
+    if (type === 'Divider') {
+      const lbl = document.createElement('label');
+      lbl.textContent = 'No content needed';
+      lbl.style.color = 'var(--muted)';
+      contentWrap.appendChild(lbl);
+      return;
+    }
+    const label = document.createElement('label');
+    label.textContent = 'Content';
+    contentWrap.appendChild(label);
+    if (type === 'Image') {
+      const imgWrap = buildImageEditor('', (url) => { imageBlockUrl = url; });
+      contentWrap.appendChild(imgWrap);
+    } else {
+      const ta = document.createElement('textarea');
+      ta.id = 'block-content';
+      ta.rows = 3;
+      ta.placeholder = 'Enter content…';
+      contentWrap.appendChild(ta);
+    }
+  });
+
+  $('#block-cancel-btn').addEventListener('click', closeModal);
+  $('#block-add-btn').addEventListener('click', () => {
+    const type = typeSel.value;
+    const sectionKey = $('#block-section-sel').value;
+    let content = '';
+    if (type === 'Image') {
+      content = imageBlockUrl;
+    } else if (type !== 'Divider') {
+      const ta = contentWrap.querySelector('textarea');
+      content = ta ? ta.value.trim() : '';
+    }
+
+    const pd = state.pageData[state.selectedPage];
+    if (!pd) { closeModal(); return; }
+
+    pd.blocks.push({ type, content, section: sectionKey, margin: emptySpacing(), padding: emptySpacing() });
+    markDirty();
+    closeModal();
+    // Show blocks tab
+    state.selectedSection = '__blocks__';
+    renderCenter(state.selectedPage, '__blocks__');
+    toast('Block added', 'success');
+  });
+}
+
+// ── NEW PROJECT MODAL ──
+
+function openNewProjectModal() {
+  createModal('New Project', `
+    <div class="form-group">
+      <label>Title</label>
+      <input type="text" id="proj-title" placeholder="Project title…" />
+    </div>
+    <div class="form-group">
+      <label>Slug <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(auto-generated)</span></label>
+      <input type="text" id="proj-slug" placeholder="project-slug" />
+    </div>
+    <div class="form-group">
+      <label>Category</label>
+      <input type="text" id="proj-category" placeholder="Branding, Motion…" />
+    </div>
+    <div class="form-group">
+      <label>Year</label>
+      <input type="text" id="proj-year" placeholder="2024" />
+    </div>
+    <div class="form-group">
+      <label>Client</label>
+      <input type="text" id="proj-client" placeholder="Client name…" />
+    </div>
+    <div class="form-group">
+      <label>Scope</label>
+      <input type="text" id="proj-scope" placeholder="Brand Identity, Web…" />
+    </div>
+    <div class="form-group">
+      <label>Role</label>
+      <input type="text" id="proj-role" placeholder="Creative Director…" />
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <textarea id="proj-desc" rows="3" placeholder="Project description…"></textarea>
+    </div>
+    <div class="modal-error" id="proj-modal-error"></div>
+  `, `
+    <button class="btn btn-ghost" id="proj-cancel-btn">Cancel</button>
+    <button class="btn btn-primary" id="proj-create-btn">Create Project</button>
+  `);
+
+  // Auto-generate slug from title
+  $('#proj-title').addEventListener('input', () => {
+    $('#proj-slug').value = slugify($('#proj-title').value);
+  });
+
+  $('#proj-cancel-btn').addEventListener('click', closeModal);
+  $('#proj-create-btn').addEventListener('click', async () => {
+    const errEl = $('#proj-modal-error');
+    errEl.textContent = '';
+    const btn = $('#proj-create-btn');
+
+    const title = $('#proj-title').value.trim();
+    const slug = $('#proj-slug').value.trim();
+    if (!title) { errEl.textContent = 'Title is required.'; return; }
+    if (!slug) { errEl.textContent = 'Slug is required.'; return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Creating…';
+    try {
+      await apiCreateProject({
+        slug,
+        title,
+        category: $('#proj-category').value.trim(),
+        year: $('#proj-year').value.trim(),
+        client: $('#proj-client').value.trim(),
+        scope: $('#proj-scope').value.trim(),
+        role: $('#proj-role').value.trim(),
+        description: $('#proj-desc').value.trim(),
+      });
+      closeModal();
+      toast(`Project "${title}" created`, 'success');
+    } catch (e) {
+      errEl.textContent = e.message || 'Failed to create project.';
+      btn.disabled = false;
+      btn.textContent = 'Create Project';
+    }
+  });
+}
+
+// ── NEW INSIGHT MODAL ──
+
+function openNewInsightModal() {
+  createModal('New Insight', `
+    <div class="form-group">
+      <label>Title</label>
+      <input type="text" id="ins-title" placeholder="Article title…" />
+    </div>
+    <div class="form-group">
+      <label>Slug <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(auto-generated)</span></label>
+      <input type="text" id="ins-slug" placeholder="article-slug" />
+    </div>
+    <div class="form-group">
+      <label>Category</label>
+      <input type="text" id="ins-category" placeholder="Design, Strategy…" />
+    </div>
+    <div class="form-group">
+      <label>Date</label>
+      <input type="text" id="ins-date" placeholder="May 2024" />
+    </div>
+    <div class="form-group">
+      <label>Author</label>
+      <input type="text" id="ins-author" placeholder="Eyuel Mulat" />
+    </div>
+    <div class="form-group">
+      <label>Excerpt</label>
+      <textarea id="ins-excerpt" rows="3" placeholder="Short excerpt…"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Body</label>
+      <textarea id="ins-body" rows="5" placeholder="Full article body…"></textarea>
+    </div>
+    <div class="modal-error" id="ins-modal-error"></div>
+  `, `
+    <button class="btn btn-ghost" id="ins-cancel-btn">Cancel</button>
+    <button class="btn btn-primary" id="ins-create-btn">Create Insight</button>
+  `);
+
+  $('#ins-title').addEventListener('input', () => {
+    $('#ins-slug').value = slugify($('#ins-title').value);
+  });
+
+  $('#ins-cancel-btn').addEventListener('click', closeModal);
+  $('#ins-create-btn').addEventListener('click', async () => {
+    const errEl = $('#ins-modal-error');
+    errEl.textContent = '';
+    const btn = $('#ins-create-btn');
+
+    const title = $('#ins-title').value.trim();
+    const slug = $('#ins-slug').value.trim();
+    if (!title) { errEl.textContent = 'Title is required.'; return; }
+    if (!slug) { errEl.textContent = 'Slug is required.'; return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Creating…';
+    try {
+      await apiCreateInsight({
+        slug,
+        title,
+        category: $('#ins-category').value.trim(),
+        date: $('#ins-date').value.trim(),
+        author: $('#ins-author').value.trim(),
+        excerpt: $('#ins-excerpt').value.trim(),
+        body: $('#ins-body').value.trim(),
+      });
+      closeModal();
+      toast(`Insight "${title}" created`, 'success');
+    } catch (e) {
+      errEl.textContent = e.message || 'Failed to create insight.';
+      btn.disabled = false;
+      btn.textContent = 'Create Insight';
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════════════
+
+function escHtml(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function escAttr(str) { return escHtml(str); }
+
+function truncate(str, n) {
+  if (!str) return '';
+  return str.length > n ? str.slice(0, n) + '…' : str;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BOOTSTRAP
+// ═══════════════════════════════════════════════════════════════
+
+(function init() {
+  initLogin();
+
+  if (state.token) {
+    showDashboard();
+  }
+})();
+</script>
+</body>
+</html>
