@@ -291,21 +291,17 @@ async function loadSection(id){
       S.data=(cd&&cd.fields)||{};S.contactSvcs=svcs||[];return
     }
     if(id==='portfolio'){
-      if(!S.portfolio){
-        const d=await api('GET','/api/content/portfolio')
-        S.portfolio={title:'Work',subtitle:'Selected Projects',items:[],archivedItems:[],...(d||{})}
-        if(!Array.isArray(S.portfolio.items))S.portfolio.items=[]
-        if(!Array.isArray(S.portfolio.archivedItems))S.portfolio.archivedItems=[]
-      }
+      const d=await api('GET','/api/content/portfolio')
+      S.portfolio={title:'Work',subtitle:'Selected Projects',items:[],archivedItems:[],...(d||{})}
+      if(!Array.isArray(S.portfolio.items))S.portfolio.items=[]
+      if(!Array.isArray(S.portfolio.archivedItems))S.portfolio.archivedItems=[]
       return
     }
     if(id==='insights'){
-      if(!S.insightsData){
-        const d=await api('GET','/api/content/insights-data')
-        S.insightsData={items:[],archivedItems:[],...(d||{})}
-        if(!Array.isArray(S.insightsData.items))S.insightsData.items=[]
-        if(!Array.isArray(S.insightsData.archivedItems))S.insightsData.archivedItems=[]
-      }
+      const d=await api('GET','/api/content/insights-data')
+      S.insightsData={items:[],archivedItems:[],...(d||{})}
+      if(!Array.isArray(S.insightsData.items))S.insightsData.items=[]
+      if(!Array.isArray(S.insightsData.archivedItems))S.insightsData.archivedItems=[]
       return
     }
     if(id==='hero'){
