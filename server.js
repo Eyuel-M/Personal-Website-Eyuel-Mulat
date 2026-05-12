@@ -16,6 +16,41 @@ const UPLOADS_DIR = path.join(__dirname, 'public', 'uploads')
 fs.mkdirSync(CONTENT_DIR, { recursive: true })
 fs.mkdirSync(UPLOADS_DIR, { recursive: true })
 
+// ── Seed content files if they don't exist ───────────────────────────────────
+function seedIfMissing(filename, data) {
+  const file = path.join(CONTENT_DIR, filename)
+  if (!fs.existsSync(file)) fs.writeFileSync(file, JSON.stringify(data, null, 2))
+}
+
+seedIfMissing('portfolio.json', {
+  title: 'Work', subtitle: 'Selected Projects',
+  items: [
+    { id: 1716000000001, slug: 'nexus-dashboard', title: 'Nexus Dashboard', category: 'Branding & UI', client: 'Nexus Technologies', year: '2024', tags: ['Brand Identity', 'UI Design'], description: 'A high-performance SaaS interface designed for complex data visualization and seamless user workflows — precision at enterprise scale.', thumbnail: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBga90sr654rVPGPEaB3kJeifl98bSDxlZBsKWfUjsSFqSEteMcDzxZ2X8DI9wNnkiRQXmSPw2yPmztXBYxqj0GuDwUG1Acgtf8ZsPJYMCoHKuPOAdAK38hAzLpvGLwdL5W3U-6cG6Sc8hV6n30pgK_smwSP8kievA0z2dr8GJOsyctxdUC5RCqkfCnoZM-gaS6sG0aXQwWmbDLjY9nGrNFCRA_fLcJJEN4pNxaLHdDkwIZkpTEijUa6bP7s3cbA-WYecL_HK6Yg_0', scope: 'Brand Identity · UI Design', role: 'Creative Director', overviewH2: 'Data at scale. Clarity by design.', gallery: [], blocks: [], archivedBlocks: [] },
+    { id: 1716000000002, slug: 'vanguard-capital', title: 'Vanguard Capital', category: 'Identity System', client: 'Vanguard Capital Group', year: '2023', tags: ['Identity', 'Strategy', 'Print'], description: 'A comprehensive visual identity system for a category-defining brand. Structural rigour meets modern expression.', thumbnail: 'https://lh3.googleusercontent.com/aida-public/AB6AXuApiyh_3aaVjPbYqtnEYBYYCxdU270rhO_lQ0MlcPYGhxDlpPR1GJwvBolsdfXepO0m06UPWAFYvjKsHqwNyFnFZ8UzBq5qUYEMMzTm-PNLwhrRHkmHx-0UsTIVuo9CyfbyQq9j_TjkVdQJRQWNO7S__j6X-y8v3yxbf9p0MDfFO-3s9aIJzbpP4pDagWdhgpBHAFHN_BxkoMOkfgk9ur5yvt6DpaCaGorEo70Rhca1Zi8Pwd7VKUoRiXpeOMhV3pwXoZA8xxFUikw', scope: 'Identity · Strategy · Print', role: 'Brand Director', overviewH2: 'Authority built from the ground up.', gallery: [], blocks: [], archivedBlocks: [] },
+  ],
+  archivedItems: [],
+})
+
+seedIfMissing('insights-data.json', {
+  items: [
+    { id: 1716000000003, slug: 'why-brand-systems-outlast-assets', title: 'Why Brand Systems Outlast Assets', category: 'Brand Strategy', date: '2024-05-01', excerpt: 'The difference between a brand that scales and one that fragments isn\'t budget — it\'s whether the thinking behind every visual decision is systematic or intuitive. Systems compound. Assets decay.', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDOWQNwCA_Sy3BPn64hPnpoO02uP_2_I6oW5rpYeyhmhbJcwdODE21QCKmNBnLYpjNRQvkZI7H-37UsPWD4dPdVF7KLHyKL4fMT6LjMz1R1Riqe4PDbEd8ECAxfvke5UBMQ2RnMElW_xDtjq2oan1PCWh863-eSkEa-k_8ihQV0Ww3edsCB43nZJJJqts4HseBRGEvomTagI29z3PqwNDUNQddqSueZb4rURX2KArszCjq8N-BVQXNl1h9vIjUAO0ihvRIynh-y3AM', body: '', blocks: [], archivedBlocks: [] },
+    { id: 1716000000004, slug: 'the-grid-beneath-everything', title: 'The Grid Beneath Everything', category: 'Typography', date: '2024-02-01', excerpt: 'Typographic grids aren\'t about constraint — they\'re about creating a framework flexible enough to hold any content while maintaining visual authority. How spatial systems become creative tools.', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBga90sr654rVPGPEaB3kJeifl98bSDxlZBsKWfUjsSFqSEteMcDzxZ2X8DI9wNnkiRQXmSPw2yPmztXBYxqj0GuDwUG1Acgtf8ZsPJYMCoHKuPOAdAK38hAzLpvGLwdL5W3U-6cG6Sc8hV6n30pgK_smwSP8kievA0z2dr8GJOsyctxdUC5RCqkfCnoZM-gaS6sG0aXQwWmbDLjY9nGrNFCRA_fLcJJEN4pNxaLHdDkwIZkpTEijUa6bP7s3cbA-WYecL_HK6Yg_0', body: '', blocks: [], archivedBlocks: [] },
+    { id: 1716000000005, slug: 'restraint-as-a-design-strategy', title: 'Restraint as a Design Strategy', category: 'Identity Design', date: '2023-10-01', excerpt: 'The hardest design decisions aren\'t what to add — they\'re what to remove. Architectural restraint as a discipline means trusting negative space, trusting the reader, and trusting the work itself.', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuApiyh_3aaVjPbYqtnEYBYYCxdU270rhO_lQ0MlcPYGhxDlpPR1GJwvBolsdfXepO0m06UPWAFYvjKsHqwNyFnFZ8UzBq5qUYEMMzTm-PNLwhrRHkmHx-0UsTIVuo9CyfbyQq9j_TjkVdQJRQWNO7S__j6X-y8v3yxbf9p0MDfFO-3s9aIJzbpP4pDagWdhgpBHAFHN_BxkoMOkfgk9ur5yvt6DpaCaGorEo70Rhca1Zi8Pwd7VKUoRiXpeOMhV3pwXoZA8xxFUikw', body: '', blocks: [], archivedBlocks: [] },
+  ],
+  archivedItems: [],
+})
+
+seedIfMissing('home.json', {
+  fields: {
+    'hero-label': { value: 'Strategy & Design' },
+    'hero-heading': { value: 'Design as <span class="text-on-surface/25">Strategy.</span><br>\nIdentity as <span class="text-accent">System.</span>' },
+    'hero-subtitle': { value: 'Creative Direction & Brand Identity for forward-thinking brands. Building architectural visual systems that transcend temporary trends through geometric precision.' },
+    'featured-title': { value: 'Nexus Dashboard' },
+    'featured-desc': { value: 'A high-performance SaaS interface designed for complex data visualization and seamless user workflows — precision at enterprise scale.' },
+    'featured-img': { value: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBga90sr654rVPGPEaB3kJeifl98bSDxlZBsKWfUjsSFqSEteMcDzxZ2X8DI9wNnkiRQXmSPw2yPmztXBYxqj0GuDwUG1Acgtf8ZsPJYMCoHKuPOAdAK38hAzLpvGLwdL5W3U-6cG6Sc8hV6n30pgK_smwSP8kievA0z2dr8GJOsyctxdUC5RCqkfCnoZM-gaS6sG0aXQwWmbDLjY9nGrNFCRA_fLcJJEN4pNxaLHdDkwIZkpTEijUa6bP7s3cbA-WYecL_HK6Yg_0' },
+  },
+})
+
 // ── Build API middleware (used by both Vite plugin and standalone) ───────────
 export function createApiApp() {
   const app = express()
