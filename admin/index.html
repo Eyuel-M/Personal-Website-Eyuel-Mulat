@@ -1,1739 +1,1078 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Content Manager — Eyuel Mulat</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --navy: #1C2B4A;
-      --navy-hover: rgba(255,255,255,0.12);
-      --side-inactive: rgba(255,255,255,0.50);
-      --bg: #EEEEF0;
-      --white: #FFFFFF;
-      --border: #E0E0E0;
-      --label: #888888;
-      --input-border: #D8D8D8;
-      --danger: #C41E1E;
-      --success-bg: #E8F5E9;
-      --sidebar-w: 220px;
-    }
-    html, body { height: 100%; background: var(--bg); color: #111; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Helvetica Neue', sans-serif; font-size: 13px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
-    ::selection { background: var(--navy); color: #fff; }
-    ::-webkit-scrollbar { width: 4px; height: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #ccc; }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Content Manager — Eyuel Mulat</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1B2A4A;--navy5:rgba(27,42,74,.05);--navy10:rgba(27,42,74,.1);--navy20:rgba(27,42,74,.2);--navy50:rgba(27,42,74,.5);
+  --g50:#F9FAFB;--g100:#F3F4F6;--g200:#E5E7EB;--g300:#D1D5DB;--g400:#9CA3AF;--g500:#6B7280;--g600:#4B5563;--g700:#374151;--g800:#1F2937;--g900:#111827;
+  --amber50:#FFFBEB;--amber100:#FEF3C7;--amber200:#FDE68A;--amber500:#F59E0B;--amber800:#92400E;
+  --red50:#FEF2F2;--red400:#F87171;--red600:#DC2626;
+  --green50:#F0FDF4;--green700:#15803D;
+  --sw:256px
+}
+html,body{height:100%;background:var(--g100);color:var(--g900);font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--g300);border-radius:3px}
+input,textarea,select,button{font-family:inherit}
 
-    /* LOGIN */
-    #login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: var(--bg); }
-    .login-wrap { width: 360px; }
-    .login-logo { font-size: 10px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--navy); display: block; margin-bottom: 48px; }
-    .login-wrap h1 { font-size: 26px; font-weight: 300; color: #111; letter-spacing: -0.03em; margin-bottom: 6px; }
-    .login-wrap p { font-size: 12px; color: #888; margin-bottom: 32px; }
-    .login-err { font-size: 12px; background: var(--danger); color: #fff; padding: 10px 14px; margin-bottom: 16px; display: none; font-weight: 500; border-radius: 4px; }
-    .login-err.show { display: block; }
+/* Login */
+#login{display:flex;align-items:center;justify-content:center;min-height:100vh}
+.lb{width:380px}.lb-brand{font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--navy);display:block;margin-bottom:48px}
+.lb h1{font-size:26px;font-weight:300;letter-spacing:-.02em;margin-bottom:6px}.lb>p{font-size:12px;color:var(--g400);margin-bottom:32px}
+.lerr{display:none;font-size:12px;color:#fff;background:#DC2626;padding:10px 14px;border-radius:6px;margin-bottom:16px;font-weight:500}
+.lerr.show{display:block}
 
-    /* FORM */
-    .f-label { display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--label); margin-bottom: 6px; }
-    input[type=text], input[type=password], input[type=url], input[type=date], input[type=number], textarea, select {
-      width: 100%; padding: 8px 10px; font-size: 13px; font-family: inherit;
-      border: 1px solid var(--input-border); background: var(--white); color: #111;
-      outline: none; border-radius: 4px; transition: border-color 0.12s; resize: vertical; line-height: 1.5;
-    }
-    input:focus, textarea:focus, select:focus { border-color: var(--navy); }
-    textarea { min-height: 80px; }
-    input::placeholder, textarea::placeholder { color: #BBB; }
-    select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; cursor: pointer; }
-    .f-group { margin-bottom: 16px; }
+/* App shell */
+#app{display:none;height:100vh;overflow:hidden;flex-direction:row}
+#app.show{display:flex}
 
-    /* BUTTONS */
-    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; border: none; border-radius: 4px; transition: opacity 0.12s; white-space: nowrap; text-decoration: none; font-family: inherit; }
-    .btn-navy { background: var(--navy); color: #fff; }
-    .btn-navy:hover { opacity: 0.85; }
-    .btn-ghost { background: none; color: #555; border: 1px solid var(--border); }
-    .btn-ghost:hover { border-color: var(--navy); color: var(--navy); }
-    .btn-danger-sm { background: none; border: none; color: #ccc; padding: 4px 6px; font-size: 12px; cursor: pointer; border-radius: 3px; line-height: 1; }
-    .btn-danger-sm:hover { color: var(--danger); background: #fff0f0; }
-    .btn:disabled { opacity: 0.35; cursor: default; }
-    .btn-full { width: 100%; justify-content: center; }
+/* Sidebar */
+#sb{width:var(--sw);background:#fff;border-right:1px solid var(--g200);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+.sb-brand{padding:20px;border-bottom:1px solid var(--g100)}
+.sb-brand h1{font-size:18px;font-weight:300;color:var(--g900);letter-spacing:-.01em}
+.sb-brand p{font-size:10px;color:var(--g400);letter-spacing:.1em;margin-top:2px}
+#sb nav{flex:1;padding:16px;overflow-y:auto}
+.sb-sec{font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--g400);padding:0 12px;margin-bottom:12px;margin-top:4px;display:block}
+.ni{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:8px 12px;font-size:13px;color:var(--g700);background:none;border:none;border-radius:8px;cursor:pointer;transition:background .12s,color .12s;margin-bottom:2px}
+.ni:hover{background:var(--g100);color:var(--g900)}.ni.on{background:var(--navy);color:#fff}
+.ni .ic{font-size:14px;width:18px;text-align:center}
+.sb-foot{padding:16px;border-top:1px solid var(--g100)}
+.sb-foot a,.sb-foot button{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--g500);background:none;border:none;cursor:pointer;padding:8px 12px;border-radius:6px;width:100%;text-align:left;text-decoration:none;transition:all .12s}
+.sb-foot a:hover{color:var(--g900);background:var(--g50)}.sb-foot button:hover{color:#DC2626;background:var(--red50)}
 
-    /* APP SHELL */
-    #app { display: none; height: 100vh; }
-    #app.on { display: flex; }
+/* Main */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#topbar{background:#fff;border-bottom:1px solid var(--g200);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+#topbar h2{font-size:15px;font-weight:500}.topbar-sub{font-size:12px;color:var(--g400);margin-top:2px}
+.topbar-r{display:flex;align-items:center;gap:16px}
+#editor{flex:1;overflow-y:auto;padding:32px}
+.ei{max-width:720px;margin:0 auto}
 
-    /* SIDEBAR */
-    #sidebar { width: var(--sidebar-w); min-width: var(--sidebar-w); background: var(--navy); display: flex; flex-direction: column; overflow: hidden; user-select: none; }
-    .sb-top { padding: 20px 18px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); }
-    .sb-wordmark { font-size: 11px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.9); display: block; margin-bottom: 2px; }
-    .sb-sub { font-size: 10px; color: rgba(255,255,255,0.35); letter-spacing: 0.06em; }
-    .sb-nav { flex: 1; overflow-y: auto; padding: 8px 0; }
-    .sb-group { font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 14px 18px 5px; }
-    .sb-item { display: flex; align-items: center; gap: 8px; padding: 8px 18px; cursor: pointer; font-size: 12px; font-weight: 400; color: var(--side-inactive); transition: color 0.1s, background 0.1s; border: none; background: none; width: 100%; text-align: left; border-radius: 0; }
-    .sb-item:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.06); }
-    .sb-item.active { color: #fff; font-weight: 500; background: var(--navy-hover); }
-    .sb-item .sb-icon { font-size: 9px; width: 14px; text-align: center; flex-shrink: 0; }
-    .sb-rule { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin: 5px 0; }
-    .sb-bottom { padding: 10px 0 8px; border-top: 1px solid rgba(255,255,255,0.08); }
-    .sb-bottom .sb-item { font-size: 11px; }
+/* SectionCard */
+.sc{background:#fff;border:1px solid var(--g200);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.07);overflow:hidden;margin-bottom:24px}
+.sc-h{padding:16px 24px;border-bottom:1px solid var(--g100);background:rgba(249,250,251,.5)}
+.sc-h h3{font-size:13px;font-weight:600;color:var(--g700)}
+.sc-b{padding:24px}.sc-b.sp>*+*{margin-top:20px}
 
-    /* MAIN */
-    #main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+/* Form */
+.fl{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--g700);margin-bottom:6px}
+.fh{font-size:12px;color:var(--g400);margin-bottom:8px}
+.fi,.fta,.fsel{width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--g800);background:#fff;outline:none;transition:border-color .12s,box-shadow .12s;line-height:1.5}
+.fi:focus,.fta:focus,.fsel:focus{border-color:var(--navy50);box-shadow:0 0 0 3px var(--navy10)}
+.fta{resize:vertical;min-height:80px}
+.fsel{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239CA3AF'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;cursor:pointer}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
 
-    /* TOPBAR */
-    #topbar { height: 56px; min-height: 56px; background: var(--white); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 28px; gap: 12px; }
-    .tb-titles { flex: 1; }
-    #tb-title { font-size: 15px; font-weight: 700; color: #111; letter-spacing: -0.01em; line-height: 1.2; }
-    #tb-desc { font-size: 11px; color: #999; }
-    #tb-status { font-size: 11px; color: #aaa; }
-    #tb-status.dirty { color: #E67E22; }
-    #tb-status.saved { color: #27AE60; }
-    #tb-status.error { color: var(--danger); }
+/* Buttons */
+.bp{background:var(--navy);color:#fff;border:none;border-radius:6px;padding:10px 24px;font-size:11px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;transition:opacity .12s}
+.bp:hover{opacity:.85}.bp:disabled{opacity:.5;cursor:not-allowed}
+.bs{background:none;border:1px solid var(--g300);border-radius:6px;padding:8px 16px;font-size:12px;color:var(--g600);cursor:pointer;transition:all .12s}
+.bs:hover{border-color:var(--navy);color:var(--navy);background:var(--navy5)}
+.bn{background:none;border:1px solid var(--navy20);border-radius:6px;padding:5px 10px;font-size:11px;color:var(--navy);cursor:pointer;transition:all .12s}
+.bn:hover{border-color:rgba(27,42,74,.4);background:var(--navy5)}
+.bd{background:none;border:none;padding:5px 10px;font-size:11px;color:var(--red400);cursor:pointer;border-radius:4px;transition:all .12s}
+.bd:hover{color:var(--red600);background:var(--red50)}
+.bdash{width:100%;border:1px dashed var(--g300);background:none;border-radius:10px;padding:12px;font-size:12px;color:var(--g500);cursor:pointer;transition:all .12s}
+.bdash:hover{border-color:var(--navy);color:var(--navy)}
+.bic{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;color:var(--g400);border-radius:4px;transition:all .12s;font-size:13px}
+.bic:hover{color:var(--g700);background:var(--g100)}.bic:disabled{opacity:.25;cursor:not-allowed}
 
-    /* CONTENT */
-    #content { flex: 1; overflow-y: auto; padding: 0; }
+/* Save message */
+.smsg{font-size:12px;padding:6px 14px;border-radius:20px;display:none}
+.smsg.show{display:inline-block}.smsg.ok{background:var(--green50);color:var(--green700)}.smsg.err{background:var(--red50);color:var(--red600)}
 
-    /* CARD */
-    .card { background: var(--white); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.07); margin-bottom: 16px; }
-    .card-head { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-    .card-title { font-size: 14px; font-weight: 600; color: #111; }
-    .card-desc { font-size: 12px; color: #888; margin-top: 2px; }
-    .card-body { padding: 18px; }
+/* ImageUpload */
+.iu-zone{position:relative;border:2px dashed var(--g200);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .15s;background:var(--g50)}
+.iu-zone:hover{border-color:var(--navy20)}.iu-zone.drag{border-color:var(--navy);background:var(--navy5);transform:scale(1.01)}
+.iu-zone.has{border-style:solid;border-color:var(--g200)}
+.iu-zone img,.iu-zone video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.iu-ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;transition:background .15s}
+.iu-zone.has .iu-ov{background:rgba(0,0,0,0)}.iu-zone.has:hover .iu-ov{background:rgba(0,0,0,.45)}
+.iu-ph{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px;text-align:center}
+.iu-ph p{font-size:11px;color:var(--g400);line-height:1.5}.iu-ph span{color:var(--navy);font-weight:500}
+.iu-ch{font-size:11px;color:#fff;font-weight:500;letter-spacing:.05em;opacity:0;transition:opacity .15s;pointer-events:none}
+.iu-zone.has:hover .iu-ch{opacity:1}
+.iu-url{margin-top:8px;width:100%;border:1px solid var(--g200);border-radius:8px;padding:7px 12px;font-size:11px;color:var(--g600);background:#fff;outline:none;transition:border-color .12s}
+.iu-url:focus{border-color:rgba(27,42,74,.4)}.iu-url::placeholder{color:var(--g300)}
 
-    /* SECTION DIVIDER */
-    .sec-div { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #555; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin: 18px 0 14px; }
+/* Project cards */
+.pc{background:#fff;border:1px solid var(--g200);border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:12px}
+.pc-h{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;cursor:pointer;transition:background .1s}
+.pc-h:hover{background:var(--g50)}.pc-hl{display:flex;align-items:center;gap:12px}
+.cat-b{font-size:11px;padding:2px 8px;border-radius:4px;background:var(--g100);color:var(--g600)}
+.pt{font-size:13px;font-weight:500;color:var(--g700)}.py{font-size:11px;color:var(--g400)}
+.pc-acts{display:flex;align-items:center;gap:8px}
+.pc-b{padding:16px 20px 24px;border-top:1px solid var(--g100)}.pc-b>*+*{margin-top:20px}
 
-    /* FIELD GRID */
-    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .field-grid .full { grid-column: 1 / -1; }
-    .field-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+/* Archive */
+.arch{border:1px solid var(--amber200);border-radius:12px;overflow:hidden;margin-top:8px}
+.arch-h{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:var(--amber50);cursor:pointer;border:none;width:100%;transition:background .1s}
+.arch-h:hover{background:var(--amber100)}.arch-hl{display:flex;align-items:center;gap:10px}
+.arch-item{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:#fff;border-top:1px solid var(--amber100);transition:background .1s}
+.arch-item:hover{background:rgba(255,251,235,.4)}
 
-    /* PAGE EDITOR WRAPPER */
-    .page-editor { padding: 24px 28px 80px; max-width: 900px; }
+/* Block wrapper */
+.bw{border:1px solid var(--g200);border-radius:12px;overflow:hidden;background:#fff;margin-bottom:16px}
+.bw-h{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--g50);border-bottom:1px solid var(--g100)}
+.bw-hl{font-size:13px;font-weight:500;color:var(--g700);cursor:pointer;display:flex;align-items:center;gap:8px;flex:1;text-align:left;background:none;border:none}
+.bw-ha{display:flex;align-items:center;gap:2px}.bw-body{padding:20px}
 
-    /* MEDIA DROP ZONE */
-    .drop-zone { border: 2px dashed var(--input-border); border-radius: 6px; background: #fafafa; transition: border-color 0.15s, background 0.15s; cursor: pointer; position: relative; overflow: hidden; }
-    .drop-zone:hover, .drop-zone.drag-over { border-color: var(--navy); background: #f0f4ff; }
-    .drop-zone-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 24px 16px; }
-    .drop-zone-icon { font-size: 28px; color: #ccc; }
-    .drop-zone-text { font-size: 11px; color: #aaa; text-align: center; line-height: 1.4; }
-    .drop-zone-text strong { color: #666; font-weight: 600; }
-    .drop-zone-preview { width: 100%; position: relative; }
-    .drop-zone-preview img, .drop-zone-preview video { width: 100%; display: block; border-radius: 4px; max-height: 260px; object-fit: contain; background: #f0f0f0; }
-    .drop-zone-preview .dz-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.5)); padding: 8px 10px 6px; display: flex; align-items: center; justify-content: space-between; }
-    .dz-type-badge { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; background: rgba(0,0,0,0.5); color: #fff; padding: 2px 6px; border-radius: 2px; }
-    .dz-remove { background: rgba(180,0,0,0.7); color: #fff; border: none; font-size: 10px; padding: 3px 8px; border-radius: 3px; cursor: pointer; font-weight: 600; }
-    .dz-remove:hover { background: var(--danger); }
-    .dz-url-row { margin-top: 6px; display: flex; gap: 6px; align-items: center; }
-    .dz-url-row input { flex: 1; font-size: 11px; }
-    .dz-upload-btn { flex-shrink: 0; }
+/* Rich text */
+.rt-bar{display:flex;flex-wrap:wrap;align-items:center;gap:4px;padding:8px 12px;background:var(--g50);border:1px solid var(--g200);border-radius:8px 8px 0 0}
+.rt-b{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;color:var(--g700);border-radius:4px;font-size:13px;transition:background .1s}
+.rt-b:hover{background:var(--g200)}.rt-div{width:1px;height:20px;background:var(--g200);margin:0 4px}
+.rt-lbl{font-size:10px;color:var(--g400);text-transform:uppercase;letter-spacing:.05em}
+.rt-sel{font-size:11px;border:1px solid var(--g200);border-radius:4px;padding:3px 6px;background:#fff;color:var(--g700);cursor:pointer;outline:none}
+.rt-col{width:28px;height:28px;border-radius:4px;cursor:pointer;border:1px solid var(--g200)}
+.rt-ed{min-height:120px;border:1px solid var(--g200);border-top:none;border-radius:0 0 8px 8px;padding:12px 16px;font-size:13px;color:var(--g800);outline:none;white-space:pre-wrap;line-height:1.6}
+.rt-ed:focus{box-shadow:0 0 0 3px var(--navy10)}
 
-    /* PROJECTS / ARTICLES — collapsible cards */
-    .list-page { padding: 24px 28px 80px; }
-    .list-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 12px; flex-wrap: wrap; }
-    .list-top h2 { font-size: 20px; font-weight: 700; color: #111; letter-spacing: -0.02em; }
-    .list-top p { font-size: 12px; color: #888; }
-    .proj-card { background: var(--white); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.07); margin-bottom: 10px; overflow: hidden; }
-    .proj-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; cursor: pointer; user-select: none; }
-    .proj-header:hover { background: #fafafa; }
-    .proj-toggle { font-size: 11px; color: #aaa; width: 16px; flex-shrink: 0; transition: transform 0.2s; }
-    .proj-card.open .proj-toggle { transform: rotate(180deg); }
-    .proj-cat-tag { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; background: #f0f0f0; border: 1px solid var(--border); color: #555; padding: 2px 8px; border-radius: 3px; flex-shrink: 0; }
-    .proj-title { font-size: 13px; font-weight: 600; color: #111; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .proj-year { font-size: 11px; color: #aaa; flex-shrink: 0; }
-    .proj-actions { display: flex; gap: 2px; flex-shrink: 0; }
-    .proj-body { display: none; padding: 18px; border-top: 1px solid var(--border); }
-    .proj-card.open .proj-body { display: block; }
+/* Margin sliders */
+.ms{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding-top:16px;border-top:1px solid var(--g100);margin-top:16px}
+.ms-lbl{font-size:11px;font-weight:500;color:var(--g600);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:4px;border-radius:2px;background:var(--g200);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--navy);cursor:pointer}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--navy);cursor:pointer;border:none}
 
-    /* BLOCKS */
-    .blocks-section { margin-top: 20px; border-top: 2px solid #111; padding-top: 16px; }
-    .blocks-list { margin-bottom: 12px; }
-    .block-card { background: #fafafa; border: 1px solid var(--border); border-radius: 5px; margin-bottom: 8px; overflow: hidden; }
-    .block-card-header { display: flex; align-items: center; gap: 8px; padding: 9px 12px; cursor: pointer; }
-    .block-card-header:hover { background: #f0f0f0; }
-    .block-card.open .block-card-header { border-bottom: 1px solid var(--border); }
-    .block-type-pill { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; background: var(--navy); color: #fff; padding: 2px 7px; border-radius: 3px; flex-shrink: 0; }
-    .block-preview { flex: 1; font-size: 11px; color: #888; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .block-card-body { display: none; padding: 14px; }
-    .block-card.open .block-card-body { display: block; }
-    .block-reorder { display: flex; flex-direction: column; gap: 1px; }
-    .block-reorder button { background: none; border: none; color: #bbb; cursor: pointer; font-size: 11px; padding: 1px 4px; line-height: 1; }
-    .block-reorder button:hover { color: #555; }
-    .add-blocks { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
-    .add-block-btn { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #888; cursor: pointer; border: 1px dashed #ccc; background: none; padding: 6px 10px; border-radius: 4px; transition: all 0.12s; font-family: inherit; }
-    .add-block-btn:hover { color: var(--navy); border-color: var(--navy); border-style: solid; }
+/* Add block */
+.ab-row{border-top:1px solid var(--g100);padding-top:20px;margin-top:8px}
+.ab-lbl{font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--g400);margin-bottom:12px}
+.ab-btns{display:flex;flex-wrap:wrap;gap:8px}
+.ab-btn{font-size:11px;border:1px dashed var(--g300);background:none;border-radius:8px;padding:8px 16px;color:var(--g500);cursor:pointer;transition:all .12s}
+.ab-btn:hover{border-color:var(--navy);color:var(--navy);background:var(--navy5)}
 
-    /* CAPABILITIES, CLIENTS, etc. */
-    .item-card { background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin-bottom: 10px; display: flex; gap: 14px; align-items: flex-start; }
-    .item-card-fields { flex: 1; }
-    .cap-media-wrap { width: 72px; flex-shrink: 0; }
-    .client-logo-wrap { width: 100px; flex-shrink: 0; }
-    .note-label { font-size: 11px; color: #888; background: #f7f7f7; border: 1px solid var(--border); border-radius: 4px; padding: 8px 12px; margin-bottom: 16px; }
-
-    /* RANGE */
-    input[type=range] { width: 100%; height: 3px; appearance: none; background: #ddd; outline: none; cursor: pointer; border: none; border-radius: 2px; }
-    input[type=range]::-webkit-slider-thumb { appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--navy); border: 2px solid #fff; box-shadow: 0 0 0 1px var(--navy); cursor: pointer; }
-    .range-row { display: flex; align-items: center; gap: 10px; }
-    .range-val { font-size: 11px; font-weight: 600; color: #333; min-width: 44px; text-align: right; font-variant-numeric: tabular-nums; }
-
-    /* SLIDESHOW */
-    .slide-card { background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 14px; margin-bottom: 10px; }
-    .slide-card-top { display: flex; gap: 12px; align-items: flex-start; }
-    .slide-preview-wrap { flex: 1; background: #f0f0f0; border-radius: 4px; overflow: hidden; min-height: 100px; display: flex; align-items: center; justify-content: center; }
-    .slide-preview-wrap img, .slide-preview-wrap video { width: 100%; max-height: 200px; object-fit: contain; display: block; }
-    .slide-preview-empty { font-size: 12px; color: #bbb; padding: 24px; text-align: center; }
-    .slide-actions { display: flex; flex-direction: column; gap: 4px; }
-    .slide-url-row { margin-top: 10px; display: flex; gap: 8px; align-items: center; }
-    .slide-url-row input { flex: 1; }
-
-    /* CATEGORIES, CONTACT SERVICES */
-    .simple-item { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
-    .simple-item input { flex: 1; }
-
-    /* TOAST */
-    #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(72px); background: #111; color: #fff; padding: 10px 20px; font-size: 12px; font-weight: 600; pointer-events: none; z-index: 9999; transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1); white-space: nowrap; border-radius: 4px; }
-    #toast.show { transform: translateX(-50%) translateY(0); }
-    #toast.ok  { background: #155724; }
-    #toast.err { background: #7B1717; }
-
-    /* MODAL */
-    .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 999; align-items: center; justify-content: center; }
-    .modal-bg.open { display: flex; }
-    .modal-box { background: var(--white); width: 520px; max-width: 95vw; max-height: 92vh; overflow-y: auto; padding: 28px; border-radius: 8px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
-    .modal-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
-    .modal-top h2 { font-size: 18px; font-weight: 600; letter-spacing: -0.02em; }
-    .modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border); }
-    .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .modal-grid .full { grid-column: 1 / -1; }
-
-    /* UTILS */
-    .hidden { display: none !important; }
-    .mt8 { margin-top: 8px; }
-    .mt12 { margin-top: 12px; }
-    .flex-row { display: flex; align-items: center; gap: 8px; }
-    .empty-state { padding: 60px 40px; text-align: center; color: #aaa; }
-    .empty-state h2 { font-size: 18px; font-weight: 300; margin-bottom: 6px; }
-    .empty-state p { font-size: 12px; }
-  </style>
+/* Misc */
+.pg-intro{font-size:13px;color:var(--g500);margin-bottom:24px}
+.back-btn{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--g500);background:none;border:none;cursor:pointer;padding:0;margin-bottom:24px;transition:color .12s}
+.back-btn:hover{color:var(--g900)}
+.gal-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.gal-row input{flex:1;font-family:monospace;font-size:12px;border:1px solid var(--g200);border-radius:6px;padding:6px 10px;outline:none}
+.gal-row input:focus{border-color:var(--navy50)}
+.sp4>*+*{margin-top:16px}.sp5>*+*{margin-top:20px}
+</style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div id="login-screen">
-  <div class="login-wrap">
-    <span class="login-logo">Eyuel Mulat Studio</span>
+<!-- Login -->
+<div id="login">
+  <div class="lb">
+    <span class="lb-brand">Eyuel Mulat</span>
     <h1>Content Manager</h1>
-    <p>Enter your password to access the admin.</p>
-    <div class="login-err" id="login-err">Incorrect password.</div>
-    <div class="f-group">
-      <label class="f-label">Password</label>
-      <input type="password" id="login-pw" placeholder="••••••••••"/>
+    <p>Sign in to edit your website content.</p>
+    <div class="lerr" id="lerr"></div>
+    <div class="sp4">
+      <div><label class="fl">Password</label><input class="fi" type="password" id="lpw" placeholder="Enter password…" autocomplete="current-password"/></div>
+      <button class="bp" id="lbtn" style="width:100%">Sign In</button>
     </div>
-    <button class="btn btn-navy btn-full" onclick="login()">Sign In</button>
   </div>
 </div>
 
-<!-- APP -->
+<!-- App -->
 <div id="app">
-  <!-- SIDEBAR -->
-  <nav id="sidebar">
-    <div class="sb-top">
-      <span class="sb-wordmark">Eyuel Mulat</span>
-      <span class="sb-sub">Content Manager</span>
+  <aside id="sb">
+    <div class="sb-brand"><h1>Eyuel Mulat</h1><p>Content Manager</p></div>
+    <nav id="sb-nav"></nav>
+    <div class="sb-foot">
+      <a href="/" target="_blank">↗ &nbsp;View Website</a>
+      <button id="logout-btn">→ &nbsp;Sign Out</button>
     </div>
-    <div class="sb-nav">
-      <div class="sb-group">Sections</div>
-      <button class="sb-item" data-p="home"         onclick="go('home')"><span class="sb-icon">▪</span>Site Settings</button>
-      <button class="sb-item" data-p="hero"         onclick="go('hero')"><span class="sb-icon">▪</span>Hero</button>
-      <button class="sb-item" data-p="slideshow"    onclick="go('slideshow')"><span class="sb-icon">▪</span>Slideshow</button>
-      <button class="sb-item" data-p="about"        onclick="go('about')"><span class="sb-icon">▪</span>About</button>
-      <button class="sb-item" data-p="capabilities" onclick="go('capabilities')"><span class="sb-icon">▪</span>Capabilities</button>
-      <button class="sb-item" data-p="work"         onclick="go('work')"><span class="sb-icon">▪</span>Work</button>
-      <button class="sb-item" data-p="categories"   onclick="go('categories')"><span class="sb-icon">▪</span>Categories</button>
-      <button class="sb-item" data-p="insights"     onclick="go('insights')"><span class="sb-icon">▪</span>Insights</button>
-      <button class="sb-item" data-p="contact"      onclick="go('contact')"><span class="sb-icon">▪</span>Contact</button>
-      <button class="sb-item" data-p="clients"      onclick="go('clients')"><span class="sb-icon">▪</span>Clients</button>
-      <button class="sb-item" data-p="footer"       onclick="go('footer')"><span class="sb-icon">▪</span>Footer</button>
-      <hr class="sb-rule"/>
-      <button class="sb-item" data-p="projects"     onclick="go('projects')"><span class="sb-icon">▪</span>Projects</button>
-      <button class="sb-item" data-p="articles"     onclick="go('articles')"><span class="sb-icon">▪</span>Articles</button>
-    </div>
-    <div class="sb-bottom">
-      <a href="/" target="_blank" class="sb-item" style="text-decoration:none"><span class="sb-icon">↗</span>View Website</a>
-      <button class="sb-item" onclick="logout()"><span class="sb-icon">→</span>Sign Out</button>
-    </div>
-  </nav>
-
-  <!-- MAIN -->
+  </aside>
   <div id="main">
-    <header id="topbar">
-      <div class="tb-titles">
-        <div id="tb-title">Home</div>
-        <div id="tb-desc"></div>
+    <div id="topbar">
+      <div><h2 id="tb-title">Site Settings</h2><div class="topbar-sub">Edit and save your content</div></div>
+      <div class="topbar-r">
+        <span class="smsg" id="smsg"></span>
+        <button class="bp" id="save-btn">Save Changes</button>
       </div>
-      <span id="tb-status"></span>
-      <button class="btn btn-ghost hidden" id="save-btn" onclick="saveCurrent()">Save Changes</button>
-    </header>
-    <div id="content">
-      <div class="empty-state"><h2>Select a section</h2><p>Choose from the sidebar to start editing.</p></div>
     </div>
+    <div id="editor"><div class="ei" id="editor-inner"></div></div>
   </div>
 </div>
-
-<!-- NEW PROJECT MODAL -->
-<div class="modal-bg" id="m-project">
-  <div class="modal-box">
-    <div class="modal-top"><h2>New Project</h2><button class="btn btn-ghost" onclick="closeM('m-project')" style="padding:6px 10px">✕</button></div>
-    <div class="modal-grid">
-      <div class="f-group full"><label class="f-label">Project Title *</label><input type="text" id="mp-title" placeholder="e.g. Forma Creative"/></div>
-      <div class="f-group"><label class="f-label">Slug *</label><input type="text" id="mp-slug" placeholder="forma-creative"/></div>
-      <div class="f-group"><label class="f-label">Category</label><input type="text" id="mp-cat" placeholder="Brand Identity"/></div>
-      <div class="f-group"><label class="f-label">Client</label><input type="text" id="mp-client" placeholder="Client name"/></div>
-      <div class="f-group"><label class="f-label">Year</label><input type="text" id="mp-year" placeholder="2024"/></div>
-      <div class="f-group"><label class="f-label">Scope</label><input type="text" id="mp-scope" placeholder="Identity, Strategy"/></div>
-      <div class="f-group full"><label class="f-label">Role</label><input type="text" id="mp-role" placeholder="Creative Director"/></div>
-      <div class="f-group full"><label class="f-label">Description</label><textarea id="mp-desc" placeholder="Short project overview..."></textarea></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeM('m-project')">Cancel</button>
-      <button class="btn btn-navy" onclick="createProject()">Create Project</button>
-    </div>
-  </div>
-</div>
-
-<!-- NEW ARTICLE MODAL -->
-<div class="modal-bg" id="m-article">
-  <div class="modal-box">
-    <div class="modal-top"><h2>New Article</h2><button class="btn btn-ghost" onclick="closeM('m-article')" style="padding:6px 10px">✕</button></div>
-    <div class="modal-grid">
-      <div class="f-group full"><label class="f-label">Title *</label><input type="text" id="ma-title" placeholder="e.g. Why Grid Systems Matter"/></div>
-      <div class="f-group"><label class="f-label">Slug *</label><input type="text" id="ma-slug" placeholder="why-grid-systems-matter"/></div>
-      <div class="f-group"><label class="f-label">Category</label><input type="text" id="ma-cat" placeholder="Design"/></div>
-      <div class="f-group"><label class="f-label">Date</label><input type="date" id="ma-date"/></div>
-      <div class="f-group full"><label class="f-label">Excerpt</label><textarea id="ma-excerpt" placeholder="One-line summary..." style="min-height:60px"></textarea></div>
-      <div class="f-group full"><label class="f-label">Body (HTML)</label><textarea id="ma-body" placeholder="<p>Article content here...</p>" style="min-height:120px;font-family:monospace;font-size:12px"></textarea></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeM('m-article')">Cancel</button>
-      <button class="btn btn-navy" onclick="createArticle()">Create Article</button>
-    </div>
-  </div>
-</div>
-
-<div id="toast"></div>
 
 <script>
-// ══════════════════════════════════════════════════════════
-// BOOTSTRAP
-// ══════════════════════════════════════════════════════════
-let TOKEN = localStorage.getItem('em_token') || ''
-let activePage = null
-let pageData = {}
-let dirty = false
-let currentSaveFn = null
-const API = '/api'
-const MEDIA_ACCEPT = 'image/*,video/*,.gif,.mp4,.webm,.mov'
+const SECTIONS=[
+  {id:'site',label:'Site Settings',icon:'⚙️'},
+  {id:'navigation',label:'Logo & Nav',icon:'🔖'},
+  {id:'hero',label:'Hero',icon:'🏠'},
+  {id:'slideshow',label:'Slideshow',icon:'🎞'},
+  {id:'about',label:'About',icon:'👤'},
+  {id:'capabilities',label:'Capabilities',icon:'✦'},
+  {id:'portfolio',label:'Portfolio',icon:'🖼'},
+  {id:'categories',label:'Categories',icon:'🏷'},
+  {id:'insights',label:'Insights',icon:'📝'},
+  {id:'contact',label:'Contact',icon:'📬'},
+  {id:'clients',label:'Clients',icon:'👥'},
+  {id:'footer',label:'Footer',icon:'🗒'},
+]
+const TOKEN_KEY='em_token'
+const UID=()=>Math.random().toString(36).slice(2,8)
+const slugify=s=>s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')
+const CATS=['Branding','Strategy','Print','Digital','Editorial','Motion','Web Design','Identity','Other']
 
-document.getElementById('login-pw').addEventListener('keydown', e => { if (e.key === 'Enter') login() })
-document.querySelectorAll('.modal-bg').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open') }))
-document.getElementById('mp-title').addEventListener('input', function() { const s = document.getElementById('mp-slug'); if (!s._t) s.value = slugify(this.value) })
-document.getElementById('mp-slug').addEventListener('input', function() { this._t = true })
-document.getElementById('ma-title').addEventListener('input', function() { const s = document.getElementById('ma-slug'); if (!s._t) s.value = slugify(this.value) })
-document.getElementById('ma-slug').addEventListener('input', function() { this._t = true })
-document.addEventListener('keydown', e => { if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveCurrent() } })
-
-if (TOKEN) showApp(); else showLogin()
-
-function showLogin() { document.getElementById('login-screen').style.display = 'flex'; document.getElementById('app').classList.remove('on') }
-function showApp()   { document.getElementById('login-screen').style.display = 'none'; document.getElementById('app').classList.add('on'); go('home') }
-
-// ══════════════════════════════════════════════════════════
-// AUTH
-// ══════════════════════════════════════════════════════════
-async function login() {
-  const pw = document.getElementById('login-pw').value
-  const err = document.getElementById('login-err')
-  err.classList.remove('show')
-  try {
-    const r = await fetch(`${API}/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pw }) })
-    const d = await r.json()
-    if (!r.ok) { err.classList.add('show'); return }
-    TOKEN = d.token; localStorage.setItem('em_token', TOKEN); showApp()
-  } catch { err.classList.add('show') }
-}
-function logout() { TOKEN = ''; localStorage.removeItem('em_token'); showLogin() }
-function ah() { return { 'x-token': TOKEN } }
-
-// ══════════════════════════════════════════════════════════
-// NAV
-// ══════════════════════════════════════════════════════════
-const VIEWS = {
-  'home':         { title: 'Site Settings',  desc: 'Global site content and home page',       load: loadGeneric('home'),         save: saveGeneric('home') },
-  'hero':         { title: 'Hero',           desc: 'Home page hero section',                  load: loadGeneric('hero'),         save: saveGeneric('hero') },
-  'slideshow':    { title: 'Hero Slideshow', desc: 'Media cycling in the hero section',       load: loadSlideshow,               save: saveSlideshow },
-  'about':        { title: 'About',          desc: 'About page content',                      load: loadGeneric('about'),        save: saveGeneric('about') },
-  'capabilities': { title: 'Capabilities',   desc: 'Services shown on home page',             load: loadCapabilities,            save: saveCapabilities },
-  'work':         { title: 'Work',           desc: 'Work page content',                       load: loadGeneric('work'),         save: saveGeneric('work') },
-  'categories':   { title: 'Categories',     desc: 'Manage project categories',               load: loadCategories,              save: saveCategories },
-  'insights':     { title: 'Insights',       desc: 'Insights page content',                   load: loadGeneric('insights'),     save: saveGeneric('insights') },
-  'contact':      { title: 'Contact',        desc: 'Contact page and form services',          load: loadContact,                 save: saveContact },
-  'clients':      { title: 'Clients',        desc: 'Client logos bar on home page',           load: loadClients,                 save: saveClients },
-  'footer':       { title: 'Footer',         desc: 'Footer content',                         load: loadGeneric('footer'),       save: saveGeneric('footer') },
-  'projects':     { title: 'Projects',       desc: 'Manage all projects',                     load: loadProjects,                save: null },
-  'articles':     { title: 'Articles',       desc: 'Manage all articles',                     load: loadArticles,                save: null },
+const S={
+  token:localStorage.getItem(TOKEN_KEY)||'',
+  section:'site',data:{},
+  portfolio:null,insightsData:null,
+  editView:null,editIdx:null,
+  expandedProj:null,projArchiveOpen:false,
+  expandedInsight:null,insightArchiveOpen:false,
+  contactSvcs:[],
 }
 
-async function go(page) {
-  document.querySelectorAll('.sb-item[data-p]').forEach(n => n.classList.toggle('active', n.dataset.p === page))
-  activePage = page
-  dirty = false
-  pageData = {}
-  setStatus('')
-  const v = VIEWS[page]
-  currentSaveFn = v ? v.save : null
-  const hasSave = !!(v && v.save)
-  document.getElementById('save-btn').classList.toggle('hidden', !hasSave)
-  document.getElementById('tb-title').textContent = v ? v.title : page
-  document.getElementById('tb-desc').textContent = v ? v.desc : ''
-  const c = document.getElementById('content')
-  c.innerHTML = '<div style="padding:40px;font-size:12px;color:#aaa">Loading…</div>'
-  if (v && v.load) await v.load()
+async function api(method,url,body){
+  const opts={method,headers:{'x-token':S.token,'Content-Type':'application/json'}}
+  if(body!==undefined)opts.body=JSON.stringify(body)
+  return fetch(url,opts).then(r=>r.json())
+}
+async function apiUpload(file){
+  const fd=new FormData();fd.append('file',file)
+  const r=await fetch('/api/upload',{method:'POST',headers:{'x-token':S.token},body:fd})
+  const j=await r.json()
+  if(!j.url)throw new Error(j.error||'Upload failed')
+  return j.url
 }
 
-// ══════════════════════════════════════════════════════════
-// SAVE
-// ══════════════════════════════════════════════════════════
-async function saveCurrent() {
-  if (!currentSaveFn) return
-  setStatus('Saving…')
-  try {
-    await currentSaveFn()
-    dirty = false
-    setStatus('Saved', 'saved')
-    toast('Changes saved', 'ok')
-    setTimeout(() => setStatus(''), 3000)
-  } catch(e) {
-    setStatus('Error', 'error')
-    toast(e.message || 'Save failed', 'err')
-  }
+// Login
+document.getElementById('lbtn').onclick=doLogin
+document.getElementById('lpw').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()})
+async function doLogin(){
+  const pw=document.getElementById('lpw').value.trim()
+  if(!pw)return
+  const j=await api('POST','/api/login',{password:pw})
+  if(j.token){S.token=j.token;localStorage.setItem(TOKEN_KEY,j.token);initApp()}
+  else{const el=document.getElementById('lerr');el.textContent=j.error||'Wrong password';el.classList.add('show')}
 }
-function markDirty() {
-  dirty = true
-  document.getElementById('save-btn').classList.remove('hidden')
-  setStatus('Unsaved changes', 'dirty')
-}
-function setStatus(msg, cls = '') {
-  const el = document.getElementById('tb-status')
-  el.textContent = msg; el.className = cls
-}
-function slugify(s) { return String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') }
-function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
-
-// ══════════════════════════════════════════════════════════
-// GENERIC PAGE CONTENT (fields object)
-// ══════════════════════════════════════════════════════════
-function loadGeneric(page) {
-  return async function() {
-    try {
-      const r = await fetch(`${API}/content/${page}`, { headers: ah() })
-      pageData = r.ok ? await r.json() : {}
-    } catch { pageData = {} }
-    renderGenericEditor(page)
-  }
-}
-function saveGeneric(page) {
-  return async function() {
-    pageData.fields = collectFields()
-    const r = await fetch(`${API}/content/${page}`, {
-      method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-token': TOKEN },
-      body: JSON.stringify(pageData)
-    })
-    if (!r.ok) throw new Error('Server error')
-  }
-}
-function collectFields() {
-  const f = {}
-  document.querySelectorAll('[data-k]').forEach(el => { f[el.dataset.k] = el.value })
-  return f
-}
-function fv(key, fallback = '') {
-  return pageData.fields && pageData.fields[key] !== undefined ? pageData.fields[key] : fallback
+document.getElementById('logout-btn').onclick=()=>{
+  localStorage.removeItem(TOKEN_KEY);S.token=''
+  document.getElementById('app').classList.remove('show')
+  document.getElementById('login').style.display='flex'
 }
 
-function renderGenericEditor(page) {
-  const builders = { home: homeEditor, hero: heroEditor, about: aboutEditor, work: workEditor, insights: insightsEditor, footer: footerEditor }
-  const fn = builders[page]
-  document.getElementById('content').innerHTML = fn
-    ? `<div class="page-editor">${fn()}</div>`
-    : `<div class="empty-state"><h2>No editor for "${page}"</h2></div>`
+async function initApp(){
+  document.getElementById('login').style.display='none'
+  document.getElementById('app').classList.add('show')
+  buildSidebar()
+  await switchSection('site')
+}
+if(S.token)initApp()
+
+function buildSidebar(){
+  const nav=document.getElementById('sb-nav')
+  nav.innerHTML='<span class="sb-sec">Sections</span>'
+  SECTIONS.forEach(s=>{
+    const b=document.createElement('button');b.className='ni'+(S.section===s.id?' on':'');b.dataset.id=s.id
+    b.innerHTML=`<span class="ic">${s.icon}</span><span>${s.label}</span>`
+    b.onclick=()=>switchSection(s.id);nav.appendChild(b)
+  })
+}
+function updateSidebarActive(){
+  document.querySelectorAll('.ni').forEach(b=>b.classList.toggle('on',b.dataset.id===S.section))
+  document.getElementById('tb-title').textContent=SECTIONS.find(s=>s.id===S.section)?.label||''
 }
 
-// ══════════════════════════════════════════════════════════
-// FIELD HELPERS
-// ══════════════════════════════════════════════════════════
-function fRow(key, label, value, type = 'text') {
-  const id = 'f-' + key
-  let inp
-  if (type === 'textarea') {
-    inp = `<textarea id="${id}" data-k="${key}" oninput="markDirty()">${esc(value)}</textarea>`
-  } else if (type === 'media') {
-    inp = mediaDropZoneHTML(id, key, value, true)
-  } else {
-    inp = `<input type="text" id="${id}" data-k="${key}" value="${esc(value)}" oninput="markDirty()"/>`
-  }
-  return `<div class="f-group"><label class="f-label">${label}</label>${inp}</div>`
+async function switchSection(id){
+  S.section=id;S.editView=null;S.editIdx=null
+  updateSidebarActive();showSaving(false)
+  await loadSection(id);render()
 }
 
-function cardSection(title, desc, innerHTML) {
-  return `<div class="card">
-    <div class="card-head"><div><div class="card-title">${title}</div>${desc ? `<div class="card-desc">${desc}</div>` : ''}</div></div>
-    <div class="card-body">${innerHTML}</div>
-  </div>`
-}
-
-// ══════════════════════════════════════════════════════════
-// MEDIA DROP ZONE
-// ══════════════════════════════════════════════════════════
-function mediaDropZoneHTML(id, dataKey, value, inline = false) {
-  const mediaType = value ? detectMediaType(value) : ''
-  let previewHTML = ''
-  if (value) {
-    const isVideo = /\.(mp4|webm|mov|avi|mkv)$/i.test(value)
-    const isGif = /\.gif$/i.test(value)
-    previewHTML = `<div class="drop-zone-preview">
-      ${isVideo
-        ? `<video src="${esc(value)}" muted playsinline style="width:100%;max-height:220px;object-fit:contain;background:#111;display:block"></video>`
-        : `<img src="${esc(value)}" style="width:100%;max-height:220px;object-fit:contain;display:block"/>`
+async function loadSection(id){
+  try{
+    if(id==='slideshow'){S.data=await api('GET','/api/slides');return}
+    if(id==='capabilities'){S.data=await api('GET','/api/capabilities');return}
+    if(id==='categories'){S.data=await api('GET','/api/categories');return}
+    if(id==='clients'){S.data=await api('GET','/api/clients');return}
+    if(id==='contact'){
+      const[cd,svcs]=await Promise.all([api('GET','/api/content/contact'),api('GET','/api/contact-services')])
+      S.data=(cd&&cd.fields)||{};S.contactSvcs=svcs||[];return
+    }
+    if(id==='portfolio'){
+      if(!S.portfolio){
+        const d=await api('GET','/api/content/portfolio')
+        S.portfolio={title:'Work',subtitle:'Selected Projects',items:[],archivedItems:[],...(d||{})}
+        if(!Array.isArray(S.portfolio.items))S.portfolio.items=[]
+        if(!Array.isArray(S.portfolio.archivedItems))S.portfolio.archivedItems=[]
       }
-      <div class="dz-overlay">
-        <span class="dz-type-badge">${mediaType}</span>
-        <button class="dz-remove" onclick="clearMedia('${id}','${dataKey || ''}')">Remove</button>
-      </div>
-    </div>`
-  } else {
-    previewHTML = `<div class="drop-zone-empty">
-      <div class="drop-zone-icon">⊞</div>
-      <div class="drop-zone-text"><strong>Drop file here</strong><br>or click to upload<br><span style="font-size:10px;color:#ccc">Image, Video, GIF</span></div>
-    </div>`
-  }
-  const urlInput = `<div class="dz-url-row">
-    <input type="url" id="${id}" ${dataKey ? `data-k="${dataKey}"` : ''} value="${esc(value)}" placeholder="https://… or upload" oninput="markDirty();updateDropZonePreview('${id}')"/>
-    <label class="btn btn-ghost dz-upload-btn" style="cursor:pointer;font-size:10px;padding:6px 10px">
-      Upload<input type="file" accept="${MEDIA_ACCEPT}" style="display:none" onchange="uploadMedia(this,'${id}')"/>
-    </label>
-  </div>`
-  return `<div class="drop-zone" id="${id}-zone"
-    ondragover="event.preventDefault();this.classList.add('drag-over')"
-    ondragleave="this.classList.remove('drag-over')"
-    ondrop="handleDrop(event,'${id}')"
-    onclick="if(event.target===this||event.target.closest('.drop-zone-empty'))this.querySelector('input[type=file]').click()">
-    <div id="${id}-preview">${previewHTML}</div>
-  </div>${urlInput}`
-}
-
-function detectMediaType(url) {
-  if (!url) return ''
-  if (/\.gif$/i.test(url)) return 'GIF'
-  if (/\.(mp4|webm|mov|avi|mkv)$/i.test(url)) return 'Video'
-  return 'Image'
-}
-
-function updateDropZonePreview(id) {
-  const inp = document.getElementById(id)
-  if (!inp) return
-  const url = inp.value.trim()
-  const preview = document.getElementById(id + '-preview')
-  if (!preview) return
-  if (!url) {
-    preview.innerHTML = `<div class="drop-zone-empty"><div class="drop-zone-icon">⊞</div><div class="drop-zone-text"><strong>Drop file here</strong><br>or click to upload</div></div>`
-    return
-  }
-  const isVideo = /\.(mp4|webm|mov|avi|mkv)$/i.test(url)
-  const mediaType = detectMediaType(url)
-  const dataKey = inp.dataset.k || ''
-  preview.innerHTML = `<div class="drop-zone-preview">
-    ${isVideo
-      ? `<video src="${esc(url)}" muted playsinline style="width:100%;max-height:220px;object-fit:contain;background:#111;display:block"></video>`
-      : `<img src="${esc(url)}" style="width:100%;max-height:220px;object-fit:contain;display:block"/>`
+      return
     }
-    <div class="dz-overlay">
-      <span class="dz-type-badge">${mediaType}</span>
-      <button class="dz-remove" onclick="clearMedia('${id}','${dataKey}')">Remove</button>
-    </div>
-  </div>`
+    if(id==='insights'){
+      if(!S.insightsData){
+        const d=await api('GET','/api/content/insights-data')
+        S.insightsData={items:[],archivedItems:[],...(d||{})}
+        if(!Array.isArray(S.insightsData.items))S.insightsData.items=[]
+        if(!Array.isArray(S.insightsData.archivedItems))S.insightsData.archivedItems=[]
+      }
+      return
+    }
+    const d=await api('GET',`/api/content/${id}`)
+    S.data=(d&&d.fields)?d.fields:(d||{})
+  }catch(e){console.warn('load error',e)}
 }
 
-function clearMedia(id, dataKey) {
-  const inp = document.getElementById(id)
-  if (inp) inp.value = ''
-  updateDropZonePreview(id)
-  markDirty()
+async function saveSection(){
+  const btn=document.getElementById('save-btn')
+  btn.disabled=true;btn.textContent='Saving…'
+  try{
+    const id=S.section
+    if(id==='slideshow'){await api('PUT','/api/slides',S.data)}
+    else if(id==='capabilities'){await api('PUT','/api/capabilities',S.data)}
+    else if(id==='categories'){await api('PUT','/api/categories',S.data)}
+    else if(id==='clients'){await api('PUT','/api/clients',S.data)}
+    else if(id==='contact'){
+      await Promise.all([api('PUT','/api/content/contact',{fields:S.data}),api('PUT','/api/contact-services',S.contactSvcs)])
+    }
+    else if(id==='portfolio'){
+      await api('PUT','/api/content/portfolio',S.portfolio)
+      for(const p of S.portfolio.items){
+        await api('PUT',`/api/content/${p.slug}`,{fields:mkProjectFields(p),blocks:(p.blocks||[]).map(blockForLoader),archivedBlocks:p.archivedBlocks||[]})
+      }
+    }
+    else if(id==='insights'){
+      await api('PUT','/api/content/insights-data',S.insightsData)
+      for(const a of S.insightsData.items){
+        await api('PUT',`/api/content/${a.slug}`,{fields:mkArticleFields(a),blocks:(a.blocks||[]).map(blockForLoader),archivedBlocks:a.archivedBlocks||[]})
+      }
+    }
+    else{await api('PUT',`/api/content/${id}`,{fields:S.data})}
+    showSaving(true)
+  }catch(e){showSaving(false,true,'Save failed')}
+  btn.disabled=false;btn.textContent='Save Changes'
 }
 
-function handleDrop(e, id) {
-  e.preventDefault()
-  const zone = e.currentTarget
-  zone.classList.remove('drag-over')
-  const file = e.dataTransfer.files[0]
-  if (!file) return
-  uploadMediaFile(file, id)
+function mkProjectFields(p){
+  return {[`${p.slug}-title`]:{value:p.title},[`${p.slug}-category`]:{value:p.category},[`${p.slug}-year`]:{value:p.year},[`${p.slug}-year2`]:{value:p.year},[`${p.slug}-client`]:{value:p.client},[`${p.slug}-scope`]:{value:p.category},[`${p.slug}-role`]:{value:'Creative Director'},[`${p.slug}-overview-text`]:{value:p.description},[`${p.slug}-hero-img`]:{value:p.image}}
+}
+function mkArticleFields(a){
+  return {[`${a.slug}-title`]:{value:a.title},[`${a.slug}-category`]:{value:a.category},[`${a.slug}-date`]:{value:a.date},[`${a.slug}-excerpt`]:{value:a.excerpt},[`${a.slug}-hero-img`]:{value:a.image},[`${a.slug}-body`]:{value:a.body}}
+}
+function blockForLoader(b){
+  const m={top:b.marginTop||0,right:b.marginRight||0,bottom:b.marginBottom||0,left:b.marginLeft||0}
+  if(b.type==='image')return{type:'image',value:b.url,margin:m}
+  if(b.type==='text')return{type:'html',value:b.html,margin:m}
+  if(b.type==='grid2')return{type:'grid2',images:b.images,margin:m}
+  if(b.type==='grid2x2')return{type:'grid2x2',images:b.images,margin:m}
+  return b
 }
 
-async function uploadMedia(input, fieldId) {
-  if (!input.files[0]) return
-  await uploadMediaFile(input.files[0], fieldId)
+function showSaving(ok,isErr,msg){
+  const el=document.getElementById('smsg')
+  if(!ok&&!isErr){el.className='smsg';el.textContent='';return}
+  el.className='smsg show '+(isErr?'err':'ok')
+  el.textContent=msg||(isErr?'Save failed.':'Saved!')
+  if(!isErr)setTimeout(()=>{el.className='smsg'},3000)
 }
+document.getElementById('save-btn').onclick=saveSection
 
-async function uploadMediaFile(file, fieldId) {
-  const fd = new FormData(); fd.append('file', file)
-  try {
-    const r = await fetch(`${API}/upload`, { method: 'POST', headers: { 'x-token': TOKEN }, body: fd })
-    const d = await r.json()
-    if (!r.ok) throw new Error(d.error)
-    const inp = document.getElementById(fieldId)
-    if (inp) { inp.value = d.url; updateDropZonePreview(fieldId) }
-    markDirty()
-    toast('Uploaded', 'ok')
-  } catch(e) { toast(e.message || 'Upload failed', 'err') }
-}
-
-// ══════════════════════════════════════════════════════════
-// PAGE EDITORS — Generic
-// ══════════════════════════════════════════════════════════
-function homeEditor() {
-  return cardSection('Site Settings', 'Global meta and home page fields',
-    `<div class="field-grid">
-      ${fRow('hero_kicker','Hero Kicker', fv('hero_kicker','Strategy & Design'))}
-      ${fRow('hero_cta','CTA Button Label', fv('hero_cta','View Work'))}
-    </div>
-    ${fRow('hero_subtitle','Hero Subtitle', fv('hero_subtitle',''), 'textarea')}
-    <div class="field-grid">
-      ${fRow('hero_title_l1','Headline Line 1', fv('hero_title_l1','Design as Strategy.'))}
-      ${fRow('hero_title_l2','Headline Line 2', fv('hero_title_l2','Identity as System.'))}
-    </div>`)
-}
-
-function heroEditor() {
-  return cardSection('Hero Section', 'Home page hero',
-    `<div class="field-grid">
-      ${fRow('label','Kicker Label', fv('label','Strategy & Design'))}
-      ${fRow('h1_l1','Headline Line 1', fv('h1_l1','Design as Strategy.'))}
-      ${fRow('h1_l2','Headline Line 2', fv('h1_l2','Identity as System.'))}
-      ${fRow('cta','CTA Label', fv('cta','View Work'))}
-      ${fRow('cta_url','CTA URL', fv('cta_url','/work.html'))}
-    </div>
-    ${fRow('subtitle','Subtitle', fv('subtitle',''), 'textarea')}`)
-}
-
-function aboutEditor() {
-  return cardSection('Hero', 'Page header',
-    `<div class="field-grid">
-      ${fRow('hero_label','Kicker Label', fv('hero_label','Creative Director'))}
-      ${fRow('hero_h1_l1','Headline Line 1', fv('hero_h1_l1','Making brands'))}
-      ${fRow('hero_h1_l2','Headline Line 2', fv('hero_h1_l2','that endure.'))}
-    </div>
-    ${fRow('hero_intro','Introduction', fv('hero_intro',''), 'textarea')}`) +
-  cardSection('Philosophy', '01 / Three Principles',
-    `<div class="field-grid">
-      ${fRow('phil1_title','Principle 1 Title', fv('phil1_title','Listen before designing'))}
-    </div>
-    ${fRow('phil1_body','Principle 1 Body', fv('phil1_body',''), 'textarea')}
-    <div class="field-grid">
-      ${fRow('phil2_title','Principle 2 Title', fv('phil2_title','Build systems, not assets'))}
-    </div>
-    ${fRow('phil2_body','Principle 2 Body', fv('phil2_body',''), 'textarea')}
-    <div class="field-grid">
-      ${fRow('phil3_title','Principle 3 Title', fv('phil3_title','Precision over decoration'))}
-    </div>
-    ${fRow('phil3_body','Principle 3 Body', fv('phil3_body',''), 'textarea')}`) +
-  cardSection('CTA', 'End of page',
-    `<div class="field-grid">
-      ${fRow('cta_kicker','Kicker', fv('cta_kicker','Have a project in mind?'))}
-      ${fRow('cta_h2_l1','Headline Line 1', fv('cta_h2_l1',"Let's build it"))}
-      ${fRow('cta_h2_l2','Headline Line 2', fv('cta_h2_l2','together.'))}
-    </div>`)
-}
-
-function workEditor() {
-  return cardSection('Page Header', '',
-    `<div class="field-grid">
-      ${fRow('hero_label','Label', fv('hero_label','Selected Work'))}
-      ${fRow('hero_h1','Headline', fv('hero_h1','Work'))}
-    </div>`) +
-  cardSection('CTA', 'Bottom call to action',
-    `<div class="field-grid">
-      ${fRow('cta_kicker','Kicker', fv('cta_kicker','Have a project in mind?'))}
-      ${fRow('cta_h2_l1','Headline Line 1', fv('cta_h2_l1',"Let's create"))}
-      ${fRow('cta_h2_l2','Headline Line 2', fv('cta_h2_l2','the next one.'))}
-    </div>`)
-}
-
-function insightsEditor() {
-  return cardSection('Page Header', '',
-    `<div class="field-grid">
-      ${fRow('hero_label','Label', fv('hero_label','Ideas & Thinking'))}
-      ${fRow('hero_h1','Headline', fv('hero_h1','Insights'))}
-    </div>
-    ${fRow('hero_subtitle','Subtitle', fv('hero_subtitle',''), 'textarea')}`)
-}
-
-function footerEditor() {
-  return cardSection('Footer', 'Contact details and links',
-    `<div class="field-grid">
-      ${fRow('email','Email', fv('email','hello@eyuelmulat.com'))}
-      ${fRow('phone','Phone', fv('phone','+251 95 355 3856'))}
-      ${fRow('location','Location', fv('location','Addis Ababa, Ethiopia'))}
-      ${fRow('ig_url','Instagram URL', fv('ig_url','#'))}
-      ${fRow('li_url','LinkedIn URL', fv('li_url','#'))}
-      ${fRow('be_url','Behance URL', fv('be_url','#'))}
-      ${fRow('copy','Copyright', fv('copy','© 2024 Eyuel Mulat'))}
-    </div>`)
-}
-
-// ══════════════════════════════════════════════════════════
-// CAPABILITIES
-// ══════════════════════════════════════════════════════════
-let capsData = []
-
-async function loadCapabilities() {
-  try {
-    const r = await fetch(`${API}/capabilities`)
-    capsData = r.ok ? await r.json() : []
-  } catch { capsData = [] }
-  renderCapsView()
-}
-
-function renderCapsView() {
-  const c = document.getElementById('content')
-  const items = capsData.map((cap, i) => `
-    <div class="item-card" id="cap-${i}">
-      <div class="cap-media-wrap">
-        <label class="f-label">Icon / Image</label>
-        ${mediaDropZoneHTML(`cap-icon-${i}`, '', cap.icon || '', false)}
-      </div>
-      <div class="item-card-fields">
-        <div class="f-group"><label class="f-label">Title</label><input type="text" value="${esc(cap.title||'')}" oninput="capsData[${i}].title=this.value;markDirty()"/></div>
-        <div class="f-group"><label class="f-label">Description</label><textarea oninput="capsData[${i}].description=this.value;markDirty()">${esc(cap.description||'')}</textarea></div>
-      </div>
-      <button class="btn-danger-sm" onclick="removeCap(${i})" title="Delete" style="margin-top:4px">✕</button>
-    </div>`).join('')
-  c.innerHTML = `<div class="page-editor">
-    <div class="note-label">When more than 3 capabilities exist, the home page shows left/right navigation arrows automatically.</div>
-    ${items}
-    <button class="btn btn-ghost" onclick="addCap()" style="margin-top:4px">+ Add Capability</button>
-  </div>`
-}
-
-async function saveCapabilities() {
-  // Sync icon URLs from inputs
-  capsData.forEach((cap, i) => {
-    const inp = document.getElementById(`cap-icon-${i}`)
-    if (inp) cap.icon = inp.value
-  })
-  const r = await fetch(`${API}/capabilities`, {
-    method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-token': TOKEN },
-    body: JSON.stringify(capsData)
-  })
-  if (!r.ok) throw new Error('Server error')
-}
-
-function addCap() {
-  capsData.push({ id: Date.now().toString(), icon: '', title: '', description: '' })
-  renderCapsView(); markDirty()
-}
-function removeCap(i) {
-  if (!confirm('Delete this capability?')) return
-  capsData.splice(i, 1); renderCapsView(); markDirty()
-}
-
-// ══════════════════════════════════════════════════════════
-// CLIENTS
-// ══════════════════════════════════════════════════════════
-let clientsData = []
-
-async function loadClients() {
-  try {
-    const r = await fetch(`${API}/clients`)
-    clientsData = r.ok ? await r.json() : []
-  } catch { clientsData = [] }
-  renderClientsView()
-}
-
-function renderClientsView() {
-  const c = document.getElementById('content')
-  const items = clientsData.map((cl, i) => `
-    <div class="item-card" id="cl-${i}">
-      <div class="client-logo-wrap">
-        <label class="f-label">Logo</label>
-        ${mediaDropZoneHTML(`cl-logo-${i}`, '', cl.logo || '', false)}
-      </div>
-      <div class="item-card-fields">
-        <div class="f-group"><label class="f-label">Name</label><input type="text" value="${esc(cl.name||'')}" oninput="clientsData[${i}].name=this.value;markDirty()"/></div>
-        <div class="f-group"><label class="f-label">Website URL</label><input type="url" value="${esc(cl.url||'')}" oninput="clientsData[${i}].url=this.value;markDirty()"/></div>
-      </div>
-      <button class="btn-danger-sm" onclick="removeClient(${i})" title="Delete" style="margin-top:4px">✕</button>
-    </div>`).join('')
-  c.innerHTML = `<div class="page-editor">${items}<button class="btn btn-ghost" onclick="addClient()" style="margin-top:4px">+ Add Client</button></div>`
-}
-
-async function saveClients() {
-  clientsData.forEach((cl, i) => {
-    const inp = document.getElementById(`cl-logo-${i}`)
-    if (inp) cl.logo = inp.value
-  })
-  const r = await fetch(`${API}/clients`, {
-    method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-token': TOKEN },
-    body: JSON.stringify(clientsData)
-  })
-  if (!r.ok) throw new Error('Server error')
-}
-
-function addClient() {
-  clientsData.push({ id: Date.now().toString(), name: '', logo: '', url: '' })
-  renderClientsView(); markDirty()
-}
-function removeClient(i) {
-  if (!confirm('Delete this client?')) return
-  clientsData.splice(i, 1); renderClientsView(); markDirty()
-}
-
-// ══════════════════════════════════════════════════════════
-// SLIDESHOW
-// ══════════════════════════════════════════════════════════
-let slidesData = []
-
-async function loadSlideshow() {
-  try {
-    const r = await fetch(`${API}/slides`)
-    slidesData = r.ok ? await r.json() : []
-  } catch { slidesData = [] }
-  renderSlideshowView()
-}
-
-function renderSlideshowView() {
-  const c = document.getElementById('content')
-  const items = slidesData.map((s, i) => {
-    const url = s.url || ''
-    const isVideo = /\.(mp4|webm|mov|avi|mkv)$/i.test(url)
-    const isGif = /\.gif$/i.test(url)
-    const mediaType = url ? (isGif ? 'GIF' : isVideo ? 'Video' : 'Image') : ''
-    const preview = url
-      ? (isVideo
-          ? `<video src="${esc(url)}" muted playsinline style="width:100%;max-height:200px;object-fit:contain;background:#111"></video>`
-          : `<img src="${esc(url)}" style="width:100%;max-height:200px;object-fit:contain"/>`)
-      : `<div class="slide-preview-empty">No media set</div>`
-    return `<div class="slide-card">
-      <div class="slide-card-top">
-        <div class="slide-preview-wrap" id="slide-prev-${i}">${preview}</div>
-        <div class="slide-actions">
-          ${i > 0 ? `<button class="btn btn-ghost" style="padding:4px 8px" onclick="moveSlide(${i},-1)">↑</button>` : '<span style="width:32px"></span>'}
-          ${i < slidesData.length-1 ? `<button class="btn btn-ghost" style="padding:4px 8px" onclick="moveSlide(${i},1)">↓</button>` : '<span style="width:32px"></span>'}
-          ${mediaType ? `<span class="dz-type-badge" style="margin-top:4px">${mediaType}</span>` : ''}
-          <button class="btn-danger-sm" onclick="removeSlide(${i})">✕</button>
-        </div>
-      </div>
-      <div class="slide-url-row">
-        <input type="url" id="slide-url-${i}" value="${esc(url)}" placeholder="https://… or upload" oninput="slidesData[${i}].url=this.value;markDirty();updateSlidePreview(${i})"/>
-        <label class="btn btn-ghost" style="cursor:pointer;font-size:10px;padding:6px 10px;white-space:nowrap">
-          Upload<input type="file" accept="${MEDIA_ACCEPT}" style="display:none" onchange="uploadSlideMedia(this,${i})"/>
-        </label>
-      </div>
-    </div>`
-  }).join('')
-  c.innerHTML = `<div class="page-editor">
-    <div class="card">
-      <div class="card-head"><div class="card-title">Hero Slideshow</div><div class="card-desc">These media items cycle through in the hero section of the home page.</div></div>
-      <div class="card-body">
-        ${items || '<div style="color:#aaa;font-size:12px;padding:16px 0">No slides yet. Add one below.</div>'}
-        <button class="btn btn-ghost mt12" onclick="addSlide()">+ Add Slide</button>
-      </div>
-    </div>
-  </div>`
-}
-
-async function saveSlideshow() {
-  slidesData.forEach((s, i) => {
-    const inp = document.getElementById(`slide-url-${i}`)
-    if (inp) s.url = inp.value
-  })
-  const r = await fetch(`${API}/slides`, {
-    method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-token': TOKEN },
-    body: JSON.stringify(slidesData)
-  })
-  if (!r.ok) throw new Error('Server error')
-}
-
-function addSlide() { slidesData.push({ url: '' }); renderSlideshowView(); markDirty() }
-function removeSlide(i) { if (!confirm('Remove this slide?')) return; slidesData.splice(i,1); renderSlideshowView(); markDirty() }
-function moveSlide(i, dir) {
-  const j = i + dir
-  if (j < 0 || j >= slidesData.length) return
-  ;[slidesData[i], slidesData[j]] = [slidesData[j], slidesData[i]]
-  renderSlideshowView(); markDirty()
-}
-function updateSlidePreview(i) {
-  const inp = document.getElementById(`slide-url-${i}`)
-  if (!inp) return
-  const url = inp.value.trim()
-  const wrap = document.getElementById(`slide-prev-${i}`)
-  if (!wrap) return
-  const isVideo = /\.(mp4|webm|mov|avi|mkv)$/i.test(url)
-  wrap.innerHTML = url
-    ? (isVideo
-        ? `<video src="${esc(url)}" muted playsinline style="width:100%;max-height:200px;object-fit:contain;background:#111"></video>`
-        : `<img src="${esc(url)}" style="width:100%;max-height:200px;object-fit:contain"/>`)
-    : '<div class="slide-preview-empty">No media set</div>'
-}
-async function uploadSlideMedia(input, i) {
-  if (!input.files[0]) return
-  const fd = new FormData(); fd.append('file', input.files[0])
-  try {
-    const r = await fetch(`${API}/upload`, { method:'POST', headers:{'x-token':TOKEN}, body:fd })
-    const d = await r.json()
-    if (!r.ok) throw new Error(d.error)
-    slidesData[i].url = d.url
-    renderSlideshowView(); markDirty()
-    toast('Uploaded','ok')
-  } catch(e) { toast(e.message||'Upload failed','err') }
-}
-
-// ══════════════════════════════════════════════════════════
-// CATEGORIES
-// ══════════════════════════════════════════════════════════
-let catsData = []
-
-async function loadCategories() {
-  try {
-    const r = await fetch(`${API}/categories`)
-    catsData = r.ok ? await r.json() : []
-  } catch { catsData = [] }
-  renderCategoriesView()
-}
-
-function renderCategoriesView() {
-  const c = document.getElementById('content')
-  const items = catsData.map((cat, i) => `
-    <div class="simple-item">
-      <input type="text" value="${esc(cat.name||'')}" placeholder="Category name" oninput="catsData[${i}].name=this.value;markDirty()"/>
-      <input type="text" value="${esc(cat.slug||'')}" placeholder="slug" style="max-width:160px" oninput="catsData[${i}].slug=this.value;markDirty()"/>
-      <button class="btn-danger-sm" onclick="removeCat(${i})">✕</button>
-    </div>`).join('')
-  c.innerHTML = `<div class="page-editor">
-    <div class="card">
-      <div class="card-head">
-        <div><div class="card-title">Categories</div><div class="card-desc">Project categories — used for filtering on the work page</div></div>
-      </div>
-      <div class="card-body">
-        <div style="display:flex;gap:8px;margin-bottom:8px">
-          <span class="f-label" style="flex:1">Name</span>
-          <span class="f-label" style="width:160px">Slug</span>
-          <span style="width:28px"></span>
-        </div>
-        ${items}
-        <button class="btn btn-ghost mt8" onclick="addCat()">+ Add Category</button>
-      </div>
-    </div>
-  </div>`
-}
-
-async function saveCategories() {
-  const r = await fetch(`${API}/categories`, {
-    method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-token': TOKEN },
-    body: JSON.stringify(catsData)
-  })
-  if (!r.ok) throw new Error('Server error')
-}
-
-function addCat() {
-  const id = Date.now().toString()
-  catsData.push({ id, name: '', slug: '' })
-  renderCategoriesView(); markDirty()
-}
-function removeCat(i) {
-  if (!confirm('Delete this category?')) return
-  catsData.splice(i,1); renderCategoriesView(); markDirty()
-}
-
-// ══════════════════════════════════════════════════════════
-// CONTACT
-// ══════════════════════════════════════════════════════════
-let contactData = {}
-let contactSvcs = []
-
-async function loadContact() {
-  try {
-    const [r1, r2] = await Promise.all([
-      fetch(`${API}/content/contact`, { headers: ah() }),
-      fetch(`${API}/contact-services`)
-    ])
-    contactData = r1.ok ? await r1.json() : {}
-    contactSvcs = r2.ok ? await r2.json() : []
-  } catch { contactData = {}; contactSvcs = [] }
-  renderContactView()
-}
-
-function renderContactView() {
-  const f = (k, label, fallback, type = 'text') => {
-    const val = (contactData.fields && contactData.fields[k]) || fallback
-    const id = 'cf-' + k
-    let inp
-    if (type === 'textarea') inp = `<textarea id="${id}" data-ck="${k}" oninput="markDirty()">${esc(val)}</textarea>`
-    else inp = `<input type="text" id="${id}" data-ck="${k}" value="${esc(val)}" oninput="markDirty()"/>`
-    return `<div class="f-group"><label class="f-label">${label}</label>${inp}</div>`
+function render(){
+  const c=document.getElementById('editor-inner')
+  if(S.section==='portfolio'){
+    if(S.editView==='project'&&S.editIdx!==null)return renderProjectEditor()
+    return renderPortfolio()
   }
-  const svcs = contactSvcs.map((s, i) => `
-    <div class="simple-item">
-      <input type="text" value="${esc(s)}" oninput="contactSvcs[${i}]=this.value;markDirty()"/>
-      <button class="btn-danger-sm" onclick="removeSvc(${i})">✕</button>
-    </div>`).join('')
-  document.getElementById('content').innerHTML = `<div class="page-editor">
-    ${cardSection('Page Header', '',
-      `<div class="field-grid">
-        ${f('hero_label','Label','Get in Touch')}
-        ${f('hero_h1_l1','Headline Line 1',"Let's work")}
-        ${f('hero_h1_l2','Headline Line 2','together.')}
-      </div>
-      ${f('hero_subtitle','Subtitle paragraph',"Whether you're building a brand from the ground up…",'textarea')}`)}
-    ${cardSection('Contact Details', 'Displayed in the left column',
-      `<div class="field-grid">
-        ${f('email','Email','hello@eyuelmulat.com')}
-        ${f('phone','Phone','+251 95 355 3856')}
-        ${f('location','Location','Addis Ababa, Ethiopia')}
-        ${f('ig_url','Instagram URL','#')}
-        ${f('li_url','LinkedIn URL','#')}
-        ${f('be_url','Behance URL','#')}
-      </div>`)}
-    <div class="card">
-      <div class="card-head"><div class="card-title">Services Checklist</div><div class="card-desc">Options shown in the contact form</div></div>
-      <div class="card-body">
-        <div id="svcs-list">${svcs}</div>
-        <button class="btn btn-ghost mt8" onclick="addSvc()">+ Add Service</button>
-      </div>
-    </div>
-  </div>`
-}
-
-async function saveContact() {
-  // collect contact fields
-  const fields = {}
-  document.querySelectorAll('[data-ck]').forEach(el => { fields[el.dataset.ck] = el.value })
-  contactData.fields = fields
-  const [r1, r2] = await Promise.all([
-    fetch(`${API}/content/contact`, {
-      method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-token': TOKEN },
-      body: JSON.stringify(contactData)
-    }),
-    fetch(`${API}/contact-services`, {
-      method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-token': TOKEN },
-      body: JSON.stringify(contactSvcs)
-    })
-  ])
-  if (!r1.ok || !r2.ok) throw new Error('Server error')
-}
-
-function addSvc() { contactSvcs.push(''); renderContactView(); markDirty() }
-function removeSvc(i) { contactSvcs.splice(i,1); renderContactView(); markDirty() }
-
-// ══════════════════════════════════════════════════════════
-// PROJECTS
-// ══════════════════════════════════════════════════════════
-let projectsData = []
-let projectPageData = {}  // slug -> content data
-
-async function loadProjects() {
-  try {
-    const r = await fetch(`${API}/projects`, { headers: ah() })
-    projectsData = r.ok ? await r.json() : []
-  } catch { projectsData = [] }
-  renderProjectsList()
-}
-
-function renderProjectsList() {
-  const c = document.getElementById('content')
-  if (!projectsData.length) {
-    c.innerHTML = `<div class="list-page">
-      <div class="list-top"><div><h2>Projects</h2><p>No projects yet</p></div><button class="btn btn-navy" onclick="openM('m-project')">+ Add New Project</button></div>
-      <div class="empty-state" style="padding:40px 0"><p>Create your first project using the button above.</p></div>
-    </div>`
-    return
+  if(S.section==='insights'){
+    if(S.editView==='insight'&&S.editIdx!==null)return renderInsightEditor()
+    return renderInsights()
   }
-  const cards = projectsData.map((p, i) => buildProjectCard(p, i)).join('')
-  c.innerHTML = `<div class="list-page">
-    <div class="list-top">
-      <div><h2>Projects</h2><p>${projectsData.length} project${projectsData.length===1?'':'s'}</p></div>
-      <button class="btn btn-navy" onclick="openM('m-project')">+ Add New Project</button>
-    </div>
-    <div id="projects-list">${cards}</div>
-  </div>`
+  const map={site:renderSite,navigation:renderNav,hero:renderHero,slideshow:renderSlideshow,about:renderAbout,capabilities:renderCapabilities,categories:renderCategories,contact:renderContact,clients:renderClients,footer:renderFooter}
+  if(map[S.section])map[S.section]()
+  else c.innerHTML='<p class="pg-intro">Section coming soon.</p>'
 }
 
-function buildProjectCard(p, i) {
-  const slug = p.slug || ''
-  const pd = projectPageData[slug] || {}
-  const blocks = pd.blocks || []
-  const blocksHTML = blocks.map((b, bi) => buildBlockCard(b, bi, slug)).join('')
-  return `<div class="proj-card" id="pcard-${slug}">
-    <div class="proj-header" onclick="toggleProjCard('${slug}')">
-      <span class="proj-toggle">▼</span>
-      <span class="proj-cat-tag">${esc(p.category||'—')}</span>
-      <span class="proj-title">${esc(p.title||slug)}</span>
-      <span class="proj-year">${esc(p.year||'')}</span>
-      <div class="proj-actions" onclick="event.stopPropagation()">
-        <a href="/work/${slug}.html" target="_blank" class="btn btn-ghost" style="padding:4px 8px;font-size:10px" title="View">↗</a>
-        <button class="btn-danger-sm" onclick="deleteProject('${slug}')" title="Delete">✕</button>
-      </div>
-    </div>
-    <div class="proj-body" id="pbody-${slug}">
-      <div id="pform-${slug}">Loading…</div>
-    </div>
-  </div>`
+// Helpers
+function mkField(label,hint){
+  const d=document.createElement('div')
+  d.innerHTML=`<label class="fl">${label}</label>${hint?`<p class="fh">${hint}</p>`:''}`
+  return d
+}
+function mkInput(label,key,obj,hint='',type='text'){
+  const d=mkField(label,hint)
+  const i=document.createElement('input');i.className='fi';i.type=type;i.value=obj[key]||''
+  i.oninput=()=>obj[key]=i.value;d.appendChild(i);return d
+}
+function mkTextarea(label,key,obj,rows=3,hint=''){
+  const d=mkField(label,hint)
+  const ta=document.createElement('textarea');ta.className='fta';ta.rows=rows;ta.value=obj[key]||''
+  ta.oninput=()=>obj[key]=ta.value;d.appendChild(ta);return d
+}
+function mkSC(title,...children){
+  const div=document.createElement('div');div.className='sc'
+  div.innerHTML=`<div class="sc-h"><h3>${title}</h3></div>`
+  const body=document.createElement('div');body.className='sc-b sp'
+  children.forEach(c=>{if(c)body.appendChild(c)})
+  div.appendChild(body);return div
+}
+function mkG2(...children){
+  const d=document.createElement('div');d.className='g2'
+  children.forEach(c=>d.appendChild(c));return d
 }
 
-async function toggleProjCard(slug) {
-  const card = document.getElementById(`pcard-${slug}`)
-  if (!card) return
-  const wasOpen = card.classList.contains('open')
-  card.classList.toggle('open')
-  if (!wasOpen && !projectPageData[slug]) {
-    await loadProjectData(slug)
-  }
-}
-
-async function loadProjectData(slug) {
-  const formEl = document.getElementById(`pform-${slug}`)
-  if (!formEl) return
-  try {
-    const [pr, cr] = await Promise.all([
-      fetch(`${API}/projects`, { headers: ah() }),
-      fetch(`${API}/content/${slug}`, { headers: ah() })
-    ])
-    const projects = pr.ok ? await pr.json() : []
-    const content = cr.ok ? await cr.json() : {}
-    const meta = projects.find(p => p.slug === slug) || {}
-    projectPageData[slug] = content
-    renderProjectForm(slug, meta, content)
-  } catch(e) {
-    if (formEl) formEl.innerHTML = `<div style="color:red;font-size:12px">Error loading: ${e.message}</div>`
-  }
-}
-
-let catOptions = []
-async function getCatOptions() {
-  if (catOptions.length) return catOptions
-  try {
-    const r = await fetch(`${API}/categories`)
-    catOptions = r.ok ? await r.json() : []
-  } catch {}
-  return catOptions
-}
-
-async function renderProjectForm(slug, meta, content) {
-  const formEl = document.getElementById(`pform-${slug}`)
-  if (!formEl) return
-  const cats = await getCatOptions()
-  const catSelect = cats.map(c => `<option value="${esc(c.name)}" ${meta.category===c.name?'selected':''}>${esc(c.name)}</option>`).join('')
-  const blocks = content.blocks || []
-  const blocksHTML = blocks.map((b, bi) => buildBlockCard(b, bi, slug)).join('')
-  const bgVal = meta.bg_image || content.fields?.bg_image || ''
-  const thumbVal = meta.thumbnail || content.fields?.thumbnail || ''
-  formEl.innerHTML = `
-    <div class="field-grid">
-      <div class="f-group"><label class="f-label">Project Title</label><input type="text" id="pm-title-${slug}" value="${esc(meta.title||'')}" oninput="markDirty()"/></div>
-      <div class="f-group"><label class="f-label">URL Slug</label><input type="text" id="pm-slug-${slug}" value="${esc(slug)}" oninput="markDirty()" readonly style="background:#f5f5f5;color:#888"/></div>
-      <div class="f-group"><label class="f-label">Category</label>
-        <select id="pm-cat-${slug}" oninput="markDirty()">
-          <option value="">— Select —</option>${catSelect}
-          <option value="${esc(meta.category||'')}" ${meta.category?'':'selected'}>${esc(meta.category||'Custom…')}</option>
-        </select>
-      </div>
-      <div class="f-group"><label class="f-label">Client</label><input type="text" id="pm-client-${slug}" value="${esc(meta.client||'')}" oninput="markDirty()"/></div>
-      <div class="f-group"><label class="f-label">Year</label><input type="text" id="pm-year-${slug}" value="${esc(meta.year||'')}" oninput="markDirty()"/></div>
-      <div class="f-group"><label class="f-label">Tags (comma-separated)</label><input type="text" id="pm-tags-${slug}" value="${esc(meta.tags||meta.scope||'')}" oninput="markDirty()"/></div>
-    </div>
-    <div class="f-group full"><label class="f-label">Description</label><textarea id="pm-desc-${slug}" style="min-height:80px" oninput="markDirty()">${esc(meta.description||'')}</textarea></div>
-    <div class="field-grid">
-      <div class="f-group"><label class="f-label">Background Image</label>${mediaDropZoneHTML(`pm-bg-${slug}`, '', bgVal)}</div>
-      <div class="f-group"><label class="f-label">Preview Thumbnail</label>${mediaDropZoneHTML(`pm-thumb-${slug}`, '', thumbVal)}</div>
-    </div>
-    <div class="blocks-section">
-      <div class="sec-div">Gallery &amp; Content Blocks</div>
-      <div class="blocks-list" id="blocks-${slug}">${blocksHTML || '<div style="color:#bbb;font-size:12px;padding:8px 0">No blocks yet.</div>'}</div>
-      <div class="add-blocks">
-        <button class="add-block-btn" onclick="addProjBlock('${slug}','full-image')">+ Full-Width Image</button>
-        <button class="add-block-btn" onclick="addProjBlock('${slug}','text')">+ Text</button>
-        <button class="add-block-btn" onclick="addProjBlock('${slug}','quote')">+ Quote</button>
-        <button class="add-block-btn" onclick="addProjBlock('${slug}','gallery')">+ Gallery</button>
-        <button class="add-block-btn" onclick="addProjBlock('${slug}','video')">+ Video/GIF</button>
-        <button class="add-block-btn" onclick="addProjBlock('${slug}','image-text')">+ Image+Text</button>
-        <button class="add-block-btn" onclick="addProjBlock('${slug}','spacer')">+ Spacer</button>
-      </div>
-    </div>
-    <div style="margin-top:16px;display:flex;gap:8px">
-      <button class="btn btn-navy" onclick="saveProject('${slug}')">Save Project</button>
-      <button class="btn btn-ghost" onclick="deleteProject('${slug}')" style="color:var(--danger);border-color:var(--danger)">Delete</button>
-    </div>`
-}
-
-function buildBlockCard(b, bi, slug) {
-  const preview = getBlockPreview(b)
-  const typeLabel = b.type === 'full-image' ? 'Full-Width Image' :
-    b.type === 'image-text' ? 'Image + Text' :
-    b.type === 'video' ? 'Video/GIF' :
-    (b.type || 'block').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
-  return `<div class="block-card" id="blk-${slug}-${bi}">
-    <div class="block-card-header" onclick="toggleBlockCard('${slug}',${bi})">
-      <span class="block-type-pill">${typeLabel}</span>
-      <span class="block-preview">${esc(preview)}</span>
-      <div class="block-reorder">
-        <button onclick="event.stopPropagation();moveProjBlock('${slug}',${bi},-1)">↑</button>
-        <button onclick="event.stopPropagation();moveProjBlock('${slug}',${bi},1)">↓</button>
-      </div>
-      <button class="btn-danger-sm" onclick="event.stopPropagation();removeProjBlock('${slug}',${bi})">✕</button>
-    </div>
-    <div class="block-card-body">${buildBlockBody(b, bi, slug)}</div>
-  </div>`
-}
-
-function getBlockPreview(b) {
-  if (!b) return ''
-  if (b.type === 'text') return String(b.text||'').slice(0,60)
-  if (b.type === 'quote') return '"' + String(b.text||'').slice(0,50) + '"'
-  if (b.type === 'full-image' || b.type === 'video') return b.url ? 'Has media' : 'No media set'
-  if (b.type === 'image-text') return String(b.text||'').slice(0,40)
-  if (b.type === 'gallery') return `${(b.images||[]).length} images`
-  if (b.type === 'spacer') return `${b.height||80}px gap`
-  return ''
-}
-
-function buildBlockBody(b, bi, slug) {
-  const sid = `${slug}-${bi}`
-  if (b.type === 'text') return `
-    <div class="f-group"><label class="f-label">Text Content</label>
-      <textarea oninput="setBlockProp('${slug}',${bi},'text',this.value)">${esc(b.text||'')}</textarea></div>`
-
-  if (b.type === 'quote') return `
-    <div class="f-group"><label class="f-label">Quote Text</label>
-      <textarea oninput="setBlockProp('${slug}',${bi},'text',this.value)">${esc(b.text||'')}</textarea></div>
-    <div class="f-group"><label class="f-label">Attribution</label>
-      <input type="text" value="${esc(b.attribution||'')}" oninput="setBlockProp('${slug}',${bi},'attribution',this.value)"/></div>`
-
-  if (b.type === 'spacer') return `
-    <div class="f-group"><label class="f-label">Height</label>
-      <div class="range-row">
-        <input type="range" min="20" max="400" value="${b.height||80}" oninput="setBlockProp('${slug}',${bi},'height',+this.value);this.nextElementSibling.textContent=this.value+'px'"/>
-        <span class="range-val">${b.height||80}px</span>
-      </div></div>`
-
-  if (b.type === 'full-image') return `
-    <div class="f-group"><label class="f-label">Image / Video</label>
-      ${mediaDropZoneHTML(`bfull-${sid}`, '', b.url||'')}</div>
-    <div class="sec-div" style="font-size:10px;margin-top:12px">Margin (px)</div>
-    <div class="field-grid">
-      <div class="f-group"><label class="f-label">Top</label>
-        <div class="range-row"><input type="range" min="0" max="200" value="${b.mt||0}" oninput="setBlockProp('${slug}',${bi},'mt',+this.value);this.nextElementSibling.textContent=this.value+'px'"/><span class="range-val">${b.mt||0}px</span></div></div>
-      <div class="f-group"><label class="f-label">Bottom</label>
-        <div class="range-row"><input type="range" min="0" max="200" value="${b.mb||0}" oninput="setBlockProp('${slug}',${bi},'mb',+this.value);this.nextElementSibling.textContent=this.value+'px'"/><span class="range-val">${b.mb||0}px</span></div></div>
-      <div class="f-group"><label class="f-label">Left</label>
-        <div class="range-row"><input type="range" min="0" max="200" value="${b.ml||0}" oninput="setBlockProp('${slug}',${bi},'ml',+this.value);this.nextElementSibling.textContent=this.value+'px'"/><span class="range-val">${b.ml||0}px</span></div></div>
-      <div class="f-group"><label class="f-label">Right</label>
-        <div class="range-row"><input type="range" min="0" max="200" value="${b.mr||0}" oninput="setBlockProp('${slug}',${bi},'mr',+this.value);this.nextElementSibling.textContent=this.value+'px'"/><span class="range-val">${b.mr||0}px</span></div></div>
-    </div>`
-
-  if (b.type === 'video') return `
-    <div class="f-group"><label class="f-label">Video / GIF</label>
-      ${mediaDropZoneHTML(`bvid-${sid}`, '', b.url||'')}</div>
-    <div class="f-group"><label class="f-label">Caption</label>
-      <input type="text" value="${esc(b.caption||'')}" oninput="setBlockProp('${slug}',${bi},'caption',this.value)"/></div>`
-
-  if (b.type === 'image-text') return `
-    <div class="f-group"><label class="f-label">Image</label>
-      ${mediaDropZoneHTML(`bit-${sid}`, '', b.img||'')}</div>
-    <div class="f-group"><label class="f-label">Text</label>
-      <textarea oninput="setBlockProp('${slug}',${bi},'text',this.value)">${esc(b.text||'')}</textarea></div>
-    <div class="f-group"><label class="f-label">Image Side</label>
-      <select onchange="setBlockProp('${slug}',${bi},'side',this.value)">
-        <option value="left" ${b.side==='left'?'selected':''}>Left</option>
-        <option value="right" ${b.side==='right'?'selected':''}>Right</option>
-      </select></div>`
-
-  if (b.type === 'gallery') {
-    const imgs = (b.images||[]).map((img, j) => `
-      <div class="flex-row" style="margin-bottom:8px">
-        ${img ? `<img src="${esc(img)}" style="width:52px;height:36px;object-fit:cover;border-radius:3px;border:1px solid var(--border)"/>` : '<div style="width:52px;height:36px;background:#f0f0f0;border-radius:3px;border:1px solid var(--border)"></div>'}
-        <input type="url" value="${esc(img)}" style="flex:1" oninput="setBlockGalleryImg('${slug}',${bi},${j},this.value)"/>
-        <button class="btn-danger-sm" onclick="removeGalleryImgProj('${slug}',${bi},${j})">✕</button>
-      </div>`).join('')
-    return `<div class="f-group"><label class="f-label">Gallery Images</label>
-      <div id="gal-${sid}">${imgs}</div>
-      <label class="btn btn-ghost" style="cursor:pointer;margin-top:8px">
-        ↑ Upload Images<input type="file" accept="${MEDIA_ACCEPT}" multiple style="display:none" onchange="uploadGalleryProj(this,'${slug}',${bi})"/>
-      </label></div>`
-  }
-  return ''
-}
-
-function toggleBlockCard(slug, bi) {
-  document.getElementById(`blk-${slug}-${bi}`)?.classList.toggle('open')
-}
-
-function setBlockProp(slug, bi, key, val) {
-  if (!projectPageData[slug]) return
-  if (!projectPageData[slug].blocks) projectPageData[slug].blocks = []
-  if (projectPageData[slug].blocks[bi]) {
-    projectPageData[slug].blocks[bi][key] = val
-    // sync drop zone url if applicable
-    if (key === 'url') {
-      const sid = `${slug}-${bi}`
-      const inp = document.getElementById(`bfull-${sid}`) || document.getElementById(`bvid-${sid}`)
-      // already set via input event
+// ImageUpload
+function mkIU({label='',hint='',value='',onChange,aspect='16/9',acceptVideo=false}){
+  const[aw,ah]=aspect.split('/').map(Number)
+  const wrap=document.createElement('div')
+  if(label){const l=document.createElement('label');l.className='fl';l.textContent=label;wrap.appendChild(l)}
+  if(hint){const h=document.createElement('p');h.className='fh';h.textContent=hint;wrap.appendChild(h)}
+  const zone=document.createElement('div')
+  zone.className='iu-zone'+(value?' has':'')
+  zone.style.cssText=`position:relative;padding-top:${(ah/aw*100).toFixed(1)}%`
+  let cur=value
+  const ov=document.createElement('div');ov.className='iu-ov'
+  function setMedia(url){
+    zone.querySelectorAll('img,video').forEach(e=>e.remove())
+    if(url){
+      let m
+      if(/\.(mp4|webm|mov|avi|mkv)$/i.test(url)){m=document.createElement('video');m.src=url;m.muted=m.loop=m.autoplay=true}
+      else{m=document.createElement('img');m.src=url;m.alt=''}
+      zone.insertBefore(m,ov)
     }
   }
-  markDirty()
-}
-
-function setBlockGalleryImg(slug, bi, j, val) {
-  if (projectPageData[slug]?.blocks?.[bi]?.images) {
-    projectPageData[slug].blocks[bi].images[j] = val
-    markDirty()
+  function setOv(url){
+    if(url){ov.innerHTML='<span class="iu-ch">↑ Change image</span>'}
+    else{ov.innerHTML=`<div class="iu-ph"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="color:var(--g300)"><rect x="3" y="3" width="18" height="18" rx="2" stroke-width="1.5"/><circle cx="8.5" cy="8.5" r="1.5" stroke-width="1.5"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m21 15-5-5L5 21"/></svg><p><span>Click to browse</span> or drag &amp; drop</p><p style="font-size:10px;color:var(--g300)">JPG, PNG, WEBP${acceptVideo?', MP4':''}${', GIF'}</p></div>`}
   }
-}
-
-function addProjBlock(slug, type) {
-  if (!projectPageData[slug]) projectPageData[slug] = { blocks: [] }
-  if (!projectPageData[slug].blocks) projectPageData[slug].blocks = []
-  const defaults = {
-    'full-image': { type:'full-image', url:'', mt:0, mb:0, ml:0, mr:0 },
-    'text': { type:'text', text:'' },
-    'quote': { type:'quote', text:'', attribution:'' },
-    'gallery': { type:'gallery', images:[] },
-    'video': { type:'video', url:'', caption:'' },
-    'image-text': { type:'image-text', img:'', text:'', side:'left' },
-    'spacer': { type:'spacer', height:80 },
+  function update(url){
+    cur=url;onChange(url);urlIn.value=url
+    zone.className='iu-zone'+(url?' has':'')
+    setMedia(url);setOv(url)
   }
-  projectPageData[slug].blocks.push({ ...defaults[type] })
-  markDirty()
-  rerenderProjBlocks(slug)
-}
-
-function removeProjBlock(slug, bi) {
-  if (!confirm('Remove this block?')) return
-  projectPageData[slug]?.blocks?.splice(bi, 1)
-  markDirty()
-  rerenderProjBlocks(slug)
-}
-
-function moveProjBlock(slug, bi, dir) {
-  const blocks = projectPageData[slug]?.blocks
-  if (!blocks) return
-  const j = bi + dir
-  if (j < 0 || j >= blocks.length) return
-  ;[blocks[bi], blocks[j]] = [blocks[j], blocks[bi]]
-  markDirty()
-  rerenderProjBlocks(slug)
-}
-
-function rerenderProjBlocks(slug) {
-  const el = document.getElementById(`blocks-${slug}`)
-  if (!el) return
-  const blocks = projectPageData[slug]?.blocks || []
-  el.innerHTML = blocks.map((b, bi) => buildBlockCard(b, bi, slug)).join('') || '<div style="color:#bbb;font-size:12px;padding:8px 0">No blocks yet.</div>'
-}
-
-async function uploadGalleryProj(input, slug, bi) {
-  for (const file of input.files) {
-    const fd = new FormData(); fd.append('file', file)
-    try {
-      const r = await fetch(`${API}/upload`, { method:'POST', headers:{'x-token':TOKEN}, body:fd })
-      const d = await r.json()
-      if (!r.ok) continue
-      if (!projectPageData[slug].blocks[bi].images) projectPageData[slug].blocks[bi].images = []
-      projectPageData[slug].blocks[bi].images.push(d.url)
-    } catch {}
+  setMedia(value);setOv(value);zone.appendChild(ov)
+  const fileIn=document.createElement('input');fileIn.type='file';fileIn.style.display='none'
+  fileIn.accept=acceptVideo?'image/*,video/*,.gif,.mp4,.webm,.mov':'image/*,.gif'
+  const urlIn=document.createElement('input');urlIn.className='iu-url';urlIn.type='text';urlIn.value=value||'';urlIn.placeholder='Or paste URL…'
+  const errP=document.createElement('p');errP.style.cssText='font-size:11px;color:#DC2626;margin-top:4px;display:none'
+  async function doUp(file){
+    errP.style.display='none';ov.innerHTML='<span style="font-size:11px;color:#fff;font-weight:500">Uploading…</span>'
+    try{update(await apiUpload(file))}
+    catch(e){errP.textContent=e.message;errP.style.display='block';setOv(cur)}
   }
-  markDirty()
-  rerenderProjBlocks(slug)
-  toast('Images uploaded','ok')
+  zone.onclick=()=>fileIn.click()
+  zone.ondragover=e=>{e.preventDefault();zone.classList.add('drag')}
+  zone.ondragleave=()=>zone.classList.remove('drag')
+  zone.ondrop=e=>{e.preventDefault();zone.classList.remove('drag');const f=e.dataTransfer.files[0];if(f)doUp(f)}
+  fileIn.onchange=e=>{const f=e.target.files[0];if(f)doUp(f);e.target.value=''}
+  urlIn.onblur=()=>{if(urlIn.value!==cur)update(urlIn.value)}
+  wrap.appendChild(zone);wrap.appendChild(urlIn);wrap.appendChild(errP);wrap.appendChild(fileIn)
+  return wrap
 }
 
-function removeGalleryImgProj(slug, bi, j) {
-  projectPageData[slug]?.blocks?.[bi]?.images?.splice(j, 1)
-  markDirty()
-  rerenderProjBlocks(slug)
-}
-
-async function saveProject(slug) {
-  const g = id => { const el = document.getElementById(id); return el ? el.value : '' }
-  // Sync block media urls from drop zone inputs
-  const blocks = projectPageData[slug]?.blocks || []
-  blocks.forEach((b, bi) => {
-    const sid = `${slug}-${bi}`
-    if (b.type === 'full-image') { const inp = document.getElementById(`bfull-${sid}`); if (inp) b.url = inp.value }
-    if (b.type === 'video') { const inp = document.getElementById(`bvid-${sid}`); if (inp) b.url = inp.value }
-    if (b.type === 'image-text') { const inp = document.getElementById(`bit-${sid}`); if (inp) b.img = inp.value }
+// Margin sliders
+function mkMS(block,onChange){
+  const wrap=document.createElement('div');wrap.className='ms'
+  ;[['marginTop','Top'],['marginRight','Right'],['marginBottom','Bottom'],['marginLeft','Left']].forEach(([k,lbl])=>{
+    const d=document.createElement('div')
+    const vs=document.createElement('span');vs.textContent=(block[k]||0)+'px'
+    const trow=document.createElement('div');trow.className='ms-lbl'
+    const t=document.createElement('span');t.textContent=lbl;trow.appendChild(t);trow.appendChild(vs)
+    const inp=document.createElement('input');inp.type='range';inp.min=0;inp.max=120;inp.value=block[k]||0
+    inp.oninput=()=>{vs.textContent=inp.value+'px';block[k]=+inp.value;onChange(block)}
+    d.appendChild(trow);d.appendChild(inp);wrap.appendChild(d)
   })
-  const meta = {
-    title: g(`pm-title-${slug}`),
-    category: g(`pm-cat-${slug}`),
-    client: g(`pm-client-${slug}`),
-    year: g(`pm-year-${slug}`),
-    tags: g(`pm-tags-${slug}`),
-    description: g(`pm-desc-${slug}`),
-    bg_image: g(`pm-bg-${slug}`),
-    thumbnail: g(`pm-thumb-${slug}`),
+  return wrap
+}
+
+// Rich text editor
+function mkRT(block,onChange){
+  const wrap=document.createElement('div')
+  const bar=document.createElement('div');bar.className='rt-bar'
+  function rb(html,cmd,val){
+    const b=document.createElement('button');b.type='button';b.className='rt-b';b.innerHTML=html
+    b.onmousedown=e=>{e.preventDefault();document.execCommand('styleWithCSS',false,'true');document.execCommand(cmd,false,val);ed.focus();sync()}
+    return b
   }
-  const content = { ...projectPageData[slug], fields: meta }
-  try {
-    const [r1, r2] = await Promise.all([
-      fetch(`${API}/project/${slug}`, {
-        method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-token': TOKEN },
-        body: JSON.stringify(meta)
-      }),
-      fetch(`${API}/content/${slug}`, {
-        method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-token': TOKEN },
-        body: JSON.stringify(content)
+  function rdiv(){const d=document.createElement('div');d.className='rt-div';return d}
+  function rlbl(t){const s=document.createElement('span');s.className='rt-lbl';s.textContent=t;return s}
+  function wrapSel(prop,val){
+    const sel=window.getSelection()
+    if(!sel||sel.rangeCount===0||sel.isCollapsed)return
+    const range=sel.getRangeAt(0),span=document.createElement('span')
+    span.style.setProperty(prop,val)
+    try{span.appendChild(range.extractContents());range.insertNode(span)}catch(e){}
+    sel.removeAllRanges();sync()
+  }
+  bar.appendChild(rb('<b>B</b>','bold'))
+  bar.appendChild(rb('<i style="font-style:italic">I</i>','italic'))
+  bar.appendChild(rb('<u style="text-decoration:underline">U</u>','underline'))
+  bar.appendChild(rdiv())
+  bar.appendChild(rlbl('Size'))
+  const szS=document.createElement('select');szS.className='rt-sel'
+  szS.innerHTML='<option value="">—</option><option value=".75rem">XS</option><option value=".9rem">S</option><option value="1rem">M</option><option value="1.3rem">L</option><option value="1.8rem">XL</option><option value="2.5rem">2XL</option><option value="3.5rem">3XL</option>'
+  szS.onchange=()=>{if(szS.value){wrapSel('font-size',szS.value);szS.value=''}}
+  bar.appendChild(szS);bar.appendChild(rdiv())
+  bar.appendChild(rlbl('Opacity'))
+  const opS=document.createElement('select');opS.className='rt-sel'
+  opS.innerHTML='<option value="">—</option><option value="1">100%</option><option value=".75">75%</option><option value=".5">50%</option><option value=".35">35%</option><option value=".2">20%</option>'
+  opS.onchange=()=>{if(opS.value){wrapSel('opacity',opS.value);opS.value=''}}
+  bar.appendChild(opS);bar.appendChild(rdiv())
+  bar.appendChild(rlbl('Color'))
+  const colI=document.createElement('input');colI.type='color';colI.className='rt-col';colI.value='#111111'
+  colI.onblur=()=>{const sel=window.getSelection();if(!sel||sel.isCollapsed)return;wrapSel('color',colI.value)}
+  bar.appendChild(colI);bar.appendChild(rdiv())
+  bar.appendChild(rb('Clear','removeFormat'))
+  const ed=document.createElement('div');ed.className='rt-ed';ed.contentEditable='true'
+  if(block.html)ed.innerHTML=block.html
+  function sync(){block.html=ed.innerHTML;onChange(block)}
+  ed.oninput=sync
+  const hint=document.createElement('p');hint.style.cssText='font-size:10px;color:var(--g400);margin-top:4px';hint.textContent='Select text, then apply formatting from toolbar.'
+  wrap.appendChild(bar);wrap.appendChild(ed);wrap.appendChild(hint)
+  wrap.appendChild(mkMS(block,onChange))
+  return wrap
+}
+
+const BLBL={image:'🖼  Full-Width Image',text:'✏️  Text Copy',grid2:'▦  2-Column Grid',grid2x2:'⊞  2 × 2 Grid'}
+
+function mkBW(block,i,total,onUp,onDown,onArch,inner){
+  const wrap=document.createElement('div');wrap.className='bw'
+  let open=true
+  const head=document.createElement('div');head.className='bw-h'
+  const lbtn=document.createElement('button');lbtn.className='bw-hl'
+  const tog=document.createElement('span');tog.style.cssText='font-size:9px;color:var(--g400)';tog.textContent='▼'
+  lbtn.appendChild(tog)
+  const ltxt=document.createElement('span');ltxt.textContent=BLBL[block.type]||block.type;lbtn.appendChild(ltxt)
+  const acts=document.createElement('div');acts.className='bw-ha'
+  function bic(html,dis,fn){const b=document.createElement('button');b.className='bic';b.innerHTML=html;b.disabled=dis;b.onclick=e=>{e.stopPropagation();fn()};return b}
+  acts.appendChild(bic('↑',i===0,onUp))
+  acts.appendChild(bic('↓',i===total-1,onDown))
+  const ab=document.createElement('button');ab.className='bic';ab.title='Archive';ab.style.color='var(--amber500)';ab.innerHTML='⊘'
+  ab.onclick=e=>{e.stopPropagation();onArch()};acts.appendChild(ab)
+  head.appendChild(lbtn);head.appendChild(acts)
+  const body=document.createElement('div');body.className='bw-body';body.appendChild(inner)
+  lbtn.onclick=()=>{open=!open;tog.textContent=open?'▼':'▶';body.style.display=open?'':'none'}
+  wrap.appendChild(head);wrap.appendChild(body);return wrap
+}
+
+function mkBlockInner(block,onChange){
+  if(block.type==='image'){
+    const w=document.createElement('div');w.className='sp4'
+    w.appendChild(mkIU({label:'Image',value:block.url||'',onChange:v=>{block.url=v;onChange(block)},aspect:'16/9',acceptVideo:true}))
+    w.appendChild(mkMS(block,onChange));return w
+  }
+  if(block.type==='text')return mkRT(block,onChange)
+  if(block.type==='grid2'||block.type==='grid2x2'){
+    const w=document.createElement('div')
+    const cnt=block.type==='grid2'?2:4
+    if(!block.images||block.images.length<cnt)block.images=Array(cnt).fill('').map((v,j)=>(block.images||[])[j]||'')
+    const grid=document.createElement('div');grid.className='g2';grid.style.marginBottom='16px'
+    for(let j=0;j<cnt;j++){
+      grid.appendChild(mkIU({label:`Image ${j+1}`,value:block.images[j]||'',onChange:v=>{block.images[j]=v;onChange(block)},aspect:'1/1'}))
+    }
+    w.appendChild(grid);w.appendChild(mkMS(block,onChange));return w
+  }
+  const d=document.createElement('div');d.textContent='Unknown: '+block.type;return d
+}
+
+function renderBlocksSection(container,item){
+  const card=document.createElement('div');card.className='sc'
+  card.innerHTML='<div class="sc-h"><h3>Gallery & Content Blocks</h3></div>'
+  const body=document.createElement('div');body.className='sc-b sp'
+  const hint=document.createElement('p');hint.style.cssText='font-size:12px;color:var(--g400)'
+  hint.textContent='Build the page by stacking blocks. Use ↑ ↓ to reorder, ⊘ to archive.'
+  body.appendChild(hint)
+  if(!item.blocks)item.blocks=[]
+  if(!item.archivedBlocks)item.archivedBlocks=[]
+  const bd=document.createElement('div');body.appendChild(bd)
+  function renderBlocks(){
+    bd.innerHTML=''
+    if(!item.blocks.length){
+      const emp=document.createElement('div');emp.style.cssText='text-align:center;padding:48px;border:2px dashed var(--g200);border-radius:12px;color:var(--g400);font-size:13px;margin-bottom:8px'
+      emp.textContent='No blocks yet — add one below';bd.appendChild(emp)
+    }else{
+      item.blocks.forEach((blk,i)=>{
+        const inner=mkBlockInner(blk,b=>{item.blocks[i]=b})
+        bd.appendChild(mkBW(blk,i,item.blocks.length,
+          ()=>{if(i>0){[item.blocks[i-1],item.blocks[i]]=[item.blocks[i],item.blocks[i-1]];renderBlocks()}},
+          ()=>{if(i<item.blocks.length-1){[item.blocks[i],item.blocks[i+1]]=[item.blocks[i+1],item.blocks[i]];renderBlocks()}},
+          ()=>{item.archivedBlocks.unshift(item.blocks.splice(i,1)[0]);renderBlocks()},
+          inner))
       })
-    ])
-    if (!r1.ok || !r2.ok) throw new Error('Server error')
-    toast(`"${meta.title || slug}" saved`, 'ok')
-    // Update local data
-    const idx = projectsData.findIndex(p => p.slug === slug)
-    if (idx >= 0) projectsData[idx] = { ...projectsData[idx], ...meta }
-  } catch(e) { toast(e.message || 'Save failed', 'err') }
-}
-
-async function deleteProject(slug) {
-  if (!confirm(`Delete project "${slug}"? This cannot be undone.`)) return
-  try {
-    const r = await fetch(`${API}/project/${slug}`, { method:'DELETE', headers:ah() })
-    if (!r.ok) throw new Error()
-    toast('Project deleted', 'ok')
-    projectsData = projectsData.filter(p => p.slug !== slug)
-    delete projectPageData[slug]
-    renderProjectsList()
-  } catch { toast('Delete failed', 'err') }
-}
-
-async function createProject() {
-  const g = id => document.getElementById(id)?.value.trim() || ''
-  const slug = g('mp-slug'), title = g('mp-title')
-  if (!slug || !title) { toast('Title and slug required', 'err'); return }
-  try {
-    const r = await fetch(`${API}/project`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-token': TOKEN },
-      body: JSON.stringify({ slug, title, category: g('mp-cat'), year: g('mp-year'), client: g('mp-client'), scope: g('mp-scope'), role: g('mp-role'), description: g('mp-desc') })
+    }
+    // Add block row
+    const abRow=document.createElement('div');abRow.className='ab-row'
+    const abLbl=document.createElement('div');abLbl.className='ab-lbl';abLbl.textContent='Add Block'
+    const abBtns=document.createElement('div');abBtns.className='ab-btns'
+    ;[['image','🖼  Full-Width Image'],['text','✏️  Text Copy'],['grid2','▦  2-Column Grid'],['grid2x2','⊞  2 × 2 Grid']].forEach(([type,lbl])=>{
+      const b=document.createElement('button');b.className='ab-btn';b.textContent='+ '+lbl
+      b.onclick=()=>{
+        const def={marginTop:10,marginBottom:10,marginLeft:0,marginRight:0}
+        const nb=type==='image'?{id:UID(),type:'image',url:'',...def}:type==='text'?{id:UID(),type:'text',html:'',...def}:type==='grid2'?{id:UID(),type:'grid2',images:['',''],...def}:{id:UID(),type:'grid2x2',images:['','','',''],...def}
+        item.blocks.push(nb);renderBlocks()
+      }
+      abBtns.appendChild(b)
     })
-    const d = await r.json()
-    if (!r.ok) throw new Error(d.error)
-    closeM('m-project')
-    toast(`"${title}" created`, 'ok')
-    await loadProjects()
-  } catch(e) { toast(e.message || 'Failed', 'err') }
-}
-
-// ══════════════════════════════════════════════════════════
-// ARTICLES
-// ══════════════════════════════════════════════════════════
-let articlesData = []
-let articlePageData = {}
-
-async function loadArticles() {
-  try {
-    const r = await fetch(`${API}/insights`, { headers: ah() })
-    articlesData = r.ok ? await r.json() : []
-  } catch { articlesData = [] }
-  renderArticlesList()
-}
-
-function renderArticlesList() {
-  const c = document.getElementById('content')
-  if (!articlesData.length) {
-    c.innerHTML = `<div class="list-page">
-      <div class="list-top"><div><h2>Articles</h2><p>No articles yet</p></div><button class="btn btn-navy" onclick="openM('m-article')">+ Add New Article</button></div>
-      <div class="empty-state" style="padding:40px 0"><p>Create your first article using the button above.</p></div>
-    </div>`
-    return
-  }
-  const cards = articlesData.map((a, i) => buildArticleCard(a, i)).join('')
-  c.innerHTML = `<div class="list-page">
-    <div class="list-top">
-      <div><h2>Articles</h2><p>${articlesData.length} article${articlesData.length===1?'':'s'}</p></div>
-      <button class="btn btn-navy" onclick="openM('m-article')">+ Add New Article</button>
-    </div>
-    <div id="articles-list">${cards}</div>
-  </div>`
-}
-
-function buildArticleCard(a, i) {
-  const slug = a.slug || ''
-  return `<div class="proj-card" id="acard-${slug}">
-    <div class="proj-header" onclick="toggleArticleCard('${slug}')">
-      <span class="proj-toggle">▼</span>
-      <span class="proj-cat-tag">${esc(a.category||'Article')}</span>
-      <span class="proj-title">${esc(a.title||slug)}</span>
-      <span class="proj-year">${esc(a.date||'')}</span>
-      <div class="proj-actions" onclick="event.stopPropagation()">
-        <a href="/insights/${slug}.html" target="_blank" class="btn btn-ghost" style="padding:4px 8px;font-size:10px" title="View">↗</a>
-        <button class="btn-danger-sm" onclick="deleteArticle('${slug}')" title="Delete">✕</button>
-      </div>
-    </div>
-    <div class="proj-body" id="abody-${slug}">
-      <div id="aform-${slug}">Loading…</div>
-    </div>
-  </div>`
-}
-
-async function toggleArticleCard(slug) {
-  const card = document.getElementById(`acard-${slug}`)
-  if (!card) return
-  const wasOpen = card.classList.contains('open')
-  card.classList.toggle('open')
-  if (!wasOpen && !articlePageData[slug]) {
-    await loadArticleData(slug)
-  }
-}
-
-async function loadArticleData(slug) {
-  const formEl = document.getElementById(`aform-${slug}`)
-  if (!formEl) return
-  try {
-    const r = await fetch(`${API}/content/${slug}`, { headers: ah() })
-    const content = r.ok ? await r.json() : {}
-    articlePageData[slug] = content
-    renderArticleForm(slug, articlesData.find(a => a.slug === slug) || {}, content)
-  } catch(e) {
-    if (formEl) formEl.innerHTML = `<div style="color:red;font-size:12px">Error: ${e.message}</div>`
-  }
-}
-
-function renderArticleForm(slug, meta, content) {
-  const formEl = document.getElementById(`aform-${slug}`)
-  if (!formEl) return
-  const blocks = content.blocks || []
-  const blocksHTML = blocks.map((b, bi) => buildBlockCard(b, bi, `a-${slug}`)).join('')
-  formEl.innerHTML = `
-    <div class="field-grid">
-      <div class="f-group"><label class="f-label">Title</label><input type="text" id="am-title-${slug}" value="${esc(meta.title||'')}" oninput="markDirty()"/></div>
-      <div class="f-group"><label class="f-label">Slug</label><input type="text" id="am-slug-${slug}" value="${esc(slug)}" readonly style="background:#f5f5f5;color:#888"/></div>
-      <div class="f-group"><label class="f-label">Category</label><input type="text" id="am-cat-${slug}" value="${esc(meta.category||'')}" oninput="markDirty()"/></div>
-      <div class="f-group"><label class="f-label">Date</label><input type="date" id="am-date-${slug}" value="${esc(meta.date||'')}" oninput="markDirty()"/></div>
-    </div>
-    <div class="f-group full"><label class="f-label">Excerpt</label><textarea id="am-excerpt-${slug}" style="min-height:60px" oninput="markDirty()">${esc(meta.excerpt||'')}</textarea></div>
-    <div class="f-group full"><label class="f-label">Body HTML</label><textarea id="am-body-${slug}" style="min-height:160px;font-family:monospace;font-size:12px" oninput="markDirty()">${esc(content.fields?.body || meta.body || '')}</textarea></div>
-    <div class="blocks-section">
-      <div class="sec-div">Content Blocks</div>
-      <div class="blocks-list" id="blocks-a-${slug}">${blocksHTML || '<div style="color:#bbb;font-size:12px;padding:8px 0">No blocks yet.</div>'}</div>
-      <div class="add-blocks">
-        <button class="add-block-btn" onclick="addArticleBlock('${slug}','full-image')">+ Full-Width Image</button>
-        <button class="add-block-btn" onclick="addArticleBlock('${slug}','text')">+ Text</button>
-        <button class="add-block-btn" onclick="addArticleBlock('${slug}','quote')">+ Quote</button>
-        <button class="add-block-btn" onclick="addArticleBlock('${slug}','gallery')">+ Gallery</button>
-        <button class="add-block-btn" onclick="addArticleBlock('${slug}','video')">+ Video/GIF</button>
-        <button class="add-block-btn" onclick="addArticleBlock('${slug}','image-text')">+ Image+Text</button>
-        <button class="add-block-btn" onclick="addArticleBlock('${slug}','spacer')">+ Spacer</button>
-      </div>
-    </div>
-    <div style="margin-top:16px;display:flex;gap:8px">
-      <button class="btn btn-navy" onclick="saveArticle('${slug}')">Save Article</button>
-      <button class="btn btn-ghost" onclick="deleteArticle('${slug}')" style="color:var(--danger);border-color:var(--danger)">Delete</button>
-    </div>`
-  // wire up article blocks
-  articlePageData[slug] = { ...articlePageData[slug], blocks }
-}
-
-function addArticleBlock(slug, type) {
-  const key = `a-${slug}`
-  if (!articlePageData[slug]) articlePageData[slug] = { blocks: [] }
-  if (!articlePageData[slug].blocks) articlePageData[slug].blocks = []
-  const defaults = {
-    'full-image': { type:'full-image', url:'', mt:0, mb:0, ml:0, mr:0 },
-    'text': { type:'text', text:'' },
-    'quote': { type:'quote', text:'', attribution:'' },
-    'gallery': { type:'gallery', images:[] },
-    'video': { type:'video', url:'', caption:'' },
-    'image-text': { type:'image-text', img:'', text:'', side:'left' },
-    'spacer': { type:'spacer', height:80 },
-  }
-  articlePageData[slug].blocks.push({ ...defaults[type] })
-  markDirty()
-  rerenderArticleBlocks(slug)
-}
-
-function rerenderArticleBlocks(slug) {
-  const el = document.getElementById(`blocks-a-${slug}`)
-  if (!el) return
-  const blocks = articlePageData[slug]?.blocks || []
-  el.innerHTML = blocks.map((b, bi) => buildBlockCard(b, bi, `a-${slug}`)).join('') || '<div style="color:#bbb;font-size:12px;padding:8px 0">No blocks yet.</div>'
-}
-
-// Article blocks reuse proj block functions by mapping 'a-{slug}' keys
-// We override setBlockProp and related to handle article prefix:
-function getArticleSlugFromKey(key) {
-  // key format: 'a-{slug}'
-  return key.startsWith('a-') ? key.slice(2) : null
-}
-
-// Patch setBlockProp to handle article slugs
-const _origSetBlockProp = setBlockProp
-function setBlockProp(slug, bi, key, val) {
-  const realSlug = slug.startsWith('a-') ? slug.slice(2) : null
-  if (realSlug) {
-    if (!articlePageData[realSlug]) return
-    if (!articlePageData[realSlug].blocks) articlePageData[realSlug].blocks = []
-    if (articlePageData[realSlug].blocks[bi]) {
-      articlePageData[realSlug].blocks[bi][key] = val
+    abRow.appendChild(abLbl);abRow.appendChild(abBtns);bd.appendChild(abRow)
+    // Archived blocks
+    if(item.archivedBlocks.length){
+      const archDiv=document.createElement('div');archDiv.style.cssText='border-top:1px solid var(--g100);margin-top:24px;padding-top:20px'
+      const tog2=document.createElement('button');tog2.style.cssText='display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--amber500);background:none;border:none;cursor:pointer;padding:0'
+      tog2._o=false;tog2.textContent=`▶ Archive — ${item.archivedBlocks.length} block${item.archivedBlocks.length!==1?'s':''}`
+      const archList=document.createElement('div');archList.style.display='none'
+      tog2.onclick=()=>{
+        tog2._o=!tog2._o;archList.style.display=tog2._o?'block':'none'
+        tog2.textContent=(tog2._o?'▼':'▶')+` Archive — ${item.archivedBlocks.length} block${item.archivedBlocks.length!==1?'s':''}`
+      }
+      item.archivedBlocks.forEach((blk,i)=>{
+        const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--amber50);border:1px solid var(--amber100);border-radius:8px;margin-bottom:8px;margin-top:8px'
+        const lbl2=document.createElement('span');lbl2.style.cssText='font-size:13px;color:var(--g600)';lbl2.textContent=BLBL[blk.type]||blk.type
+        const ra=document.createElement('div');ra.style.cssText='display:flex;gap:8px'
+        const rb2=document.createElement('button');rb2.className='bn';rb2.textContent='Restore'
+        rb2.onclick=()=>{item.blocks.push(item.archivedBlocks.splice(i,1)[0]);renderBlocks()}
+        const db2=document.createElement('button');db2.className='bd';db2.textContent='Delete Forever'
+        db2.onclick=()=>{if(confirm('Delete permanently?')){item.archivedBlocks.splice(i,1);renderBlocks()}}
+        ra.appendChild(rb2);ra.appendChild(db2);row.appendChild(lbl2);row.appendChild(ra);archList.appendChild(row)
+      })
+      archDiv.appendChild(tog2);archDiv.appendChild(archList);bd.appendChild(archDiv)
     }
-    markDirty()
-  } else {
-    if (!projectPageData[slug]) return
-    if (!projectPageData[slug].blocks) projectPageData[slug].blocks = []
-    if (projectPageData[slug].blocks[bi]) {
-      projectPageData[slug].blocks[bi][key] = val
-    }
-    markDirty()
   }
+  renderBlocks();card.appendChild(body);container.appendChild(card)
 }
 
-function toggleBlockCard(slug, bi) {
-  document.getElementById(`blk-${slug}-${bi}`)?.classList.toggle('open')
+// ── Site Settings ─────────────────────────────────────────────────────────────
+function renderSite(){
+  const c=document.getElementById('editor-inner');c.innerHTML=''
+  if(!S.data.siteTitle)Object.assign(S.data,{siteTitle:'Eyuel Mulat — Design Studio',metaDescription:'Strategic design for ambitious brands.',favicon:'',ogImage:''})
+  c.appendChild(mkSC('Site Identity',mkInput('Site Title','siteTitle',S.data),mkTextarea('Meta Description','metaDescription',S.data,2)))
+  c.appendChild(mkSC('SEO & Social',mkIU({label:'Favicon',hint:'Square icon (32×32)',value:S.data.favicon||'',onChange:v=>S.data.favicon=v,aspect:'1/1'}),mkIU({label:'OG Image',hint:'1200×630 — shown in link previews',value:S.data.ogImage||'',onChange:v=>S.data.ogImage=v,aspect:'16/9'})))
 }
 
-function moveProjBlock(slug, bi, dir) {
-  const realSlug = slug.startsWith('a-') ? slug.slice(2) : null
-  const data = realSlug ? articlePageData[realSlug] : projectPageData[slug]
-  const blocks = data?.blocks
-  if (!blocks) return
-  const j = bi + dir
-  if (j < 0 || j >= blocks.length) return
-  ;[blocks[bi], blocks[j]] = [blocks[j], blocks[bi]]
-  markDirty()
-  if (realSlug) rerenderArticleBlocks(realSlug)
-  else rerenderProjBlocks(slug)
-}
-
-function removeProjBlock(slug, bi) {
-  if (!confirm('Remove this block?')) return
-  const realSlug = slug.startsWith('a-') ? slug.slice(2) : null
-  const data = realSlug ? articlePageData[realSlug] : projectPageData[slug]
-  data?.blocks?.splice(bi, 1)
-  markDirty()
-  if (realSlug) rerenderArticleBlocks(realSlug)
-  else rerenderProjBlocks(slug)
-}
-
-function setBlockGalleryImg(slug, bi, j, val) {
-  const realSlug = slug.startsWith('a-') ? slug.slice(2) : null
-  const data = realSlug ? articlePageData[realSlug] : projectPageData[slug]
-  if (data?.blocks?.[bi]?.images) { data.blocks[bi].images[j] = val; markDirty() }
-}
-
-function removeGalleryImgProj(slug, bi, j) {
-  const realSlug = slug.startsWith('a-') ? slug.slice(2) : null
-  const data = realSlug ? articlePageData[realSlug] : projectPageData[slug]
-  data?.blocks?.[bi]?.images?.splice(j, 1)
-  markDirty()
-  if (realSlug) rerenderArticleBlocks(realSlug)
-  else rerenderProjBlocks(slug)
-}
-
-async function uploadGalleryProj(input, slug, bi) {
-  const realSlug = slug.startsWith('a-') ? slug.slice(2) : null
-  const data = realSlug ? articlePageData[realSlug] : projectPageData[slug]
-  for (const file of input.files) {
-    const fd = new FormData(); fd.append('file', file)
-    try {
-      const r = await fetch(`${API}/upload`, { method:'POST', headers:{'x-token':TOKEN}, body:fd })
-      const d = await r.json()
-      if (!r.ok) continue
-      if (!data.blocks[bi].images) data.blocks[bi].images = []
-      data.blocks[bi].images.push(d.url)
-    } catch {}
+// ── Navigation ────────────────────────────────────────────────────────────────
+function renderNav(){
+  const c=document.getElementById('editor-inner');c.innerHTML=''
+  if(!S.data.logoText)Object.assign(S.data,{logoText:'EYUEL MULAT',logoImage:'',navLinks:[{label:'About',href:'/about.html'},{label:'Work',href:'/work.html'},{label:'Insights',href:'/insights.html'},{label:'Contact',href:'/contact.html'}]})
+  if(!S.data.navLinks)S.data.navLinks=[]
+  c.appendChild(mkSC('Logo',mkInput('Logo Text','logoText',S.data),mkIU({label:'Logo Image',hint:'Leave blank to use text',value:S.data.logoImage||'',onChange:v=>S.data.logoImage=v,aspect:'4/1'})))
+  const lCard=document.createElement('div');lCard.className='sc';lCard.innerHTML='<div class="sc-h"><h3>Navigation Links</h3></div>'
+  const lb=document.createElement('div');lb.className='sc-b'
+  const ld=document.createElement('div');ld.className='sp4'
+  function rnl(){
+    ld.innerHTML=''
+    S.data.navLinks.forEach((lnk,i)=>{
+      const row=document.createElement('div');row.style.cssText='display:flex;gap:8px;align-items:flex-end'
+      const lf=document.createElement('div');lf.style.flex='1'
+      const ll=document.createElement('label');ll.className='fl';ll.textContent='Label'
+      const li=document.createElement('input');li.className='fi';li.value=lnk.label;li.oninput=()=>lnk.label=li.value
+      lf.appendChild(ll);lf.appendChild(li)
+      const hf=document.createElement('div');hf.style.flex='2'
+      const hl2=document.createElement('label');hl2.className='fl';hl2.textContent='URL'
+      const hi=document.createElement('input');hi.className='fi';hi.value=lnk.href;hi.oninput=()=>lnk.href=hi.value
+      hf.appendChild(hl2);hf.appendChild(hi)
+      const db=document.createElement('button');db.className='bd';db.textContent='✕';db.style.marginBottom='2px'
+      db.onclick=()=>{S.data.navLinks.splice(i,1);rnl()}
+      row.appendChild(lf);row.appendChild(hf);row.appendChild(db);ld.appendChild(row)
+    })
+    const add=document.createElement('button');add.className='bs';add.textContent='+ Add Link'
+    add.onclick=()=>{S.data.navLinks.push({label:'New Link',href:'/'});rnl()}
+    ld.appendChild(add)
   }
-  markDirty()
-  if (realSlug) rerenderArticleBlocks(realSlug)
-  else rerenderProjBlocks(slug)
-  toast('Images uploaded','ok')
+  rnl();lb.appendChild(ld);lCard.appendChild(lb);c.appendChild(lCard)
 }
 
-async function saveArticle(slug) {
-  const g = id => document.getElementById(id)?.value || ''
-  // Sync block urls
-  const blocks = articlePageData[slug]?.blocks || []
-  blocks.forEach((b, bi) => {
-    const sid = `a-${slug}-${bi}`
-    if (b.type === 'full-image') { const inp = document.getElementById(`bfull-${sid}`); if (inp) b.url = inp.value }
-    if (b.type === 'video') { const inp = document.getElementById(`bvid-${sid}`); if (inp) b.url = inp.value }
-    if (b.type === 'image-text') { const inp = document.getElementById(`bit-${sid}`); if (inp) b.img = inp.value }
+// ── Hero ──────────────────────────────────────────────────────────────────────
+function renderHero(){
+  const c=document.getElementById('editor-inner');c.innerHTML=''
+  if(!S.data.headline)Object.assign(S.data,{headline:'Design That Thinks',subline:'Brand strategy, identity systems, and digital experiences for forward-moving companies.',ctaText:'View Work',ctaLink:'/work.html',bgMedia:''})
+  c.appendChild(mkSC('Hero Text',mkInput('Headline','headline',S.data),mkTextarea('Subline','subline',S.data,2),mkInput('CTA Button Text','ctaText',S.data),mkInput('CTA Button Link','ctaLink',S.data)))
+  c.appendChild(mkSC('Background Media',mkIU({label:'Background Image or Video',hint:'1920×1080 — accepts MP4/WEBM',value:S.data.bgMedia||'',onChange:v=>S.data.bgMedia=v,aspect:'16/9',acceptVideo:true})))
+}
+
+// ── Slideshow ─────────────────────────────────────────────────────────────────
+function renderSlideshow(){
+  const c=document.getElementById('editor-inner');c.innerHTML=''
+  if(!Array.isArray(S.data))S.data=[]
+  const slides=S.data
+  function rsl(){
+    c.innerHTML='<p class="pg-intro">Hero slideshow images — displayed in order.</p>'
+    slides.forEach((sl,i)=>{
+      const card=document.createElement('div');card.className='sc';card.style.marginBottom='16px'
+      card.innerHTML=`<div class="sc-h" style="display:flex;justify-content:space-between;align-items:center"><h3>Slide ${i+1}</h3><button class="bd" data-i="${i}">Remove</button></div>`
+      card.querySelector('.bd').onclick=()=>{slides.splice(i,1);rsl()}
+      const body=document.createElement('div');body.className='sc-b sp'
+      body.appendChild(mkIU({label:'Image / Video',value:sl.media||sl.image||'',onChange:v=>{sl.media=v;sl.image=v},aspect:'16/9',acceptVideo:true}))
+      const tf=document.createElement('div')
+      const tl=document.createElement('label');tl.className='fl';tl.textContent='Title (optional)'
+      const ti=document.createElement('input');ti.className='fi';ti.value=sl.title||'';ti.oninput=()=>sl.title=ti.value
+      tf.appendChild(tl);tf.appendChild(ti);body.appendChild(tf);card.appendChild(body);c.appendChild(card)
+    })
+    const add=document.createElement('button');add.className='bdash';add.textContent='+ Add Slide'
+    add.onclick=()=>{slides.push({media:'',title:''});rsl()};c.appendChild(add)
+  }
+  rsl()
+}
+
+// ── About ─────────────────────────────────────────────────────────────────────
+function renderAbout(){
+  const c=document.getElementById('editor-inner');c.innerHTML=''
+  if(!S.data.headline)Object.assign(S.data,{headline:'Design is thinking made visual.',bio:'Eyuel Mulat is a design director and brand strategist based in Addis Ababa.',portraitImage:'',stat1Label:'Years Active',stat1Value:'8+',stat2Label:'Projects',stat2Value:'120+',stat3Label:'Clients',stat3Value:'60+'})
+  c.appendChild(mkSC('Portrait',mkIU({label:'Portrait Image',hint:'Best at 800×1000',value:S.data.portraitImage||'',onChange:v=>S.data.portraitImage=v,aspect:'4/5'})))
+  c.appendChild(mkSC('Text',mkInput('Headline','headline',S.data),mkTextarea('Bio','bio',S.data,4)))
+  const sg=document.createElement('div');sg.className='g3'
+  ;['1','2','3'].forEach(n=>{
+    const d=document.createElement('div');d.className='sp4'
+    const lf=document.createElement('div');const ll=document.createElement('label');ll.className='fl';ll.textContent='Label';const li=document.createElement('input');li.className='fi';li.value=S.data['stat'+n+'Label']||'';li.oninput=()=>S.data['stat'+n+'Label']=li.value;lf.appendChild(ll);lf.appendChild(li)
+    const vf=document.createElement('div');const vl=document.createElement('label');vl.className='fl';vl.textContent='Value';const vi=document.createElement('input');vi.className='fi';vi.value=S.data['stat'+n+'Value']||'';vi.oninput=()=>S.data['stat'+n+'Value']=vi.value;vf.appendChild(vl);vf.appendChild(vi)
+    d.appendChild(lf);d.appendChild(vf);sg.appendChild(d)
   })
-  const meta = {
-    title: g(`am-title-${slug}`),
-    category: g(`am-cat-${slug}`),
-    date: g(`am-date-${slug}`),
-    excerpt: g(`am-excerpt-${slug}`),
+  c.appendChild(mkSC('Stats',sg))
+}
+
+// ── Capabilities ──────────────────────────────────────────────────────────────
+function renderCapabilities(){
+  const c=document.getElementById('editor-inner');c.innerHTML=''
+  if(!Array.isArray(S.data)||!S.data.length)S.data=[{id:'1',icon:'',title:'Brand Strategy',description:'Defining the core essence, positioning, and architectural narrative of your brand.'},{id:'2',icon:'',title:'Identity Design',description:'Visual systems built on grid-based precision and timeless modernist principles.'},{id:'3',icon:'',title:'Digital Build',description:'High-performance digital experiences that prioritize clarity and user flow.'}]
+  const caps=S.data
+  function rc(){
+    c.innerHTML='<p class="pg-intro">Capabilities shown on the homepage.</p>'
+    caps.forEach((cap,i)=>{
+      const card=document.createElement('div');card.className='sc';card.style.marginBottom='16px'
+      card.innerHTML=`<div class="sc-h" style="display:flex;justify-content:space-between;align-items:center"><h3>${cap.title||'Capability '+(i+1)}</h3><button class="bd">Remove</button></div>`
+      card.querySelector('.bd').onclick=()=>{caps.splice(i,1);rc()}
+      const body=document.createElement('div');body.className='sc-b sp'
+      body.appendChild(mkIU({label:'Icon / Logo',hint:'SVG or PNG, ideally square',value:cap.icon||'',onChange:v=>cap.icon=v,aspect:'1/1'}))
+      const tf=document.createElement('div');tf.className='sp4'
+      const tl=document.createElement('label');tl.className='fl';tl.textContent='Title'
+      const ti=document.createElement('input');ti.className='fi';ti.value=cap.title||'';ti.oninput=()=>{cap.title=ti.value;card.querySelector('h3').textContent=ti.value||'Capability '+(i+1)};tf.appendChild(tl);tf.appendChild(ti)
+      const dl=document.createElement('label');dl.className='fl';dl.style.marginTop='12px';dl.textContent='Description'
+      const da=document.createElement('textarea');da.className='fta';da.rows=2;da.value=cap.description||'';da.oninput=()=>cap.description=da.value;tf.appendChild(dl);tf.appendChild(da)
+      body.appendChild(tf);card.appendChild(body);c.appendChild(card)
+    })
+    const add=document.createElement('button');add.className='bdash';add.textContent='+ Add Capability'
+    add.onclick=()=>{caps.push({id:UID(),icon:'',title:'New Capability',description:''});rc()};c.appendChild(add)
   }
-  const content = {
-    ...articlePageData[slug],
-    fields: { ...meta, body: g(`am-body-${slug}`) }
+  rc()
+}
+
+// ── Categories ────────────────────────────────────────────────────────────────
+function renderCategories(){
+  const c=document.getElementById('editor-inner');c.innerHTML=''
+  if(!Array.isArray(S.data)||!S.data.length)S.data=[{id:'brand',name:'Brand Identity',slug:'brand'},{id:'web',name:'Web Design',slug:'web'},{id:'motion',name:'Motion',slug:'motion'},{id:'editorial',name:'Editorial',slug:'editorial'},{id:'branding-ui',name:'Branding & UI',slug:'branding-ui'},{id:'identity',name:'Identity System',slug:'identity'}]
+  const cats=S.data
+  function rcat(){
+    c.innerHTML='<p class="pg-intro">Work page filter categories.</p>'
+    const card=document.createElement('div');card.className='sc';card.innerHTML='<div class="sc-h"><h3>Categories</h3></div>'
+    const body=document.createElement('div');body.className='sc-b'
+    const list=document.createElement('div');list.className='sp4'
+    cats.forEach((cat,i)=>{
+      const row=document.createElement('div');row.style.cssText='display:flex;gap:8px;align-items:flex-end'
+      const nf=document.createElement('div');nf.style.flex='2'
+      const nl=document.createElement('label');nl.className='fl';nl.textContent='Name'
+      const ni=document.createElement('input');ni.className='fi';ni.value=cat.name||'';ni.oninput=()=>cat.name=ni.value;nf.appendChild(nl);nf.appendChild(ni)
+      const sf=document.createElement('div');sf.style.flex='1'
+      const sl=document.createElement('label');sl.className='fl';sl.textContent='Slug'
+      const si=document.createElement('input');si.className='fi';si.value=cat.slug||'';si.oninput=()=>cat.slug=slugify(si.value);sf.appendChild(sl);sf.appendChild(si)
+      const db=document.createElement('button');db.className='bd';db.textContent='✕';db.style.marginBottom='2px';db.onclick=()=>{cats.splice(i,1);rcat()}
+      row.appendChild(nf);row.appendChild(sf);row.appendChild(db);list.appendChild(row)
+    })
+    const add=document.createElement('button');add.className='bs';add.textContent='+ Add Category'
+    add.onclick=()=>{cats.push({id:UID(),name:'New Category',slug:'new-category'});rcat()}
+    list.appendChild(add);body.appendChild(list);card.appendChild(body);c.appendChild(card)
   }
-  try {
-    const r = await fetch(`${API}/content/${slug}`, {
-      method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-token': TOKEN },
-      body: JSON.stringify(content)
-    })
-    if (!r.ok) throw new Error('Server error')
-    // Also update insights list
-    await fetch(`${API}/insight`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-token': TOKEN },
-      body: JSON.stringify({ slug, ...meta, body: g(`am-body-${slug}`) })
-    })
-    toast(`"${meta.title || slug}" saved`, 'ok')
-    const idx = articlesData.findIndex(a => a.slug === slug)
-    if (idx >= 0) articlesData[idx] = { ...articlesData[idx], ...meta }
-  } catch(e) { toast(e.message || 'Save failed', 'err') }
+  rcat()
 }
 
-async function deleteArticle(slug) {
-  if (!confirm(`Delete article "${slug}"? This cannot be undone.`)) return
-  try {
-    const r = await fetch(`${API}/insight/${slug}`, { method:'DELETE', headers:ah() })
-    if (!r.ok) throw new Error()
-    toast('Article deleted', 'ok')
-    articlesData = articlesData.filter(a => a.slug !== slug)
-    delete articlePageData[slug]
-    renderArticlesList()
-  } catch { toast('Delete failed', 'err') }
-}
-
-async function createArticle() {
-  const g = id => document.getElementById(id)?.value.trim() || ''
-  const slug = g('ma-slug'), title = g('ma-title')
-  if (!slug || !title) { toast('Title and slug required', 'err'); return }
-  try {
-    const r = await fetch(`${API}/insight`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-token': TOKEN },
-      body: JSON.stringify({ slug, title, category: g('ma-cat'), date: g('ma-date'), excerpt: g('ma-excerpt'), body: g('ma-body') })
+// ── Clients ───────────────────────────────────────────────────────────────────
+function renderClients(){
+  const c=document.getElementById('editor-inner');c.innerHTML=''
+  if(!Array.isArray(S.data)||!S.data.length)S.data=[{id:'1',name:'Nexus Technologies',logo:'',url:''},{id:'2',name:'Vanguard Capital',logo:'',url:''},{id:'3',name:'Orion Group',logo:'',url:''}]
+  const clients=S.data
+  function rcl(){
+    c.innerHTML='<p class="pg-intro">Client logos on the homepage.</p>'
+    clients.forEach((cl,i)=>{
+      const card=document.createElement('div');card.className='sc';card.style.marginBottom='16px'
+      card.innerHTML=`<div class="sc-h" style="display:flex;justify-content:space-between;align-items:center"><h3>${cl.name||'Client '+(i+1)}</h3><button class="bd">Remove</button></div>`
+      card.querySelector('.bd').onclick=()=>{clients.splice(i,1);rcl()}
+      const body=document.createElement('div');body.className='sc-b sp'
+      body.appendChild(mkIU({label:'Logo',hint:'SVG or transparent PNG recommended',value:cl.logo||'',onChange:v=>cl.logo=v,aspect:'3/1'}))
+      const g=document.createElement('div');g.className='g2'
+      const nf=document.createElement('div');const nl=document.createElement('label');nl.className='fl';nl.textContent='Client Name';const ni=document.createElement('input');ni.className='fi';ni.value=cl.name||'';ni.oninput=()=>{cl.name=ni.value;card.querySelector('h3').textContent=ni.value||'Client '+(i+1)};nf.appendChild(nl);nf.appendChild(ni)
+      const uf=document.createElement('div');const ul=document.createElement('label');ul.className='fl';ul.textContent='Website URL';const ui=document.createElement('input');ui.className='fi';ui.type='url';ui.value=cl.url||'';ui.oninput=()=>cl.url=ui.value;uf.appendChild(ul);uf.appendChild(ui)
+      g.appendChild(nf);g.appendChild(uf);body.appendChild(g);card.appendChild(body);c.appendChild(card)
     })
-    const d = await r.json()
-    if (!r.ok) throw new Error(d.error)
-    closeM('m-article')
-    toast(`"${title}" created`, 'ok')
-    await loadArticles()
-  } catch(e) { toast(e.message || 'Failed', 'err') }
+    const add=document.createElement('button');add.className='bdash';add.textContent='+ Add Client'
+    add.onclick=()=>{clients.push({id:UID(),name:'New Client',logo:'',url:''});rcl()};c.appendChild(add)
+  }
+  rcl()
 }
 
-// ══════════════════════════════════════════════════════════
-// MODAL
-// ══════════════════════════════════════════════════════════
-function openM(id)  { document.getElementById(id)?.classList.add('open') }
-function closeM(id) { document.getElementById(id)?.classList.remove('open') }
+// ── Contact ───────────────────────────────────────────────────────────────────
+function renderContact(){
+  const c=document.getElementById('editor-inner');c.innerHTML=''
+  if(!S.data.email)Object.assign(S.data,{email:'hello@eyuelmulat.com',phone:'+251 95 355 3856',address:'Addis Ababa, Ethiopia',headline:"Let's Make Something Great",subline:'Ready to elevate your brand? We\'d love to hear from you.'})
+  if(!Array.isArray(S.contactSvcs))S.contactSvcs=['Brand Strategy','Visual Identity','Creative Direction','Typography','Digital Systems','Editorial Design']
+  c.appendChild(mkSC('Contact Details',mkInput('Email Address','email',S.data),mkInput('Phone','phone',S.data),mkInput('Address','address',S.data),mkInput('Section Headline','headline',S.data),mkTextarea('Section Subline','subline',S.data,2)))
+  const svcsCard=document.createElement('div');svcsCard.className='sc';svcsCard.innerHTML='<div class="sc-h"><h3>Services Checklist</h3></div>'
+  const sb=document.createElement('div');sb.className='sc-b'
+  const sd=document.createElement('div');sd.className='sp4'
+  function rsvc(){
+    sd.innerHTML=''
+    S.contactSvcs.forEach((svc,i)=>{
+      const row=document.createElement('div');row.style.cssText='display:flex;gap:8px;align-items:center'
+      const inp=document.createElement('input');inp.className='fi';inp.value=svc;inp.oninput=()=>S.contactSvcs[i]=inp.value
+      const db=document.createElement('button');db.className='bd';db.textContent='✕';db.onclick=()=>{S.contactSvcs.splice(i,1);rsvc()}
+      row.appendChild(inp);row.appendChild(db);sd.appendChild(row)
+    })
+    const add=document.createElement('button');add.className='bs';add.textContent='+ Add Service';add.onclick=()=>{S.contactSvcs.push('New Service');rsvc()};sd.appendChild(add)
+  }
+  rsvc();sb.appendChild(sd);svcsCard.appendChild(sb);c.appendChild(svcsCard)
+}
 
-// ══════════════════════════════════════════════════════════
-// TOAST
-// ══════════════════════════════════════════════════════════
-let _tt
-function toast(msg, type = '') {
-  const el = document.getElementById('toast')
-  el.textContent = msg; el.className = 'show' + (type ? ' ' + type : '')
-  clearTimeout(_tt); _tt = setTimeout(() => el.className = '', 2600)
+// ── Footer ────────────────────────────────────────────────────────────────────
+function renderFooter(){
+  const c=document.getElementById('editor-inner');c.innerHTML=''
+  if(!S.data.email)Object.assign(S.data,{email:'hello@eyuelmulat.com',phone:'+251 95 355 3856',address:'Addis Ababa, Ethiopia',copyright:'© 2024 Eyuel Mulat',instagram:'',linkedin:'',behance:''})
+  c.appendChild(mkSC('Contact Info',mkInput('Email','email',S.data),mkInput('Phone','phone',S.data),mkInput('Address','address',S.data)))
+  c.appendChild(mkSC('Social Links',mkInput('Instagram URL','instagram',S.data),mkInput('LinkedIn URL','linkedin',S.data),mkInput('Behance URL','behance',S.data)))
+  c.appendChild(mkSC('Copyright',mkInput('Copyright Text','copyright',S.data)))
+}
+
+// ── Portfolio ─────────────────────────────────────────────────────────────────
+function renderPortfolio(){
+  const c=document.getElementById('editor-inner');c.innerHTML=''
+  const p=S.portfolio
+  c.appendChild(mkSC('Section Header',mkInput('Section Title','title',p),mkInput('Subtitle','subtitle',p)))
+  const ld=document.createElement('div');ld.style.marginBottom='16px';c.appendChild(ld)
+
+  function rpl(){
+    ld.innerHTML=''
+    p.items.forEach((item,i)=>{
+      const card=document.createElement('div');card.className='pc'
+      const head=document.createElement('div');head.className='pc-h'
+      const hl=document.createElement('div');hl.className='pc-hl'
+      const cb=document.createElement('span');cb.className='cat-b';cb.textContent=item.category||'—'
+      const tt=document.createElement('span');tt.className='pt';tt.textContent=item.title||'Untitled'
+      const yr=document.createElement('span');yr.className='py';yr.textContent=item.year||''
+      hl.appendChild(cb);hl.appendChild(tt);hl.appendChild(yr)
+      const acts=document.createElement('div');acts.className='pc-acts'
+      const eb=document.createElement('button');eb.className='bn';eb.textContent='Edit Full Project'
+      eb.onclick=e=>{e.stopPropagation();S.editView='project';S.editIdx=i;render()}
+      const ab=document.createElement('button');ab.className='bd';ab.textContent='Archive';ab.style.color='var(--amber500)'
+      ab.onclick=e=>{e.stopPropagation();if(!p.archivedItems)p.archivedItems=[];p.archivedItems.unshift(p.items.splice(i,1)[0]);if(S.expandedProj===i)S.expandedProj=null;rpl()}
+      const tog=document.createElement('span');tog.style.cssText='font-size:11px;color:var(--g400)';tog.textContent=S.expandedProj===i?'▲':'▼'
+      acts.appendChild(eb);acts.appendChild(ab);acts.appendChild(tog)
+      head.appendChild(hl);head.appendChild(acts)
+      head.onclick=()=>{S.expandedProj=S.expandedProj===i?null:i;rpl()}
+      card.appendChild(head)
+      if(S.expandedProj===i){
+        const body=document.createElement('div');body.className='pc-b'
+        // Title & Slug
+        const g1=document.createElement('div');g1.className='g2'
+        const tf=document.createElement('div');const tl=document.createElement('label');tl.className='fl';tl.textContent='Project Title'
+        const ti=document.createElement('input');ti.className='fi';ti.value=item.title||''
+        ti.oninput=()=>{item.title=ti.value;tt.textContent=ti.value||'Untitled';if(!item.slug||item.slug==='new-project')item.slug=slugify(ti.value)};tf.appendChild(tl);tf.appendChild(ti)
+        const sf=document.createElement('div');const sl=document.createElement('label');sl.className='fl';sl.textContent='URL Slug'
+        const si=document.createElement('input');si.className='fi';si.value=item.slug||'';si.placeholder='my-project-name';si.oninput=()=>{item.slug=slugify(si.value);si.value=item.slug};sf.appendChild(sl);sf.appendChild(si)
+        g1.appendChild(tf);g1.appendChild(sf);body.appendChild(g1)
+        // Category & Client
+        const g2=document.createElement('div');g2.className='g2'
+        const cf=document.createElement('div');const cl2=document.createElement('label');cl2.className='fl';cl2.textContent='Category'
+        const cs=document.createElement('select');cs.className='fsel';CATS.forEach(cat=>{const o=document.createElement('option');o.value=cat;o.textContent=cat;if(cat===item.category)o.selected=true;cs.appendChild(o)});cs.onchange=()=>{item.category=cs.value;cb.textContent=cs.value};cf.appendChild(cl2);cf.appendChild(cs)
+        const clf=document.createElement('div');const cll=document.createElement('label');cll.className='fl';cll.textContent='Client';const cli=document.createElement('input');cli.className='fi';cli.value=item.client||'';cli.placeholder='Client Name';cli.oninput=()=>item.client=cli.value;clf.appendChild(cll);clf.appendChild(cli)
+        g2.appendChild(cf);g2.appendChild(clf);body.appendChild(g2)
+        // Year & Tags
+        const g3=document.createElement('div');g3.className='g2'
+        const yf=document.createElement('div');const yl=document.createElement('label');yl.className='fl';yl.textContent='Year';const yi=document.createElement('input');yi.className='fi';yi.value=item.year||'';yi.placeholder='2024';yi.oninput=()=>{item.year=yi.value;yr.textContent=yi.value};yf.appendChild(yl);yf.appendChild(yi)
+        const tgf=document.createElement('div');const tgl=document.createElement('label');tgl.className='fl';tgl.innerHTML='Tags <span style="font-weight:400;text-transform:none;color:var(--g400)">(comma-separated)</span>';const tgi=document.createElement('input');tgi.className='fi';tgi.value=(item.tags||[]).join(', ');tgi.placeholder='Identity, Brand';tgi.oninput=()=>item.tags=tgi.value.split(',').map(t=>t.trim()).filter(Boolean);tgf.appendChild(tgl);tgf.appendChild(tgi)
+        g3.appendChild(yf);g3.appendChild(tgf);body.appendChild(g3)
+        // Description
+        const df=document.createElement('div');const dl=document.createElement('label');dl.className='fl';dl.textContent='Description';const da=document.createElement('textarea');da.className='fta';da.rows=3;da.value=item.description||'';da.oninput=()=>item.description=da.value;df.appendChild(dl);df.appendChild(da);body.appendChild(df)
+        // Images
+        const ig=document.createElement('div');ig.className='g2';ig.style.paddingTop='4px'
+        ig.appendChild(mkIU({label:'Background Image',hint:'Full-bleed (1920×1080)',value:item.image||'',onChange:v=>item.image=v,aspect:'16/9'}))
+        ig.appendChild(mkIU({label:'Preview Thumbnail',hint:'Portrait card (600×780)',value:item.thumbnail||'',onChange:v=>item.thumbnail=v,aspect:'3/4'}))
+        body.appendChild(ig)
+        // Gallery
+        const galDiv=document.createElement('div');const galL=document.createElement('label');galL.className='fl';galL.textContent='Project Gallery';const galH=document.createElement('p');galH.className='fh';galH.textContent='Extra images for the project detail page.';galDiv.appendChild(galL);galDiv.appendChild(galH)
+        if(!item.gallery)item.gallery=[]
+        function rgal(){
+          galDiv.querySelectorAll('.gal-row').forEach(e=>e.remove())
+          item.gallery.forEach((url,gi)=>{
+            const row=document.createElement('div');row.className='gal-row'
+            const inp=document.createElement('input');inp.type='text';inp.value=url;inp.placeholder='https://…';inp.oninput=()=>item.gallery[gi]=inp.value
+            const db2=document.createElement('button');db2.className='bic';db2.textContent='✕';db2.style.color='var(--red400)';db2.onclick=()=>{item.gallery.splice(gi,1);rgal()}
+            row.appendChild(inp);row.appendChild(db2)
+            const addBtn2=galDiv.querySelector('.bs');galDiv.insertBefore(row,addBtn2)
+          })
+        }
+        const addGalBtn=document.createElement('button');addGalBtn.className='bs';addGalBtn.textContent='+ Add Image';addGalBtn.onclick=()=>{item.gallery.push('');rgal()};galDiv.appendChild(addGalBtn);rgal();body.appendChild(galDiv)
+        // Open full editor
+        const openBtn=document.createElement('button');openBtn.className='bs';openBtn.style.cssText='width:100%;padding:10px;font-size:13px;font-weight:500;color:var(--navy);border-color:var(--navy20)';openBtn.textContent='Open Full Project Editor →';openBtn.onclick=()=>{S.editView='project';S.editIdx=i;render()};body.appendChild(openBtn)
+        card.appendChild(body)
+      }
+      ld.appendChild(card)
+    })
+    // Add button
+    const addBtn=document.createElement('button');addBtn.className='bdash';addBtn.textContent='+ Add Portfolio Item'
+    addBtn.onclick=()=>{p.items.push({id:Date.now(),slug:'new-project',title:'New Project',category:'Branding',client:'',description:'',image:'',thumbnail:'',year:new Date().getFullYear().toString(),tags:[],gallery:[],blocks:[],archivedBlocks:[]});S.expandedProj=p.items.length-1;rpl()}
+    ld.appendChild(addBtn)
+    // Archive
+    if(p.archivedItems&&p.archivedItems.length){
+      const arch=document.createElement('div');arch.className='arch';arch.style.marginTop='16px'
+      const ah=document.createElement('button');ah.className='arch-h'
+      ah.innerHTML=`<div class="arch-hl"><span style="color:var(--amber500)">⊘</span><span style="font-size:13px;font-weight:500;color:var(--amber800)">Archive — ${p.archivedItems.length} project${p.archivedItems.length!==1?'s':''}</span></div><span style="color:var(--amber500);font-size:11px">${S.projArchiveOpen?'▲':'▼'}</span>`
+      ah.onclick=()=>{S.projArchiveOpen=!S.projArchiveOpen;rpl()};arch.appendChild(ah)
+      if(S.projArchiveOpen){
+        p.archivedItems.forEach((item2,i)=>{
+          const row=document.createElement('div');row.className='arch-item'
+          const rl=document.createElement('div');rl.style.cssText='display:flex;align-items:center;gap:12px'
+          const cb2=document.createElement('span');cb2.className='cat-b';cb2.textContent=item2.category||'—'
+          const tt2=document.createElement('span');tt2.style.cssText='font-size:13px;color:var(--g600)';tt2.textContent=item2.title||'Untitled'
+          const yr2=document.createElement('span');yr2.style.cssText='font-size:11px;color:var(--g400)';yr2.textContent=item2.year||''
+          rl.appendChild(cb2);rl.appendChild(tt2);rl.appendChild(yr2)
+          const ra=document.createElement('div');ra.style.cssText='display:flex;gap:8px'
+          const rb=document.createElement('button');rb.className='bn';rb.textContent='Restore';rb.onclick=()=>{p.items.push(p.archivedItems.splice(i,1)[0]);rpl()}
+          const db3=document.createElement('button');db3.className='bd';db3.textContent='Delete Forever';db3.onclick=()=>{if(confirm('Delete permanently?')){p.archivedItems.splice(i,1);rpl()}}
+          ra.appendChild(rb);ra.appendChild(db3);row.appendChild(rl);row.appendChild(ra);arch.appendChild(row)
+        })
+      }
+      ld.appendChild(arch)
+    }
+  }
+  rpl()
+}
+
+// ── Project Full Editor ────────────────────────────────────────────────────────
+function renderProjectEditor(){
+  const c=document.getElementById('editor-inner');c.innerHTML=''
+  const item=S.portfolio.items[S.editIdx]
+  if(!item){S.editView=null;S.editIdx=null;return render()}
+  if(!item.blocks)item.blocks=[]
+  if(!item.archivedBlocks)item.archivedBlocks=[]
+  const back=document.createElement('button');back.className='back-btn';back.innerHTML='← All Projects';back.onclick=()=>{S.editView=null;S.editIdx=null;render()};c.appendChild(back)
+  const intro=document.createElement('p');intro.className='pg-intro';intro.innerHTML=`Editing: <strong style="color:var(--g800)">${item.title||'Untitled'}</strong>`;c.appendChild(intro)
+  // Basic info card
+  const ic=document.createElement('div');ic.className='sc';ic.style.marginBottom='24px';ic.innerHTML='<div class="sc-h"><h3>Basic Info</h3></div>'
+  const ib=document.createElement('div');ib.className='sc-b sp'
+  const g1=document.createElement('div');g1.className='g2'
+  // Title
+  const tf=document.createElement('div');const tl=document.createElement('label');tl.className='fl';tl.textContent='Title';const ti=document.createElement('input');ti.className='fi';ti.value=item.title||'';ti.oninput=()=>{item.title=ti.value;intro.innerHTML=`Editing: <strong style="color:var(--g800)">${ti.value||'Untitled'}</strong>`;if(!item.slug||item.slug==='new-project')item.slug=slugify(ti.value)};tf.appendChild(tl);tf.appendChild(ti)
+  // Slug
+  const sf=document.createElement('div');const sl=document.createElement('label');sl.className='fl';sl.textContent='URL Slug';const si=document.createElement('input');si.className='fi';si.value=item.slug||'';si.placeholder='my-project';si.oninput=()=>{item.slug=slugify(si.value);si.value=item.slug};sf.appendChild(sl);sf.appendChild(si)
+  g1.appendChild(tf);g1.appendChild(sf);ib.appendChild(g1)
+  const g2=document.createElement('div');g2.className='g2'
+  // Category
+  const cf=document.createElement('div');const cl=document.createElement('label');cl.className='fl';cl.textContent='Category';const cs=document.createElement('select');cs.className='fsel';CATS.forEach(cat=>{const o=document.createElement('option');o.value=cat;o.textContent=cat;if(cat===item.category)o.selected=true;cs.appendChild(o)});cs.onchange=()=>item.category=cs.value;cf.appendChild(cl);cf.appendChild(cs)
+  // Client
+  const clf=document.createElement('div');const cll=document.createElement('label');cll.className='fl';cll.textContent='Client';const cli=document.createElement('input');cli.className='fi';cli.value=item.client||'';cli.oninput=()=>item.client=cli.value;clf.appendChild(cll);clf.appendChild(cli)
+  g2.appendChild(cf);g2.appendChild(clf);ib.appendChild(g2)
+  const g3=document.createElement('div');g3.className='g2'
+  // Year
+  const yf=document.createElement('div');const yl=document.createElement('label');yl.className='fl';yl.textContent='Year';const yi=document.createElement('input');yi.className='fi';yi.value=item.year||'';yi.placeholder='2024';yi.oninput=()=>item.year=yi.value;yf.appendChild(yl);yf.appendChild(yi)
+  // Tags
+  const tgf=document.createElement('div');const tgl=document.createElement('label');tgl.className='fl';tgl.innerHTML='Tags <span style="font-weight:400;text-transform:none;color:var(--g400)">(comma-separated)</span>';const tgi=document.createElement('input');tgi.className='fi';tgi.value=(item.tags||[]).join(', ');tgi.placeholder='Identity, Brand';tgi.oninput=()=>item.tags=tgi.value.split(',').map(t=>t.trim()).filter(Boolean);tgf.appendChild(tgl);tgf.appendChild(tgi)
+  g3.appendChild(yf);g3.appendChild(tgf);ib.appendChild(g3)
+  // Description
+  const df=document.createElement('div');const dl=document.createElement('label');dl.className='fl';dl.textContent='Description';const da=document.createElement('textarea');da.className='fta';da.rows=3;da.value=item.description||'';da.oninput=()=>item.description=da.value;df.appendChild(dl);df.appendChild(da);ib.appendChild(df)
+  // Publish button
+  const pr=document.createElement('div');pr.style.cssText='padding-top:8px;border-top:1px solid var(--g100)'
+  const pb=document.createElement('button');pb.className='bs';pb.innerHTML='⬡ Create / Update Project Page'
+  pb.onclick=async()=>{pb.disabled=true;pb.textContent='Creating…';try{const j=await api('POST','/api/project',{slug:item.slug,title:item.title,category:item.category,year:item.year,client:item.client,scope:item.category,description:item.description,role:'Creative Director'});pb.textContent=j.ok?'✓ Created at '+j.url:'Error: '+(j.error||'failed')}catch(e){pb.textContent='Error: '+e.message};pb.disabled=false;setTimeout(()=>{pb.innerHTML='⬡ Create / Update Project Page'},4000)}
+  pr.appendChild(pb);ib.appendChild(pr)
+  ic.appendChild(ib);c.appendChild(ic)
+  // Cover images
+  const cc=document.createElement('div');cc.className='sc';cc.style.marginBottom='24px';cc.innerHTML='<div class="sc-h"><h3>Cover Images</h3></div>'
+  const cb=document.createElement('div');cb.className='sc-b sp';const cg=document.createElement('div');cg.className='g2'
+  cg.appendChild(mkIU({label:'Hero Image',hint:'Full-screen (1920×1080)',value:item.image||'',onChange:v=>item.image=v,aspect:'16/9',acceptVideo:true}))
+  cg.appendChild(mkIU({label:'Grid Thumbnail',hint:'Portrait card (600×780)',value:item.thumbnail||'',onChange:v=>item.thumbnail=v,aspect:'3/4'}))
+  cb.appendChild(cg);cc.appendChild(cb);c.appendChild(cc)
+  // Blocks
+  renderBlocksSection(c,item)
+}
+
+// ── Insights ──────────────────────────────────────────────────────────────────
+function renderInsights(){
+  const c=document.getElementById('editor-inner');c.innerHTML=''
+  const ins=S.insightsData
+  const ld=document.createElement('div');c.appendChild(ld)
+  function ril(){
+    ld.innerHTML=''
+    ins.items.forEach((item,i)=>{
+      const card=document.createElement('div');card.className='pc'
+      const head=document.createElement('div');head.className='pc-h'
+      const hl=document.createElement('div');hl.className='pc-hl'
+      const cb=document.createElement('span');cb.className='cat-b';cb.textContent=item.category||'Essay'
+      const tt=document.createElement('span');tt.className='pt';tt.textContent=item.title||'Untitled'
+      const dt=document.createElement('span');dt.className='py';dt.textContent=item.date||''
+      hl.appendChild(cb);hl.appendChild(tt);hl.appendChild(dt)
+      const acts=document.createElement('div');acts.className='pc-acts'
+      const eb=document.createElement('button');eb.className='bn';eb.textContent='Edit Full Article';eb.onclick=e=>{e.stopPropagation();S.editView='insight';S.editIdx=i;render()}
+      const ab=document.createElement('button');ab.className='bd';ab.textContent='Archive';ab.style.color='var(--amber500)'
+      ab.onclick=e=>{e.stopPropagation();ins.archivedItems.unshift(ins.items.splice(i,1)[0]);if(S.expandedInsight===i)S.expandedInsight=null;ril()}
+      const tog=document.createElement('span');tog.style.cssText='font-size:11px;color:var(--g400)';tog.textContent=S.expandedInsight===i?'▲':'▼'
+      acts.appendChild(eb);acts.appendChild(ab);acts.appendChild(tog)
+      head.appendChild(hl);head.appendChild(acts);head.onclick=()=>{S.expandedInsight=S.expandedInsight===i?null:i;ril()};card.appendChild(head)
+      if(S.expandedInsight===i){
+        const body=document.createElement('div');body.className='pc-b'
+        const g1=document.createElement('div');g1.className='g2'
+        const tf=document.createElement('div');const tl=document.createElement('label');tl.className='fl';tl.textContent='Title';const ti=document.createElement('input');ti.className='fi';ti.value=item.title||'';ti.oninput=()=>{item.title=ti.value;tt.textContent=ti.value||'Untitled';if(!item.slug)item.slug=slugify(ti.value)};tf.appendChild(tl);tf.appendChild(ti)
+        const sf=document.createElement('div');const sl=document.createElement('label');sl.className='fl';sl.textContent='URL Slug';const si=document.createElement('input');si.className='fi';si.value=item.slug||'';si.oninput=()=>{item.slug=slugify(si.value);si.value=item.slug};sf.appendChild(sl);sf.appendChild(si)
+        g1.appendChild(tf);g1.appendChild(sf);body.appendChild(g1)
+        const g2=document.createElement('div');g2.className='g2'
+        const catf=document.createElement('div');const catl=document.createElement('label');catl.className='fl';catl.textContent='Category';const cati=document.createElement('input');cati.className='fi';cati.value=item.category||'Essay';cati.placeholder='Essay';cati.oninput=()=>{item.category=cati.value;cb.textContent=cati.value};catf.appendChild(catl);catf.appendChild(cati)
+        const datf=document.createElement('div');const datl=document.createElement('label');datl.className='fl';datl.textContent='Date';const dati=document.createElement('input');dati.className='fi';dati.type='date';dati.value=item.date||'';dati.oninput=()=>{item.date=dati.value;dt.textContent=dati.value};datf.appendChild(datl);datf.appendChild(dati)
+        g2.appendChild(catf);g2.appendChild(datf);body.appendChild(g2)
+        const excf=document.createElement('div');const excl=document.createElement('label');excl.className='fl';excl.textContent='Excerpt';const exca=document.createElement('textarea');exca.className='fta';exca.rows=2;exca.value=item.excerpt||'';exca.oninput=()=>item.excerpt=exca.value;excf.appendChild(excl);excf.appendChild(exca);body.appendChild(excf)
+        body.appendChild(mkIU({label:'Cover Image',value:item.image||'',onChange:v=>item.image=v,aspect:'16/9'}))
+        const ob=document.createElement('button');ob.className='bs';ob.style.cssText='width:100%;padding:10px;font-size:13px;font-weight:500;color:var(--navy);border-color:var(--navy20)';ob.textContent='Open Full Article Editor →';ob.onclick=()=>{S.editView='insight';S.editIdx=i;render()};body.appendChild(ob)
+        card.appendChild(body)
+      }
+      ld.appendChild(card)
+    })
+    const addBtn=document.createElement('button');addBtn.className='bdash';addBtn.textContent='+ Add Article'
+    addBtn.onclick=()=>{ins.items.push({id:Date.now(),slug:'new-article',title:'New Article',category:'Essay',date:'',excerpt:'',image:'',body:'',blocks:[],archivedBlocks:[]});S.expandedInsight=ins.items.length-1;ril()};ld.appendChild(addBtn)
+    if(ins.archivedItems&&ins.archivedItems.length){
+      const arch=document.createElement('div');arch.className='arch';arch.style.marginTop='16px'
+      const ah=document.createElement('button');ah.className='arch-h'
+      ah.innerHTML=`<div class="arch-hl"><span style="color:var(--amber500)">⊘</span><span style="font-size:13px;font-weight:500;color:var(--amber800)">Archive — ${ins.archivedItems.length} article${ins.archivedItems.length!==1?'s':''}</span></div><span style="color:var(--amber500);font-size:11px">${S.insightArchiveOpen?'▲':'▼'}</span>`
+      ah.onclick=()=>{S.insightArchiveOpen=!S.insightArchiveOpen;ril()};arch.appendChild(ah)
+      if(S.insightArchiveOpen){
+        ins.archivedItems.forEach((item2,i)=>{
+          const row=document.createElement('div');row.className='arch-item'
+          const rl=document.createElement('div');rl.style.cssText='display:flex;align-items:center;gap:12px'
+          const cb2=document.createElement('span');cb2.className='cat-b';cb2.textContent=item2.category||'Essay'
+          const tt2=document.createElement('span');tt2.style.cssText='font-size:13px;color:var(--g600)';tt2.textContent=item2.title||'Untitled'
+          rl.appendChild(cb2);rl.appendChild(tt2)
+          const ra=document.createElement('div');ra.style.cssText='display:flex;gap:8px'
+          const rb=document.createElement('button');rb.className='bn';rb.textContent='Restore';rb.onclick=()=>{ins.items.push(ins.archivedItems.splice(i,1)[0]);ril()}
+          const db=document.createElement('button');db.className='bd';db.textContent='Delete Forever';db.onclick=()=>{if(confirm('Delete permanently?')){ins.archivedItems.splice(i,1);ril()}}
+          ra.appendChild(rb);ra.appendChild(db);row.appendChild(rl);row.appendChild(ra);arch.appendChild(row)
+        })
+      }
+      ld.appendChild(arch)
+    }
+  }
+  ril()
+}
+
+// ── Insight Full Editor ────────────────────────────────────────────────────────
+function renderInsightEditor(){
+  const c=document.getElementById('editor-inner');c.innerHTML=''
+  const item=S.insightsData.items[S.editIdx]
+  if(!item){S.editView=null;S.editIdx=null;return render()}
+  if(!item.blocks)item.blocks=[]
+  if(!item.archivedBlocks)item.archivedBlocks=[]
+  const back=document.createElement('button');back.className='back-btn';back.innerHTML='← All Articles';back.onclick=()=>{S.editView=null;S.editIdx=null;render()};c.appendChild(back)
+  const intro=document.createElement('p');intro.className='pg-intro';intro.innerHTML=`Editing: <strong style="color:var(--g800)">${item.title||'Untitled'}</strong>`;c.appendChild(intro)
+  const ic=document.createElement('div');ic.className='sc';ic.style.marginBottom='24px';ic.innerHTML='<div class="sc-h"><h3>Article Info</h3></div>'
+  const ib=document.createElement('div');ib.className='sc-b sp'
+  const g1=document.createElement('div');g1.className='g2'
+  const tf=document.createElement('div');const tl=document.createElement('label');tl.className='fl';tl.textContent='Title';const ti=document.createElement('input');ti.className='fi';ti.value=item.title||'';ti.oninput=()=>{item.title=ti.value;intro.innerHTML=`Editing: <strong style="color:var(--g800)">${ti.value||'Untitled'}</strong>`;if(!item.slug)item.slug=slugify(ti.value)};tf.appendChild(tl);tf.appendChild(ti)
+  const sf=document.createElement('div');const sl=document.createElement('label');sl.className='fl';sl.textContent='URL Slug';const si=document.createElement('input');si.className='fi';si.value=item.slug||'';si.oninput=()=>{item.slug=slugify(si.value);si.value=item.slug};sf.appendChild(sl);sf.appendChild(si)
+  g1.appendChild(tf);g1.appendChild(sf);ib.appendChild(g1)
+  const g2=document.createElement('div');g2.className='g2'
+  const catf=document.createElement('div');const catl=document.createElement('label');catl.className='fl';catl.textContent='Category';const cati=document.createElement('input');cati.className='fi';cati.value=item.category||'Essay';cati.oninput=()=>item.category=cati.value;catf.appendChild(catl);catf.appendChild(cati)
+  const datf=document.createElement('div');const datl=document.createElement('label');datl.className='fl';datl.textContent='Date';const dati=document.createElement('input');dati.className='fi';dati.type='date';dati.value=item.date||'';dati.oninput=()=>item.date=dati.value;datf.appendChild(datl);datf.appendChild(dati)
+  g2.appendChild(catf);g2.appendChild(datf);ib.appendChild(g2)
+  const excf=document.createElement('div');const excl=document.createElement('label');excl.className='fl';excl.textContent='Excerpt';const exca=document.createElement('textarea');exca.className='fta';exca.rows=2;exca.value=item.excerpt||'';exca.oninput=()=>item.excerpt=exca.value;excf.appendChild(excl);excf.appendChild(exca);ib.appendChild(excf)
+  // Publish
+  const pr=document.createElement('div');pr.style.cssText='padding-top:8px;border-top:1px solid var(--g100)'
+  const pb=document.createElement('button');pb.className='bs';pb.innerHTML='⬡ Create / Update Article Page'
+  pb.onclick=async()=>{pb.disabled=true;pb.textContent='Creating…';try{const j=await api('POST','/api/insight',{slug:item.slug,title:item.title,category:item.category,date:item.date,excerpt:item.excerpt,body:item.body||''});pb.textContent=j.ok?'✓ Created at '+j.url:'Error: '+(j.error||'failed')}catch(e){pb.textContent='Error: '+e.message};pb.disabled=false;setTimeout(()=>{pb.innerHTML='⬡ Create / Update Article Page'},4000)}
+  pr.appendChild(pb);ib.appendChild(pr)
+  ic.appendChild(ib);c.appendChild(ic)
+  const cc=document.createElement('div');cc.className='sc';cc.style.marginBottom='24px';cc.innerHTML='<div class="sc-h"><h3>Cover Image</h3></div>'
+  const cb=document.createElement('div');cb.className='sc-b';cb.appendChild(mkIU({label:'Hero / Cover Image',hint:'1920×1080 recommended',value:item.image||'',onChange:v=>item.image=v,aspect:'16/9'}));cc.appendChild(cb);c.appendChild(cc)
+  renderBlocksSection(c,item)
 }
 </script>
 </body>

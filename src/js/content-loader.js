@@ -86,6 +86,37 @@ const API = 'http://localhost:3001'
         if (block.height) img.style.height = block.height + 'px'
         el.appendChild(img)
 
+      } else if (block.type === 'html') {
+        // Rich text block from admin block editor
+        const div = document.createElement('div')
+        div.className = 'text-base text-on-surface-variant leading-relaxed max-w-2xl reveal'
+        div.innerHTML = block.value || ''
+        el.appendChild(div)
+
+      } else if (block.type === 'grid2') {
+        // 2-column image grid
+        const grid = document.createElement('div')
+        grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:16px'
+        ;(block.images || []).slice(0, 2).forEach(src => {
+          if (!src) return
+          const img = document.createElement('img')
+          img.src = src; img.className = 'w-full object-cover aspect-square'
+          grid.appendChild(img)
+        })
+        el.appendChild(grid)
+
+      } else if (block.type === 'grid2x2') {
+        // 2×2 image grid
+        const grid = document.createElement('div')
+        grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:16px'
+        ;(block.images || []).slice(0, 4).forEach(src => {
+          if (!src) return
+          const img = document.createElement('img')
+          img.src = src; img.className = 'w-full object-cover aspect-square'
+          grid.appendChild(img)
+        })
+        el.appendChild(grid)
+
       } else if (block.type === 'heading') {
         const h = document.createElement('h2')
         h.className = 'font-display text-[40px] md:text-[56px] uppercase leading-tight reveal'
@@ -96,7 +127,7 @@ const API = 'http://localhost:3001'
         el.className = 'border-t border-black/10 my-12'
 
       } else {
-        // text block (default)
+        // text block (default / legacy)
         const p = document.createElement('p')
         p.className = 'text-base text-on-surface-variant leading-relaxed max-w-2xl reveal'
         if (block.fontSize) p.style.fontSize = block.fontSize
