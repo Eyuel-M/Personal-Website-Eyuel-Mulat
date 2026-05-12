@@ -360,7 +360,7 @@ function mkArticleFields(a){
 function blockForLoader(b){
   const m={top:b.marginTop||0,right:b.marginRight||0,bottom:b.marginBottom||0,left:b.marginLeft||0}
   if(b.type==='image')return{type:'image',value:b.url,margin:m}
-  if(b.type==='text')return{type:'html',value:b.html,margin:m}
+  if(b.type==='text')return{type:'html',value:b.html,title:b.title||'',margin:m}
   if(b.type==='grid2')return{type:'grid2',images:b.images,margin:m}
   if(b.type==='grid2x2')return{type:'grid2x2',images:b.images,margin:m}
   return b
@@ -531,6 +531,7 @@ function mkRT(block,onChange){
 }
 
 const BLBL={image:'🖼  Full-Width Image',text:'✏️  Text Copy',grid2:'▦  2-Column Grid',grid2x2:'⊞  2 × 2 Grid'}
+function blbl(block){return block.type==='text'&&block.title?`✏️  ${block.title}`:BLBL[block.type]||block.type}
 
 function mkBW(block,i,total,onUp,onDown,onArch,inner){
   const wrap=document.createElement('div');wrap.className='bw'
@@ -539,7 +540,7 @@ function mkBW(block,i,total,onUp,onDown,onArch,inner){
   const lbtn=document.createElement('button');lbtn.className='bw-hl'
   const tog=document.createElement('span');tog.style.cssText='font-size:9px;color:var(--g400)';tog.textContent='▼'
   lbtn.appendChild(tog)
-  const ltxt=document.createElement('span');ltxt.textContent=BLBL[block.type]||block.type;lbtn.appendChild(ltxt)
+  const ltxt=document.createElement('span');ltxt.textContent=blbl(block);lbtn.appendChild(ltxt)
   const acts=document.createElement('div');acts.className='bw-ha'
   function bic(html,dis,fn){const b=document.createElement('button');b.className='bic';b.innerHTML=html;b.disabled=dis;b.onclick=e=>{e.stopPropagation();fn()};return b}
   acts.appendChild(bic('↑',i===0,onUp))
@@ -558,7 +559,15 @@ function mkBlockInner(block,onChange){
     w.appendChild(mkIU({label:'Image',value:block.url||'',onChange:v=>{block.url=v;onChange(block)},aspect:'16/9',acceptVideo:true}))
     w.appendChild(mkMS(block,onChange));return w
   }
-  if(block.type==='text')return mkRT(block,onChange)
+  if(block.type==='text'){
+    const w=document.createElement('div');w.className='sp4'
+    const tf=document.createElement('div')
+    const tl=document.createElement('label');tl.className='fl';tl.textContent='Title (optional)';tf.appendChild(tl)
+    const th=document.createElement('p');th.className='fh';th.textContent='Heading displayed above the text block on the page.';tf.appendChild(th)
+    const ti=document.createElement('input');ti.className='fi';ti.value=block.title||'';ti.placeholder='e.g. Our Process'
+    ti.oninput=()=>{block.title=ti.value};tf.appendChild(ti);w.appendChild(tf)
+    w.appendChild(mkRT(block,onChange));return w
+  }
   if(block.type==='grid2'||block.type==='grid2x2'){
     const w=document.createElement('div')
     const cnt=block.type==='grid2'?2:4
@@ -623,7 +632,7 @@ function renderBlocksSection(container,item){
       }
       item.archivedBlocks.forEach((blk,i)=>{
         const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--amber50);border:1px solid var(--amber100);border-radius:8px;margin-bottom:8px;margin-top:8px'
-        const lbl2=document.createElement('span');lbl2.style.cssText='font-size:13px;color:var(--g600)';lbl2.textContent=BLBL[blk.type]||blk.type
+        const lbl2=document.createElement('span');lbl2.style.cssText='font-size:13px;color:var(--g600)';lbl2.textContent=blbl(blk)
         const ra=document.createElement('div');ra.style.cssText='display:flex;gap:8px'
         const rb2=document.createElement('button');rb2.className='bn';rb2.textContent='Restore'
         rb2.onclick=()=>{item.blocks.push(item.archivedBlocks.splice(i,1)[0]);renderBlocks()}
