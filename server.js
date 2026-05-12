@@ -70,10 +70,15 @@ app.get('/api/content/:page', (req, res) => {
   }
 })
 
-// Save content for a page
+// Save content for a page (merges fields to avoid wiping unrelated sections)
 app.put('/api/content/:page', auth, (req, res) => {
   const file = path.join(CONTENT_DIR, `${req.params.page}.json`)
-  fs.writeFileSync(file, JSON.stringify(req.body, null, 2))
+  const existing = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : {}
+  const merged = { ...existing, ...req.body }
+  if (req.body.fields) merged.fields = { ...(existing.fields || {}), ...req.body.fields }
+  if (req.body.blocks !== undefined) merged.blocks = req.body.blocks
+  if (req.body.archivedBlocks !== undefined) merged.archivedBlocks = req.body.archivedBlocks
+  fs.writeFileSync(file, JSON.stringify(merged, null, 2))
   res.json({ ok: true })
 })
 

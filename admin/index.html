@@ -308,6 +308,13 @@ async function loadSection(id){
       }
       return
     }
+    if(id==='hero'){
+      const d=await api('GET','/api/content/home')
+      const f=d&&d.fields||{}
+      const dv=(k,fb)=>(f[k]&&f[k].value!==undefined?f[k].value:fb)
+      S.data={'hero-label':{value:dv('hero-label','Strategy & Design')},'hero-heading':{value:dv('hero-heading','')},'hero-subtitle':{value:dv('hero-subtitle','Creative Direction & Brand Identity for forward-thinking brands. Building architectural visual systems that transcend temporary trends through geometric precision.')},'featured-title':{value:dv('featured-title','Nexus Dashboard')},'featured-desc':{value:dv('featured-desc','A high-performance SaaS interface designed for complex data visualization and seamless user workflows — precision at enterprise scale.')},'featured-img':{value:dv('featured-img','')}}
+      return
+    }
     const d=await api('GET',`/api/content/${id}`)
     S.data=(d&&d.fields)?d.fields:(d||{})
   }catch(e){console.warn('load error',e)}
@@ -337,6 +344,7 @@ async function saveSection(){
         await api('PUT',`/api/content/${a.slug}`,{fields:mkArticleFields(a),blocks:(a.blocks||[]).map(blockForLoader),archivedBlocks:a.archivedBlocks||[]})
       }
     }
+    else if(id==='hero'){await api('PUT','/api/content/home',{fields:S.data})}
     else{await api('PUT',`/api/content/${id}`,{fields:S.data})}
     showSaving(true)
   }catch(e){showSaving(false,true,'Save failed')}
@@ -344,7 +352,7 @@ async function saveSection(){
 }
 
 function mkProjectFields(p){
-  return {[`${p.slug}-title`]:{value:p.title},[`${p.slug}-category`]:{value:p.category},[`${p.slug}-year`]:{value:p.year},[`${p.slug}-year2`]:{value:p.year},[`${p.slug}-client`]:{value:p.client},[`${p.slug}-scope`]:{value:p.category},[`${p.slug}-role`]:{value:'Creative Director'},[`${p.slug}-overview-text`]:{value:p.description},[`${p.slug}-hero-img`]:{value:p.image}}
+  return {[`${p.slug}-title`]:{value:p.title},[`${p.slug}-category`]:{value:p.category},[`${p.slug}-year`]:{value:p.year},[`${p.slug}-year2`]:{value:p.year},[`${p.slug}-client`]:{value:p.client},[`${p.slug}-scope`]:{value:p.scope||p.category},[`${p.slug}-role`]:{value:p.role||'Creative Director'},[`${p.slug}-overview-h2`]:{value:p.overviewH2||''},[`${p.slug}-overview-text`]:{value:p.description},[`${p.slug}-hero-img`]:{value:p.thumbnail}}
 }
 function mkArticleFields(a){
   return {[`${a.slug}-title`]:{value:a.title},[`${a.slug}-category`]:{value:a.category},[`${a.slug}-date`]:{value:a.date},[`${a.slug}-excerpt`]:{value:a.excerpt},[`${a.slug}-hero-img`]:{value:a.image},[`${a.slug}-body`]:{value:a.body}}
@@ -672,9 +680,25 @@ function renderNav(){
 // ── Hero ──────────────────────────────────────────────────────────────────────
 function renderHero(){
   const c=document.getElementById('editor-inner');c.innerHTML=''
-  if(!S.data.headline)Object.assign(S.data,{headline:'Design That Thinks',subline:'Brand strategy, identity systems, and digital experiences for forward-moving companies.',ctaText:'View Work',ctaLink:'/work.html',bgMedia:''})
-  c.appendChild(mkSC('Hero Text',mkInput('Headline','headline',S.data),mkTextarea('Subline','subline',S.data,2),mkInput('CTA Button Text','ctaText',S.data),mkInput('CTA Button Link','ctaLink',S.data)))
-  c.appendChild(mkSC('Background Media',mkIU({label:'Background Image or Video',hint:'1920×1080 — accepts MP4/WEBM',value:S.data.bgMedia||'',onChange:v=>S.data.bgMedia=v,aspect:'16/9',acceptVideo:true})))
+  function mkFV(label,key,hint,multiline){
+    const d=document.createElement('div')
+    const l=document.createElement('label');l.className='fl';l.textContent=label;d.appendChild(l)
+    if(hint){const h=document.createElement('p');h.className='fh';h.textContent=hint;d.appendChild(h)}
+    if(!S.data[key])S.data[key]={value:''}
+    if(multiline){const ta=document.createElement('textarea');ta.className='fta';ta.rows=3;ta.value=S.data[key].value||'';ta.oninput=()=>S.data[key].value=ta.value;d.appendChild(ta)}
+    else{const i=document.createElement('input');i.className='fi';i.value=S.data[key].value||'';i.oninput=()=>S.data[key].value=i.value;d.appendChild(i)}
+    return d
+  }
+  c.appendChild(mkSC('Hero Text',
+    mkFV('Eyebrow Label','hero-label','Small caps text above the heading — e.g. "Strategy & Design"'),
+    mkFV('Heading','hero-heading','Supports HTML — use <br> for line breaks, <span class="text-accent">…</span> for accent color.',true),
+    mkFV('Description','hero-subtitle','The paragraph of text below the heading.',true)
+  ))
+  c.appendChild(mkSC('Featured Project',
+    mkFV('Featured Project Title','featured-title'),
+    mkFV('Description','featured-desc','Short blurb shown in the home page feature block.',true),
+    mkIU({label:'Featured Image',hint:'Landscape — displayed in the home page feature block',value:(S.data['featured-img']&&S.data['featured-img'].value)||'',onChange:v=>{if(!S.data['featured-img'])S.data['featured-img']={};S.data['featured-img'].value=v},aspect:'16/9'})
+  ))
 }
 
 // ── Slideshow ─────────────────────────────────────────────────────────────────
@@ -876,11 +900,14 @@ function renderPortfolio(){
         g3.appendChild(yf);g3.appendChild(tgf);body.appendChild(g3)
         // Description
         const df=document.createElement('div');const dl=document.createElement('label');dl.className='fl';dl.textContent='Description';const da=document.createElement('textarea');da.className='fta';da.rows=3;da.value=item.description||'';da.oninput=()=>item.description=da.value;df.appendChild(dl);df.appendChild(da);body.appendChild(df)
-        // Images
-        const ig=document.createElement('div');ig.className='g2';ig.style.paddingTop='4px'
-        ig.appendChild(mkIU({label:'Background Image',hint:'Full-bleed (1920×1080)',value:item.image||'',onChange:v=>item.image=v,aspect:'16/9'}))
-        ig.appendChild(mkIU({label:'Preview Thumbnail',hint:'Portrait card (600×780)',value:item.thumbnail||'',onChange:v=>item.thumbnail=v,aspect:'3/4'}))
-        body.appendChild(ig)
+        // Scope / Role
+        const g3b=document.createElement('div');g3b.className='g2'
+        const scf=document.createElement('div');const scl=document.createElement('label');scl.className='fl';scl.textContent='Scope';const sci=document.createElement('input');sci.className='fi';sci.value=item.scope||'';sci.placeholder='Brand Identity · UI Design';sci.oninput=()=>item.scope=sci.value;scf.appendChild(scl);scf.appendChild(sci)
+        const rof=document.createElement('div');const rol=document.createElement('label');rol.className='fl';rol.textContent='Role';const roi=document.createElement('input');roi.className='fi';roi.value=item.role||'';roi.placeholder='Creative Director';roi.oninput=()=>item.role=roi.value;rof.appendChild(rol);rof.appendChild(roi)
+        g3b.appendChild(scf);g3b.appendChild(rof);body.appendChild(g3b)
+        const ovf=document.createElement('div');const ovl=document.createElement('label');ovl.className='fl';ovl.textContent='Overview Heading';const ovi=document.createElement('input');ovi.className='fi';ovi.value=item.overviewH2||'';ovi.placeholder='Project tagline or key statement';ovi.oninput=()=>item.overviewH2=ovi.value;ovf.appendChild(ovl);ovf.appendChild(ovi);body.appendChild(ovf)
+        // Image
+        body.appendChild(mkIU({label:'Preview Thumbnail',hint:'Card image shown on home & work pages (3:4 portrait)',value:item.thumbnail||'',onChange:v=>item.thumbnail=v,aspect:'3/4'}))
         // Gallery
         const galDiv=document.createElement('div');const galL=document.createElement('label');galL.className='fl';galL.textContent='Project Gallery';const galH=document.createElement('p');galH.className='fh';galH.textContent='Extra images for the project detail page.';galDiv.appendChild(galL);galDiv.appendChild(galH)
         if(!item.gallery)item.gallery=[]
@@ -903,7 +930,7 @@ function renderPortfolio(){
     })
     // Add button
     const addBtn=document.createElement('button');addBtn.className='bdash';addBtn.textContent='+ Add Portfolio Item'
-    addBtn.onclick=()=>{p.items.push({id:Date.now(),slug:'new-project',title:'New Project',category:'Branding',client:'',description:'',image:'',thumbnail:'',year:new Date().getFullYear().toString(),tags:[],gallery:[],blocks:[],archivedBlocks:[]});S.expandedProj=p.items.length-1;rpl()}
+    addBtn.onclick=()=>{p.items.push({id:Date.now(),slug:'new-project',title:'New Project',category:'Branding',client:'',description:'',scope:'',role:'',overviewH2:'',thumbnail:'',year:new Date().getFullYear().toString(),tags:[],gallery:[],blocks:[],archivedBlocks:[]});S.expandedProj=p.items.length-1;rpl()}
     ld.appendChild(addBtn)
     // Archive
     if(p.archivedItems&&p.archivedItems.length){
@@ -963,18 +990,22 @@ function renderProjectEditor(){
   g3.appendChild(yf);g3.appendChild(tgf);ib.appendChild(g3)
   // Description
   const df=document.createElement('div');const dl=document.createElement('label');dl.className='fl';dl.textContent='Description';const da=document.createElement('textarea');da.className='fta';da.rows=3;da.value=item.description||'';da.oninput=()=>item.description=da.value;df.appendChild(dl);df.appendChild(da);ib.appendChild(df)
+  const g3b=document.createElement('div');g3b.className='g2'
+  const scf=document.createElement('div');const scl=document.createElement('label');scl.className='fl';scl.textContent='Scope';const sci=document.createElement('input');sci.className='fi';sci.value=item.scope||'';sci.placeholder='Brand Identity · UI Design';sci.oninput=()=>item.scope=sci.value;scf.appendChild(scl);scf.appendChild(sci)
+  const rof=document.createElement('div');const rol=document.createElement('label');rol.className='fl';rol.textContent='Role';const roi=document.createElement('input');roi.className='fi';roi.value=item.role||'';roi.placeholder='Creative Director';roi.oninput=()=>item.role=roi.value;rof.appendChild(rol);rof.appendChild(roi)
+  g3b.appendChild(scf);g3b.appendChild(rof);ib.appendChild(g3b)
+  const ovf=document.createElement('div');const ovl=document.createElement('label');ovl.className='fl';ovl.textContent='Overview Heading';const ovi=document.createElement('input');ovi.className='fi';ovi.value=item.overviewH2||'';ovi.placeholder='Project tagline or key statement';ovi.oninput=()=>item.overviewH2=ovi.value;ovf.appendChild(ovl);ovf.appendChild(ovi);ib.appendChild(ovf)
   // Publish button
   const pr=document.createElement('div');pr.style.cssText='padding-top:8px;border-top:1px solid var(--g100)'
   const pb=document.createElement('button');pb.className='bs';pb.innerHTML='⬡ Create / Update Project Page'
-  pb.onclick=async()=>{pb.disabled=true;pb.textContent='Creating…';try{const j=await api('POST','/api/project',{slug:item.slug,title:item.title,category:item.category,year:item.year,client:item.client,scope:item.category,description:item.description,role:'Creative Director'});pb.textContent=j.ok?'✓ Created at '+j.url:'Error: '+(j.error||'failed')}catch(e){pb.textContent='Error: '+e.message};pb.disabled=false;setTimeout(()=>{pb.innerHTML='⬡ Create / Update Project Page'},4000)}
+  pb.onclick=async()=>{pb.disabled=true;pb.textContent='Creating…';try{const j=await api('POST','/api/project',{slug:item.slug,title:item.title,category:item.category,year:item.year,client:item.client,scope:item.scope||item.category,description:item.description,role:item.role||'Creative Director'});pb.textContent=j.ok?'✓ Created at '+j.url:'Error: '+(j.error||'failed')}catch(e){pb.textContent='Error: '+e.message};pb.disabled=false;setTimeout(()=>{pb.innerHTML='⬡ Create / Update Project Page'},4000)}
   pr.appendChild(pb);ib.appendChild(pr)
   ic.appendChild(ib);c.appendChild(ic)
-  // Cover images
-  const cc=document.createElement('div');cc.className='sc';cc.style.marginBottom='24px';cc.innerHTML='<div class="sc-h"><h3>Cover Images</h3></div>'
-  const cb=document.createElement('div');cb.className='sc-b sp';const cg=document.createElement('div');cg.className='g2'
-  cg.appendChild(mkIU({label:'Hero Image',hint:'Full-screen (1920×1080)',value:item.image||'',onChange:v=>item.image=v,aspect:'16/9',acceptVideo:true}))
-  cg.appendChild(mkIU({label:'Grid Thumbnail',hint:'Portrait card (600×780)',value:item.thumbnail||'',onChange:v=>item.thumbnail=v,aspect:'3/4'}))
-  cb.appendChild(cg);cc.appendChild(cb);c.appendChild(cc)
+  // Cover image
+  const cc=document.createElement('div');cc.className='sc';cc.style.marginBottom='24px';cc.innerHTML='<div class="sc-h"><h3>Project Image</h3></div>'
+  const cb=document.createElement('div');cb.className='sc-b sp'
+  cb.appendChild(mkIU({label:'Preview Thumbnail',hint:'Used as card on home & work pages, and as hero on the project page (3:4 portrait)',value:item.thumbnail||'',onChange:v=>item.thumbnail=v,aspect:'3/4'}))
+  cc.appendChild(cb);c.appendChild(cc)
   // Blocks
   renderBlocksSection(c,item)
 }

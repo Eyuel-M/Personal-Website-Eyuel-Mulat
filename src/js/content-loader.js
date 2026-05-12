@@ -1,7 +1,5 @@
 // Content-loader: fetches page-specific overrides from the admin API
 // and applies them to data-editable elements on the page.
-const API = 'http://localhost:3001'
-
 ;(async () => {
   // Determine page key from URL
   const path = window.location.pathname
@@ -15,7 +13,7 @@ const API = 'http://localhost:3001'
 
   let data
   try {
-    const res = await fetch(`${API}/api/content/${page}`)
+    const res = await fetch(`/api/content/${page}`)
     if (!res.ok) return
     data = await res.json()
   } catch {
