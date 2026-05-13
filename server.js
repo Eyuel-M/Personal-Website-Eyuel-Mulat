@@ -506,8 +506,37 @@ ${navHTML()}
         <div class="reveal">
           <h2 class="font-display text-[40px] md:text-[52px] uppercase leading-tight" data-editable="${slug}-overview-h2">Project Overview</h2>
         </div>
-        <div class="reveal reveal-delay-2">
-          <p class="text-base text-on-surface-variant leading-relaxed" data-editable="${slug}-overview-text">${description || ''}</p>
+        <div class="reveal reveal-delay-2" data-editable="${slug}-overview-text" data-editable-type="html">
+          <p class="text-base text-on-surface-variant leading-relaxed">${description || ''}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Secondary Image ──────────────────────────────────────────────── -->
+    <section class="px-10 md:px-[80px] mb-32 bg-background">
+      <div class="w-full overflow-hidden aspect-[21/9] border-l border-black/10 reveal">
+        <img data-editable="${slug}-img-1" data-editable-type="image" src="" alt="${title}" class="w-full h-full object-cover" style="display:none"/>
+      </div>
+    </section>
+
+    <!-- ── Deliverables ──────────────────────────────────────────────────── -->
+    <section class="px-10 md:px-[80px] mb-40">
+      <div class="section-header reveal"><span class="label-caps tracking-[0.4em]">02 / Deliverables</span></div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-x-16 gap-y-0">
+        <div class="border-t border-black/10 py-8 reveal">
+          <span class="label-caps text-[10px] text-accent tracking-[0.3em] block mb-3">01</span>
+          <h3 class="font-display text-2xl uppercase mb-3" data-editable="${slug}-del-1-title"></h3>
+          <p class="text-sm text-on-surface-variant leading-relaxed" data-editable="${slug}-del-1-desc"></p>
+        </div>
+        <div class="border-t border-black/10 py-8 reveal reveal-delay-2">
+          <span class="label-caps text-[10px] text-accent tracking-[0.3em] block mb-3">02</span>
+          <h3 class="font-display text-2xl uppercase mb-3" data-editable="${slug}-del-2-title"></h3>
+          <p class="text-sm text-on-surface-variant leading-relaxed" data-editable="${slug}-del-2-desc"></p>
+        </div>
+        <div class="border-t border-black/10 py-8 reveal reveal-delay-3">
+          <span class="label-caps text-[10px] text-accent tracking-[0.3em] block mb-3">03</span>
+          <h3 class="font-display text-2xl uppercase mb-3" data-editable="${slug}-del-3-title"></h3>
+          <p class="text-sm text-on-surface-variant leading-relaxed" data-editable="${slug}-del-3-desc"></p>
         </div>
       </div>
     </section>
