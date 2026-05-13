@@ -1135,6 +1135,14 @@ function renderInsightEditor(){
   ic.appendChild(ib);c.appendChild(ic)
   const cc=document.createElement('div');cc.className='sc';cc.style.marginBottom='24px';cc.innerHTML='<div class="sc-h"><h3>Cover Image</h3></div>'
   const cb=document.createElement('div');cb.className='sc-b';cb.appendChild(mkIU({label:'Hero / Cover Image',hint:'1920×1080 recommended',value:item.image||'',onChange:v=>item.image=v,aspect:'16/9'}));cc.appendChild(cb);c.appendChild(cc)
+  // Article body card
+  const abCard=document.createElement('div');abCard.className='sc';abCard.style.marginBottom='24px';abCard.innerHTML='<div class="sc-h"><h3>Article Body</h3></div>'
+  const abBody=document.createElement('div');abBody.className='sc-b sp'
+  const abHint=document.createElement('p');abHint.style.cssText='font-size:12px;color:var(--g400)';abHint.textContent='The full article text. Supports bold, italic, font size, and colour from the toolbar.'
+  abBody.appendChild(abHint)
+  const abBlock={html:item.body||'',marginTop:0,marginRight:0,marginBottom:0,marginLeft:0}
+  abBody.appendChild(mkRT(abBlock,b=>{item.body=b.html}))
+  abCard.appendChild(abBody);c.appendChild(abCard)
   renderBlocksSection(c,item)
 }
 </script>
