@@ -11,9 +11,12 @@
   else if (path.includes('/insights') && !path.includes('/insights/')) page = 'insights'
   else if (path.includes('/insights/')) page = path.split('/insights/')[1].replace('.html', '')
 
+  const isPreview = new URLSearchParams(window.location.search).has('preview')
+  const apiBase = isPreview ? '/api/preview' : '/api/content'
+
   let data
   try {
-    const res = await fetch(`/api/content/${page}`)
+    const res = await fetch(`${apiBase}/${page}`)
     if (!res.ok) return
     data = await res.json()
   } catch {

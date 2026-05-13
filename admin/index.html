@@ -277,9 +277,30 @@ document.getElementById('logout-btn').onclick=()=>{
   document.getElementById('login').style.display='flex'
 }
 const PREVIEW_URLS={site:'/',navigation:'/',hero:'/',slideshow:'/',about:'/about.html',services:'/',portfolio:'/work.html',insights:'/insights.html',contact:'/contact.html',clients:'/',footer:'/'}
-document.getElementById('preview-btn').onclick=()=>{
-  const url=PREVIEW_URLS[S.section]||'/'
-  window.open(url,'_blank')
+document.getElementById('preview-btn').onclick=previewSection
+async function previewSection(){
+  const id=S.section
+  const btn=document.getElementById('preview-btn')
+  const origHTML=btn.innerHTML;btn.disabled=true;btn.textContent='Preparing…'
+  try{
+    if(id==='slideshow')await api('PUT','/api/preview/slideshow',S.data)
+    else if(id==='capabilities')await api('PUT','/api/preview/capabilities',S.data)
+    else if(id==='categories')await api('PUT','/api/preview/categories',S.data)
+    else if(id==='clients')await api('PUT','/api/preview/clients',S.data)
+    else if(id==='contact')await api('PUT','/api/preview/contact',{fields:S.data})
+    else if(id==='portfolio'){
+      await api('PUT','/api/preview/portfolio',S.portfolio)
+      for(const p of S.portfolio.items)await api('PUT',`/api/preview/${p.slug}`,{fields:mkProjectFields(p),blocks:(p.blocks||[]).map(blockForLoader),archivedBlocks:p.archivedBlocks||[]})
+    }
+    else if(id==='insights'){
+      await api('PUT','/api/preview/insights-data',S.insightsData)
+      for(const a of S.insightsData.items)await api('PUT',`/api/preview/${a.slug}`,{fields:mkArticleFields(a),blocks:(a.blocks||[]).map(blockForLoader),archivedBlocks:a.archivedBlocks||[]})
+    }
+    else if(id==='hero')await api('PUT','/api/preview/home',{fields:S.data})
+    else await api('PUT',`/api/preview/${id}`,{fields:S.data})
+    window.open((PREVIEW_URLS[id]||'/')+'?preview=1','_blank')
+  }catch(e){console.error('Preview failed',e)}
+  btn.disabled=false;btn.innerHTML=origHTML
 }
 
 async function initApp(){

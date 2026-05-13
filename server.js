@@ -160,6 +160,22 @@ app.put('/api/content/:page', auth, (req, res) => {
   res.json({ ok: true })
 })
 
+// Preview cache (in-memory, not persisted to disk)
+const previewCache = {}
+app.put('/api/preview/:page', auth, (req, res) => {
+  previewCache[req.params.page] = req.body
+  res.json({ ok: true })
+})
+app.get('/api/preview/:page', (req, res) => {
+  const cached = previewCache[req.params.page]
+  if (cached) return res.json(cached)
+  // Fall back to saved content if no preview exists
+  const file = path.join(CONTENT_DIR, `${req.params.page}.json`)
+  if (!fs.existsSync(file)) return res.json({ fields: {}, blocks: [] })
+  try { res.json(JSON.parse(fs.readFileSync(file, 'utf8'))) }
+  catch { res.json({ fields: {}, blocks: [] }) }
+})
+
 // Upload file
 app.post('/api/upload', auth, upload.single('file'), (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No file uploaded' })
