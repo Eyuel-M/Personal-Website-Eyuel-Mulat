@@ -103,6 +103,49 @@ export function createApiApp() {
   // Serve uploaded files
   app.use('/public/uploads', express.static(UPLOADS_DIR))
 
+  // Dynamic project/insight page serving — generates HTML on demand when the
+  // static .html file doesn't yet exist (e.g. items created via admin save
+  // without clicking "Create / Update Page"). Also writes the file to disk so
+  // Vite serves it directly on subsequent requests.
+  app.use((req, res, next) => {
+    let m
+    if ((m = req.url.match(/^\/work\/([a-z0-9][a-z0-9-]*)\.html(\?.*)?$/i))) {
+      const slug = m[1]
+      const filePath = path.join(__dirname, 'work', `${slug}.html`)
+      if (fs.existsSync(filePath)) return next()
+      try {
+        const pf = path.join(CONTENT_DIR, 'portfolio.json')
+        if (!fs.existsSync(pf)) return next()
+        const portfolio = JSON.parse(fs.readFileSync(pf))
+        const item = (portfolio.items || []).find(p => p.slug === slug)
+        if (!item) return next()
+        const html = buildProjectPage(item)
+        fs.mkdirSync(path.join(__dirname, 'work'), { recursive: true })
+        fs.writeFileSync(filePath, html)
+        res.setHeader('Content-Type', 'text/html; charset=utf-8')
+        return res.send(html)
+      } catch { return next() }
+    }
+    if ((m = req.url.match(/^\/insights\/([a-z0-9][a-z0-9-]*)\.html(\?.*)?$/i))) {
+      const slug = m[1]
+      const filePath = path.join(__dirname, 'insights', `${slug}.html`)
+      if (fs.existsSync(filePath)) return next()
+      try {
+        const af = path.join(CONTENT_DIR, 'insights-data.json')
+        if (!fs.existsSync(af)) return next()
+        const insightsData = JSON.parse(fs.readFileSync(af))
+        const item = (insightsData.items || []).find(a => a.slug === slug)
+        if (!item) return next()
+        const html = buildInsightPage(item)
+        fs.mkdirSync(path.join(__dirname, 'insights'), { recursive: true })
+        fs.writeFileSync(filePath, html)
+        res.setHeader('Content-Type', 'text/html; charset=utf-8')
+        return res.send(html)
+      } catch { return next() }
+    }
+    next()
+  })
+
   const storage = multer.diskStorage({
     destination: UPLOADS_DIR,
     filename: (req, file, cb) => {
