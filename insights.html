@@ -38,14 +38,14 @@
         <div class="col-span-12 md:col-span-4 md:pb-4">
           <div class="reveal-hero delay-2">
             <p class="text-base text-on-surface-variant mb-2">Writing on brand, identity &amp; creative direction</p>
-            <p class="label-caps text-[10px] text-accent tracking-[0.3em]">3 Articles</p>
+            <p class="label-caps text-[10px] text-accent tracking-[0.3em]" id="insights-hero-count">3 Articles</p>
           </div>
         </div>
       </div>
     </section>
 
     <!-- ── Featured Post ─────────────────────────────────────────────────── -->
-    <section class="px-10 md:px-[80px] pt-24 pb-0">
+    <section class="px-10 md:px-[80px] pt-24 pb-0" id="insights-featured">
       <a href="/insights/why-brand-systems-outlast-assets.html" class="group block border-b border-black/10 pb-24 reveal">
         <div class="grid grid-cols-12 gap-8 md:gap-16 items-center">
           <div class="col-span-12 md:col-span-6 overflow-hidden bg-surface-container-low aspect-[16/9]">
@@ -78,7 +78,7 @@
     </section>
 
     <!-- ── Articles List ─────────────────────────────────────────────────── -->
-    <section class="px-10 md:px-[80px]">
+    <section class="px-10 md:px-[80px]" id="insights-list">
 
       <!-- Article 02 -->
       <a href="/insights/the-grid-beneath-everything.html" class="group block border-b border-black/10 py-16 reveal">
@@ -187,5 +187,85 @@
 
   <script type="module" src="/src/js/main.js"></script>
   <script type="module" src="/src/js/content-loader.js"></script>
+  <script>
+    ;(async function() {
+      function fmtDate(iso) {
+        if (!iso) return ''
+        try {
+          const d = new Date(iso + 'T00:00:00')
+          return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+        } catch { return '' }
+      }
+
+      try {
+        const r = await fetch('/api/content/insights-data')
+        if (!r.ok) return
+        const data = await r.json()
+        const items = (data.items || []).filter(a => !a.status || a.status === 'published')
+        if (!items.length) return
+
+        // Update hero count
+        const countEl = document.getElementById('insights-hero-count')
+        if (countEl) countEl.textContent = items.length + ' Article' + (items.length !== 1 ? 's' : '')
+
+        // Render featured (first item)
+        const featuredSection = document.getElementById('insights-featured')
+        if (featuredSection) {
+          const f = items[0]
+          const fDate = fmtDate(f.date)
+          const words = (f.title||'').split(' ')
+          const mid = Math.ceil(words.length / 2)
+          const titleHtml = words.length > 2 ? words.slice(0,mid).join(' ') + '<br>' + words.slice(mid).join(' ') : (f.title||'')
+          featuredSection.innerHTML = `<a href="/insights/${f.slug}.html" class="group block border-b border-black/10 pb-24 reveal is-visible">
+            <div class="grid grid-cols-12 gap-8 md:gap-16 items-center">
+              <div class="col-span-12 md:col-span-6 overflow-hidden bg-surface-container-low aspect-[16/9]">
+                ${f.image ? `<img src="${f.image.replace(/"/g,'&quot;')}" alt="${(f.title||'').replace(/"/g,'&quot;')}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"/>` : ''}
+              </div>
+              <div class="col-span-12 md:col-span-6 flex flex-col gap-8">
+                <div class="flex items-center gap-6">
+                  <span class="label-caps text-[10px] text-accent tracking-[0.3em]">${f.category||''}</span>
+                  ${fDate ? `<span class="label-caps text-[10px] text-on-surface-variant/50">${fDate}</span>` : ''}
+                </div>
+                <div>
+                  <h2 class="font-display text-[48px] md:text-[64px] uppercase leading-none mb-6 group-hover:text-accent transition-colors duration-300">${titleHtml}</h2>
+                  <p class="text-base text-on-surface-variant leading-relaxed max-w-md">${f.excerpt||''}</p>
+                </div>
+                <div class="btn-link self-start">Read Article <span class="material-symbols-outlined text-accent" style="font-size:14px;line-height:1">north_east</span></div>
+              </div>
+            </div>
+          </a>`
+        }
+
+        // Render remaining articles as list
+        const listSection = document.getElementById('insights-list')
+        if (listSection) {
+          listSection.innerHTML = ''
+          items.slice(1).forEach(a => {
+            const aDate = fmtDate(a.date)
+            const words = (a.title||'').split(' ')
+            const mid = Math.ceil(words.length / 2)
+            const titleHtml = words.length > 2 ? words.slice(0,mid).join(' ') + '<br>' + words.slice(mid).join(' ') : (a.title||'')
+            const el = document.createElement('a')
+            el.href = `/insights/${a.slug}.html`
+            el.className = 'group block border-b border-black/10 py-16 reveal is-visible'
+            el.innerHTML = `<div class="grid grid-cols-12 gap-8 items-start">
+              <div class="col-span-12 md:col-span-2">
+                ${aDate ? `<span class="label-caps text-[10px] text-on-surface-variant/50">${aDate}</span>` : ''}
+              </div>
+              <div class="col-span-12 md:col-span-6">
+                <span class="label-caps text-[10px] text-accent tracking-[0.3em] block mb-6">${a.category||''}</span>
+                <h2 class="font-display text-[36px] md:text-[48px] uppercase leading-tight mb-5 group-hover:text-accent transition-colors duration-300">${titleHtml}</h2>
+                <p class="text-base text-on-surface-variant leading-relaxed max-w-md">${a.excerpt||''}</p>
+              </div>
+              <div class="col-span-12 md:col-span-4 overflow-hidden bg-surface-container-low aspect-[4/3]">
+                ${a.image ? `<img src="${a.image.replace(/"/g,'&quot;')}" alt="${(a.title||'').replace(/"/g,'&quot;')}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"/>` : ''}
+              </div>
+            </div>`
+            listSection.appendChild(el)
+          })
+        }
+      } catch(e) { console.error('insights load error', e) }
+    })()
+  </script>
 </body>
 </html>
