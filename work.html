@@ -318,79 +318,26 @@
     [data-work-item].hidden-item { display: none; }
   </style>
   <script>
-    function slugify(s) { return (s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') }
-
-    function fmtYear(iso) {
-      if (!iso) return ''
-      try { return new Date(iso + 'T00:00:00').getFullYear().toString() } catch { return '' }
-    }
-
-    // ── Load and render portfolio items ────────────────────────────────────────
+    // ── Work page: load portfolio + categories together ───────────────────────
     ;(async function() {
-      try {
-        const r = await fetch('/api/content/portfolio')
-        if (!r.ok) return
-        const data = await r.json()
-        const items = (data.items || []).filter(p => !p.status || p.status === 'published')
-        if (!items.length) return
+      // Fetch both in parallel so category slugs are available when rendering items
+      const [portRes, catsRes] = await Promise.all([
+        fetch('/api/content/portfolio').catch(() => null),
+        fetch('/api/categories').catch(() => null),
+      ])
 
-        // Update hero count + year range
-        const countEl = document.getElementById('work-hero-count')
-        const yearEl  = document.getElementById('work-hero-year')
-        if (countEl) countEl.textContent = items.length + ' Project' + (items.length !== 1 ? 's' : '')
-        if (yearEl) {
-          const years = items.map(p => parseInt(p.year)).filter(Boolean).sort()
-          if (years.length) yearEl.textContent = years.length > 1 ? years[0] + ' — ' + years[years.length-1] : years[0]
-        }
+      const cats = (catsRes && catsRes.ok) ? await catsRes.json() : []
+      const data = (portRes && portRes.ok)  ? await portRes.json()  : {}
 
-        // Render items
-        const container = document.getElementById('work-projects')
-        if (!container) return
-        container.innerHTML = ''
-        items.forEach((p, i) => {
-          const isEven = i % 2 === 1
-          const catSlug = slugify(p.category)
-          const tags = (p.tags || []).join(' · ')
-          const words = (p.title || '').split(' ')
-          const mid = Math.ceil(words.length / 2)
-          const titleHtml = words.length > 1 ? words.slice(0,mid).join(' ') + '<br>' + words.slice(mid).join(' ') : (p.title || '')
+      // Build name→slug lookup so item categories match filter slugs exactly
+      const catLookup = {}
+      cats.forEach(c => { catLookup[c.name.toLowerCase()] = c.slug })
+      function slugify(s) { return (s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') }
+      function getCatSlug(name) { return catLookup[(name||'').toLowerCase()] || slugify(name) }
 
-          const imgBlock = `<div class="col-span-12 md:col-span-5${isEven ? ' order-1 md:order-2' : ''} overflow-hidden bg-surface-container-low aspect-[4/3]">${p.thumbnail ? `<img src="${p.thumbnail.replace(/"/g,'&quot;')}" alt="${(p.title||'').replace(/"/g,'&quot;')}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"/>` : ''}</div>`
-
-          const textBlock = `<div class="col-span-12 md:col-span-7${isEven ? ' order-2 md:order-1' : ''} flex flex-col gap-8">
-            <div class="flex items-center justify-between">
-              <div class="badge-circle text-primary">${String(i+1).padStart(2,'0')}</div>
-              <span class="label-caps text-[10px] text-accent tracking-[0.3em]">${p.category||''}</span>
-            </div>
-            <div>
-              <h2 class="font-display text-[56px] md:text-[72px] uppercase leading-none mb-5 group-hover:text-accent transition-colors duration-300">${titleHtml}</h2>
-              <p class="text-base text-on-surface-variant leading-relaxed max-w-md">${p.description||''}</p>
-            </div>
-            <div class="flex items-center gap-6 text-on-surface-variant">
-              <span class="label-caps text-[10px]">${p.year||''}</span>
-              ${tags ? `<span class="w-px h-4 bg-black/20"></span><span class="label-caps text-[10px]">${tags}</span>` : ''}
-            </div>
-            <div class="btn-link self-start">View Case Study <span class="material-symbols-outlined text-accent" style="font-size:14px;line-height:1">north_east</span></div>
-          </div>`
-
-          const a = document.createElement('a')
-          a.href = `/work/${p.slug}.html`
-          a.className = 'block border-b border-black/10 py-16 md:py-24 group reveal is-visible'
-          a.dataset.workItem = ''
-          a.dataset.category = catSlug
-          a.innerHTML = `<div class="grid grid-cols-12 gap-8 md:gap-12 items-center">${isEven ? textBlock + imgBlock : imgBlock + textBlock}</div>`
-          container.appendChild(a)
-        })
-      } catch(e) { console.error('portfolio load error', e) }
-    })()
-
-    // ── Load categories and build filter tabs ──────────────────────────────────
-    ;(async function() {
-      try {
-        const r = await fetch('/api/categories')
-        const cats = r.ok ? await r.json() : []
-        const bar = document.getElementById('work-filters')
-        if (!bar) return
+      // ── Render filter tabs ──────────────────────────────────────────────────
+      const bar = document.getElementById('work-filters')
+      if (bar) {
         cats.forEach(cat => {
           const btn = document.createElement('button')
           btn.className = 'work-filter-btn'
@@ -399,7 +346,62 @@
           btn.addEventListener('click', () => filterWork(cat.slug, btn))
           bar.appendChild(btn)
         })
-      } catch {}
+      }
+
+      // ── Render portfolio items ──────────────────────────────────────────────
+      const items = (data.items || []).filter(p => !p.status || p.status === 'published')
+      if (!items.length) return
+
+      // Update hero count + year range
+      const countEl = document.getElementById('work-hero-count')
+      const yearEl  = document.getElementById('work-hero-year')
+      if (countEl) countEl.textContent = items.length + ' Project' + (items.length !== 1 ? 's' : '')
+      if (yearEl) {
+        const years = items.map(p => parseInt(p.year)).filter(Boolean).sort()
+        if (years.length) yearEl.textContent = years.length > 1 ? years[0] + ' — ' + years[years.length-1] : String(years[0])
+      }
+
+      const container = document.getElementById('work-projects')
+      if (!container) return
+      container.innerHTML = '' // replace static placeholder cards
+
+      items.forEach((p, i) => {
+        const isEven  = i % 2 === 1
+        const cs      = getCatSlug(p.category)   // slug that matches filter buttons
+        const tags    = (p.tags || []).join(' · ')
+        const words   = (p.title || '').split(' ')
+        const mid     = Math.ceil(words.length / 2)
+        const titleHtml = words.length > 1
+          ? words.slice(0, mid).join(' ') + '<br>' + words.slice(mid).join(' ')
+          : (p.title || '')
+
+        const thumb = p.thumbnail ? `<img src="${p.thumbnail.replace(/"/g,'&quot;')}" alt="${(p.title||'').replace(/"/g,'&quot;')}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"/>` : ''
+        const imgBlock = `<div class="col-span-12 md:col-span-5${isEven?' order-1 md:order-2':''} overflow-hidden bg-surface-container-low aspect-[4/3]">${thumb}</div>`
+
+        const textBlock = `<div class="col-span-12 md:col-span-7${isEven?' order-2 md:order-1':''} flex flex-col gap-8">
+          <div class="flex items-center justify-between">
+            <div class="badge-circle text-primary">${String(i+1).padStart(2,'0')}</div>
+            <span class="label-caps text-[10px] text-accent tracking-[0.3em]">${p.category||''}</span>
+          </div>
+          <div>
+            <h2 class="font-display text-[56px] md:text-[72px] uppercase leading-none mb-5 group-hover:text-accent transition-colors duration-300">${titleHtml}</h2>
+            <p class="text-base text-on-surface-variant leading-relaxed max-w-md">${p.description||''}</p>
+          </div>
+          <div class="flex items-center gap-6 text-on-surface-variant">
+            <span class="label-caps text-[10px]">${p.year||''}</span>
+            ${tags ? `<span class="w-px h-4 bg-black/20"></span><span class="label-caps text-[10px]">${tags}</span>` : ''}
+          </div>
+          <div class="btn-link self-start">View Case Study <span class="material-symbols-outlined text-accent" style="font-size:14px;line-height:1">north_east</span></div>
+        </div>`
+
+        const a = document.createElement('a')
+        a.href = `/work/${p.slug}.html`
+        a.className = 'block border-b border-black/10 py-16 md:py-24 group reveal is-visible'
+        a.dataset.workItem = ''
+        a.dataset.category = cs   // exact slug from categories API
+        a.innerHTML = `<div class="grid grid-cols-12 gap-8 md:gap-12 items-center">${isEven ? textBlock + imgBlock : imgBlock + textBlock}</div>`
+        container.appendChild(a)
+      })
     })()
 
     function filterWork(cat, btn) {
@@ -409,8 +411,7 @@
         if (cat === 'all') {
           item.classList.remove('hidden-item')
         } else {
-          const itemCat = (item.dataset.category || '').toLowerCase()
-          item.classList.toggle('hidden-item', itemCat !== cat.toLowerCase())
+          item.classList.toggle('hidden-item', (item.dataset.category||'') !== cat)
         }
       })
     }
