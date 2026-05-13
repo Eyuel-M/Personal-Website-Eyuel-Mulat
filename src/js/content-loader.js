@@ -25,24 +25,25 @@
       document.querySelectorAll('[data-editable]').forEach(el => {
         const id   = el.dataset.editable
         const type = el.dataset.editableType || 'text'
-        const override = fields[id]
-        if (!override) return
+        const raw = fields[id]
+        if (raw === null || raw === undefined || raw === '') return
+        const ov = (raw !== null && typeof raw === 'object') ? raw : { value: raw }
 
         // Apply content
         if (type === 'image') {
-          if (override.value) {
-            el.src = override.value
-            el.style.display = override.value ? '' : 'none'
+          if (ov.value) {
+            el.src = ov.value
+            el.style.display = ''
           }
         } else if (type === 'html') {
-          if (override.value) el.innerHTML = override.value
+          if (ov.value) el.innerHTML = ov.value
         } else {
-          if (override.value !== undefined) el.textContent = override.value
+          if (ov.value !== undefined) el.textContent = ov.value
         }
 
         // Apply spacing
-        const m = override.margin  || {}
-        const p = override.padding || {}
+        const m = ov.margin  || {}
+        const p = ov.padding || {}
         if (m.top    !== undefined) el.style.marginTop    = m.top    + 'px'
         if (m.right  !== undefined) el.style.marginRight  = m.right  + 'px'
         if (m.bottom !== undefined) el.style.marginBottom = m.bottom + 'px'
@@ -53,9 +54,9 @@
         if (p.left   !== undefined) el.style.paddingLeft   = p.left   + 'px'
 
         // Apply extra text styles
-        if (override.fontSize)   el.style.fontSize   = override.fontSize
-        if (override.fontWeight) el.style.fontWeight  = override.fontWeight
-        if (override.color)      el.style.color       = override.color
+        if (ov.fontSize)   el.style.fontSize   = ov.fontSize
+        if (ov.fontWeight) el.style.fontWeight  = ov.fontWeight
+        if (ov.color)      el.style.color       = ov.color
       })
 
       // Render custom blocks into #admin-blocks

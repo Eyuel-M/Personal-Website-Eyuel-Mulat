@@ -241,10 +241,15 @@
               if (titleEl) titleEl.textContent = caps[i].title || ''
               if (descEl) descEl.textContent = caps[i].description || ''
               if (iconEl && caps[i].icon) {
-                const isVideo = /\.(mp4|webm|mov)$/i.test(caps[i].icon)
-                iconEl.innerHTML = isVideo
-                  ? `<video src="${caps[i].icon}" autoplay muted loop playsinline class="w-full h-full object-contain"></video>`
-                  : `<img src="${caps[i].icon}" class="w-full h-full object-contain" alt="${caps[i].title}"/>`
+                const ico = caps[i].icon.trim()
+                if (ico.startsWith('<svg')) {
+                  iconEl.innerHTML = ico
+                  const s = iconEl.querySelector('svg'); if (s) s.setAttribute('class','w-full h-full stroke-current fill-none')
+                } else if (/\.(mp4|webm|mov)$/i.test(ico)) {
+                  iconEl.innerHTML = `<video src="${ico}" autoplay muted loop playsinline class="w-full h-full object-contain"></video>`
+                } else {
+                  iconEl.innerHTML = `<img src="${ico}" class="w-full h-full object-contain" alt="${caps[i].title}"/>`
+                }
               }
             }
           })
@@ -258,9 +263,11 @@
               div.innerHTML = `
                 <div class="w-16 h-16 text-on-surface/30 group-hover:text-accent transition-colors duration-500">
                   ${cap.icon
-                    ? (/\.(mp4|webm|mov)$/i.test(cap.icon)
-                        ? `<video src="${cap.icon}" autoplay muted loop playsinline class="w-full h-full object-contain"></video>`
-                        : `<img src="${cap.icon}" class="w-full h-full object-contain" alt="${cap.title}"/>`)
+                    ? (cap.icon.trim().startsWith('<svg')
+                        ? cap.icon
+                        : (/\.(mp4|webm|mov)$/i.test(cap.icon)
+                            ? `<video src="${cap.icon}" autoplay muted loop playsinline class="w-full h-full object-contain"></video>`
+                            : `<img src="${cap.icon}" class="w-full h-full object-contain" alt="${cap.title}"/>`))
                     : `<svg class="w-full h-full stroke-current fill-none" style="stroke-width:1.5" viewBox="0 0 100 100"><rect x="20" y="20" width="60" height="60"/><line x1="20" x2="80" y1="20" y2="80"/></svg>`}
                 </div>
                 <div>
@@ -375,10 +382,12 @@
     if (clients.length <= 6) {
       section.className = 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 divide-x divide-y divide-black/8 border border-black/8'
       clients.forEach(cl => {
-        const cell = document.createElement('div')
+        const cell = cl.url ? document.createElement('a') : document.createElement('div')
         cell.className = 'flex items-center justify-center py-12 px-6 group'
+        if (cl.url) { cell.href = cl.url; cell.target = '_blank'; cell.rel = 'noopener noreferrer'; cell.style.textDecoration = 'none' }
+        const h = (cl.logoHeight || 32) + 'px'
         const inner = cl.logo
-          ? `<img src="${cl.logo}" alt="${cl.name}" class="h-8 object-contain opacity-30 group-hover:opacity-70 transition-opacity duration-500"/>`
+          ? `<img src="${cl.logo}" alt="${cl.name}" style="height:${h};object-fit:contain" class="opacity-30 group-hover:opacity-70 transition-opacity duration-500"/>`
           : `<span class="font-display text-[20px] uppercase text-on-surface/20 group-hover:text-on-surface/60 transition-colors duration-500 text-center leading-tight">${cl.name.replace(' ','<br>')}</span>`
         cell.innerHTML = inner
         section.appendChild(cell)
@@ -390,10 +399,12 @@
       const track = document.createElement('div')
       track.style.cssText = 'display:flex;width:max-content'
       const buildItems = () => clients.map(cl => {
-        const cell = document.createElement('div')
-        cell.style.cssText = 'display:flex;align-items:center;justify-content:center;padding:48px 40px;border-right:1px solid rgba(0,0,0,0.08);flex-shrink:0;width:calc(100vw / 6)'
+        const cell = cl.url ? document.createElement('a') : document.createElement('div')
+        cell.style.cssText = 'display:flex;align-items:center;justify-content:center;padding:48px 40px;border-right:1px solid rgba(0,0,0,0.08);flex-shrink:0;width:calc(100vw / 6);text-decoration:none'
+        if (cl.url) { cell.href = cl.url; cell.target = '_blank'; cell.rel = 'noopener noreferrer' }
+        const h = (cl.logoHeight || 32) + 'px'
         const inner = cl.logo
-          ? `<img src="${cl.logo}" alt="${cl.name}" style="height:32px;object-fit:contain;opacity:0.3" />`
+          ? `<img src="${cl.logo}" alt="${cl.name}" style="height:${h};object-fit:contain;opacity:0.3" />`
           : `<span style="font-family:Anton,sans-serif;font-size:20px;text-transform:uppercase;color:rgba(12,12,12,0.2);text-align:center;line-height:1.2">${cl.name.replace(' ','<br>')}</span>`
         cell.innerHTML = inner
         return cell

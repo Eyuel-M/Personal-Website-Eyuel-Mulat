@@ -272,9 +272,9 @@ app.post('/api/insight', auth, (req, res) => {
 
   // ── Capabilities ──────────────────────────────────────────────────────────
   const defaultCaps = [
-    { id: '1', icon: '', title: 'Brand Strategy', description: 'Defining the core essence, positioning, and architectural narrative of your brand through rigorous analysis.' },
-    { id: '2', icon: '', title: 'Identity Design', description: 'Visual systems built on grid-based precision and timeless modernist principles for lasting impact.' },
-    { id: '3', icon: '', title: 'Digital Build', description: 'High-performance digital experiences that prioritize clarity, structural integrity, and user flow.' },
+    { id: '1', icon: '<svg class="w-full h-full stroke-current fill-none" style="stroke-width:1.5" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40"/><circle cx="50" cy="50" r="25"/><line x1="50" x2="50" y1="10" y2="90"/><line x1="10" x2="90" y1="50" y2="50"/></svg>', title: 'Brand Strategy', description: 'Defining the core essence, positioning, and architectural narrative of your brand through rigorous analysis.' },
+    { id: '2', icon: '<svg class="w-full h-full stroke-current fill-none" style="stroke-width:1.5" viewBox="0 0 100 100"><rect x="20" y="20" width="60" height="60"/><rect x="10" y="10" width="80" height="80" opacity="0.3"/><path d="M20 20 L80 80"/><path d="M80 20 L20 80"/></svg>', title: 'Identity Design', description: 'Visual systems built on grid-based precision and timeless modernist principles for lasting impact.' },
+    { id: '3', icon: '<svg class="w-full h-full stroke-current fill-none" style="stroke-width:1.5" viewBox="0 0 100 100"><path d="M50 10 L90 80 H10 Z"/><path d="M50 30 L75 70 H25 Z" opacity="0.5"/><circle cx="50" cy="55" r="5" fill="currentColor" stroke="none"/></svg>', title: 'Digital Build', description: 'High-performance digital experiences that prioritize clarity, structural integrity, and user flow.' },
   ]
   app.get('/api/capabilities', (req, res) => {
     const f = path.join(CONTENT_DIR, 'capabilities.json')

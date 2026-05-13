@@ -406,7 +406,8 @@ function mkProjectFields(p){
   return {[`${s}-title`]:{value:p.title},[`${s}-category`]:{value:p.category},[`${s}-year`]:{value:p.year},[`${s}-year2`]:{value:p.year},[`${s}-client`]:{value:p.client},[`${s}-scope`]:{value:p.scope||p.category},[`${s}-role`]:{value:p.role||'Creative Director'},[`${s}-overview-h2`]:{value:p.overviewH2||''},[`${s}-overview-text`]:{value:p.overviewText||p.description||''},[`${s}-img-1`]:{value:p.img1||''},[`${s}-hero-img`]:{value:p.thumbnail},[`${s}-del-1-title`]:{value:(dv[0]||{}).title||''},[`${s}-del-1-desc`]:{value:(dv[0]||{}).desc||''},[`${s}-del-2-title`]:{value:(dv[1]||{}).title||''},[`${s}-del-2-desc`]:{value:(dv[1]||{}).desc||''},[`${s}-del-3-title`]:{value:(dv[2]||{}).title||''},[`${s}-del-3-desc`]:{value:(dv[2]||{}).desc||''}}
 }
 function mkArticleFields(a){
-  return {[`${a.slug}-title`]:{value:a.title},[`${a.slug}-category`]:{value:a.category},[`${a.slug}-date`]:{value:a.date},[`${a.slug}-excerpt`]:{value:a.excerpt},[`${a.slug}-hero-img`]:{value:a.image},[`${a.slug}-body`]:{value:a.body}}
+  const bodyHtml=a.bodyTitle?`<h2 class="font-display text-[32px] md:text-[40px] uppercase leading-tight mb-6">${a.bodyTitle}</h2>${a.body||''}`:a.body||''
+  return {[`${a.slug}-title`]:{value:a.title},[`${a.slug}-category`]:{value:a.category},[`${a.slug}-date`]:{value:a.date},[`${a.slug}-excerpt`]:{value:a.excerpt},[`${a.slug}-hero-img`]:{value:a.image},[`${a.slug}-body`]:{value:bodyHtml}}
 }
 function blockForLoader(b){
   const m={top:b.marginTop||0,right:b.marginRight||0,bottom:b.marginBottom||0,left:b.marginLeft||0}
@@ -894,7 +895,21 @@ function renderCapabilities(){
       card.innerHTML=`<div class="sc-h" style="display:flex;justify-content:space-between;align-items:center"><h3>${cap.title||'Capability '+(i+1)}</h3><button class="bd">Remove</button></div>`
       card.querySelector('.bd').onclick=()=>{caps.splice(i,1);rc()}
       const body=document.createElement('div');body.className='sc-b sp'
-      body.appendChild(mkIU({label:'Icon / Logo',hint:'SVG or PNG, ideally square',value:cap.icon||'',onChange:v=>cap.icon=v,aspect:'1/1'}))
+      const icWrap=document.createElement('div')
+      const icL=document.createElement('label');icL.className='fl';icL.textContent='Icon';icWrap.appendChild(icL)
+      const icH=document.createElement('p');icH.className='fh';icH.textContent='Upload an image or paste SVG code.';icWrap.appendChild(icH)
+      const icPrev=document.createElement('div');icPrev.style.cssText='width:64px;height:64px;border:1px solid var(--g200);border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:8px;background:var(--g50)'
+      function setIconPrev(v){icPrev.innerHTML='';if(!v)return;if(v.trim().startsWith('<svg')){icPrev.innerHTML=v;const s=icPrev.querySelector('svg');if(s){s.style.cssText='width:100%;height:100%';s.setAttribute('class','w-full h-full stroke-current fill-none')}}else{const im=document.createElement('img');im.src=v;im.style.cssText='width:100%;height:100%;object-fit:contain';icPrev.appendChild(im)}}
+      setIconPrev(cap.icon||'')
+      icWrap.appendChild(icPrev)
+      const icTA=document.createElement('textarea');icTA.className='fta';icTA.rows=3;icTA.value=cap.icon||'';icTA.placeholder='<svg viewBox="0 0 100 100">…</svg>  or  https://…';icTA.style.fontFamily='monospace';icTA.style.fontSize='11px'
+      icTA.oninput=()=>{cap.icon=icTA.value;setIconPrev(icTA.value)}
+      icWrap.appendChild(icTA)
+      const icFileIn=document.createElement('input');icFileIn.type='file';icFileIn.accept='image/*,.svg';icFileIn.style.display='none'
+      const icUpBtn=document.createElement('button');icUpBtn.className='bs';icUpBtn.style.marginTop='6px';icUpBtn.textContent='↑ Upload Image'
+      icUpBtn.onclick=()=>icFileIn.click()
+      icFileIn.onchange=async e=>{const f=e.target.files[0];if(!f)return;icUpBtn.textContent='Uploading…';try{const url=await apiUpload(f);cap.icon=url;icTA.value=url;setIconPrev(url)}catch(err){console.error(err)};icUpBtn.textContent='↑ Upload Image';e.target.value=''}
+      icWrap.appendChild(icUpBtn);icWrap.appendChild(icFileIn);body.appendChild(icWrap)
       const tf=document.createElement('div');tf.className='sp4'
       const tl=document.createElement('label');tl.className='fl';tl.textContent='Title'
       const ti=document.createElement('input');ti.className='fi';ti.value=cap.title||'';ti.oninput=()=>{cap.title=ti.value;card.querySelector('h3').textContent=ti.value||'Capability '+(i+1)};tf.appendChild(tl);tf.appendChild(ti)
@@ -949,6 +964,14 @@ function renderClients(){
       card.querySelector('.bd').onclick=()=>{clients.splice(i,1);rcl()}
       const body=document.createElement('div');body.className='sc-b sp'
       body.appendChild(mkIU({label:'Logo',hint:'SVG or transparent PNG recommended',value:cl.logo||'',onChange:v=>cl.logo=v,aspect:'3/1'}))
+      const clHWrap=document.createElement('div')
+      const clHRow=document.createElement('div');clHRow.className='ms-lbl'
+      const clHT=document.createElement('span');clHT.textContent='Logo Display Height'
+      const clHV=document.createElement('span');clHV.textContent=(cl.logoHeight||32)+'px'
+      clHRow.appendChild(clHT);clHRow.appendChild(clHV)
+      const clHInp=document.createElement('input');clHInp.type='range';clHInp.min=16;clHInp.max=80;clHInp.value=cl.logoHeight||32
+      clHInp.oninput=()=>{cl.logoHeight=+clHInp.value;clHV.textContent=clHInp.value+'px'}
+      clHWrap.appendChild(clHRow);clHWrap.appendChild(clHInp);body.appendChild(clHWrap)
       const g=document.createElement('div');g.className='g2'
       const nf=document.createElement('div');const nl=document.createElement('label');nl.className='fl';nl.textContent='Client Name';const ni=document.createElement('input');ni.className='fi';ni.value=cl.name||'';ni.oninput=()=>{cl.name=ni.value;card.querySelector('h3').textContent=ni.value||'Client '+(i+1)};nf.appendChild(nl);nf.appendChild(ni)
       const uf=document.createElement('div');const ul=document.createElement('label');ul.className='fl';ul.textContent='Website URL';const ui=document.createElement('input');ui.className='fi';ui.type='url';ui.value=cl.url||'';ui.oninput=()=>cl.url=ui.value;uf.appendChild(ul);uf.appendChild(ui)
@@ -1064,7 +1087,6 @@ function renderPortfolio(){
         const scf=document.createElement('div');const scl=document.createElement('label');scl.className='fl';scl.textContent='Scope';const sci=document.createElement('input');sci.className='fi';sci.value=item.scope||'';sci.placeholder='Brand Identity · UI Design';sci.oninput=()=>item.scope=sci.value;scf.appendChild(scl);scf.appendChild(sci)
         const rof=document.createElement('div');const rol=document.createElement('label');rol.className='fl';rol.textContent='Role';const roi=document.createElement('input');roi.className='fi';roi.value=item.role||'';roi.placeholder='Creative Director';roi.oninput=()=>item.role=roi.value;rof.appendChild(rol);rof.appendChild(roi)
         g3b.appendChild(scf);g3b.appendChild(rof);body.appendChild(g3b)
-        const ovf=document.createElement('div');const ovl=document.createElement('label');ovl.className='fl';ovl.textContent='Overview Heading';const ovi=document.createElement('input');ovi.className='fi';ovi.value=item.overviewH2||'';ovi.placeholder='Project tagline or key statement';ovi.oninput=()=>item.overviewH2=ovi.value;ovf.appendChild(ovl);ovf.appendChild(ovi);body.appendChild(ovf)
         // Image
         body.appendChild(mkIU({label:'Preview Thumbnail',hint:'Card image shown on home & work pages (3:4 portrait)',value:item.thumbnail||'',onChange:v=>item.thumbnail=v,aspect:'3/4',acceptVideo:true}))
         // Gallery
@@ -1154,7 +1176,6 @@ function renderProjectEditor(){
   const scf=document.createElement('div');const scl=document.createElement('label');scl.className='fl';scl.textContent='Scope';const sci=document.createElement('input');sci.className='fi';sci.value=item.scope||'';sci.placeholder='Brand Identity · UI Design';sci.oninput=()=>item.scope=sci.value;scf.appendChild(scl);scf.appendChild(sci)
   const rof=document.createElement('div');const rol=document.createElement('label');rol.className='fl';rol.textContent='Role';const roi=document.createElement('input');roi.className='fi';roi.value=item.role||'';roi.placeholder='Creative Director';roi.oninput=()=>item.role=roi.value;rof.appendChild(rol);rof.appendChild(roi)
   g3b.appendChild(scf);g3b.appendChild(rof);ib.appendChild(g3b)
-  const ovf=document.createElement('div');const ovl=document.createElement('label');ovl.className='fl';ovl.textContent='Overview Heading';const ovi=document.createElement('input');ovi.className='fi';ovi.value=item.overviewH2||'';ovi.placeholder='Project tagline or key statement';ovi.oninput=()=>item.overviewH2=ovi.value;ovf.appendChild(ovl);ovf.appendChild(ovi);ib.appendChild(ovf)
   // Publish button
   const pr=document.createElement('div');pr.style.cssText='padding-top:8px;border-top:1px solid var(--g100)'
   const pb=document.createElement('button');pb.className='bs';pb.innerHTML='⬡ Create / Update Project Page'
@@ -1169,9 +1190,17 @@ function renderProjectEditor(){
   // Overview text card
   if(!item.deliverables||!Array.isArray(item.deliverables))item.deliverables=[{title:'',desc:''},{title:'',desc:''},{title:'',desc:''}]
   while(item.deliverables.length<3)item.deliverables.push({title:'',desc:''})
-  const otCard=document.createElement('div');otCard.className='sc';otCard.style.marginBottom='24px';otCard.innerHTML='<div class="sc-h"><h3>Overview Text</h3></div>'
+  const otCard=document.createElement('div');otCard.className='sc';otCard.style.marginBottom='24px';otCard.innerHTML='<div class="sc-h"><h3>Overview</h3></div>'
   const otBody=document.createElement('div');otBody.className='sc-b sp'
-  const otHint=document.createElement('p');otHint.style.cssText='font-size:12px;color:var(--g400)';otHint.textContent='Descriptive text beside the overview heading. Use the rich editor for bold/italic emphasis.'
+  const ovHPrev=document.createElement('div');ovHPrev.style.cssText='font-family:Anton,sans-serif;font-size:22px;text-transform:uppercase;color:var(--g900);letter-spacing:.02em;line-height:1.1;margin-bottom:4px;min-height:0'
+  ovHPrev.textContent=item.overviewH2||''
+  const ovHI=document.getElementById('ov-h2-input')
+  const ovHWrap=document.createElement('div')
+  const ovHL=document.createElement('label');ovHL.className='fl';ovHL.textContent='Overview Heading';ovHWrap.appendChild(ovHL)
+  const ovHInput=document.createElement('input');ovHInput.className='fi';ovHInput.value=item.overviewH2||'';ovHInput.placeholder='Project tagline or key statement'
+  ovHInput.oninput=()=>{item.overviewH2=ovHInput.value;ovHPrev.textContent=ovHInput.value}
+  ovHWrap.appendChild(ovHInput);ovHWrap.appendChild(ovHPrev);otBody.appendChild(ovHWrap)
+  const otHint=document.createElement('p');otHint.style.cssText='font-size:12px;color:var(--g400);margin-top:12px';otHint.textContent='Descriptive text beside the overview heading.'
   otBody.appendChild(otHint)
   const otBlock={html:item.overviewText||'',marginTop:0,marginRight:0,marginBottom:0,marginLeft:0}
   otBody.appendChild(mkRT(otBlock,b=>{item.overviewText=b.html}))
@@ -1194,6 +1223,12 @@ function renderProjectEditor(){
   dvCard.appendChild(dvBody);c.appendChild(dvCard)
   // Blocks
   renderBlocksSection(c,item)
+  // Publish row
+  const pubRowP=document.createElement('div');pubRowP.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:20px 0;border-top:1px solid var(--g200);margin-top:8px'
+  const pubLblP=document.createElement('div');pubLblP.innerHTML=`<span style="font-size:13px;font-weight:600;color:var(--g700)">Status: </span><span class="${item.status==='published'?'pub-b':'draft-b'}">${item.status==='published'?'Published':'Draft'}</span>`
+  const pubBtnP=document.createElement('button');pubBtnP.className=item.status==='published'?'btn-unpub':'btn-pub';pubBtnP.textContent=item.status==='published'?'Set to Draft':'Publish'
+  pubBtnP.onclick=async()=>{item.status=item.status==='published'?'draft':'published';pubLblP.innerHTML=`<span style="font-size:13px;font-weight:600;color:var(--g700)">Status: </span><span class="${item.status==='published'?'pub-b':'draft-b'}">${item.status==='published'?'Published':'Draft'}</span>`;pubBtnP.className=item.status==='published'?'btn-unpub':'btn-pub';pubBtnP.textContent=item.status==='published'?'Set to Draft':'Publish';await saveSection()}
+  pubRowP.appendChild(pubLblP);pubRowP.appendChild(pubBtnP);c.appendChild(pubRowP)
 }
 
 // ── Insights ──────────────────────────────────────────────────────────────────
@@ -1292,14 +1327,29 @@ function renderInsightEditor(){
   const cc=document.createElement('div');cc.className='sc';cc.style.marginBottom='24px';cc.innerHTML='<div class="sc-h"><h3>Cover Image</h3></div>'
   const cb=document.createElement('div');cb.className='sc-b';cb.appendChild(mkIU({label:'Hero / Cover Image',hint:'1920×1080 recommended',value:item.image||'',onChange:v=>item.image=v,aspect:'16/9'}));cc.appendChild(cb);c.appendChild(cc)
   // Article body card
+  if(!item.bodyTitle)item.bodyTitle=''
   const abCard=document.createElement('div');abCard.className='sc';abCard.style.marginBottom='24px';abCard.innerHTML='<div class="sc-h"><h3>Article Body</h3></div>'
   const abBody=document.createElement('div');abBody.className='sc-b sp'
-  const abHint=document.createElement('p');abHint.style.cssText='font-size:12px;color:var(--g400)';abHint.textContent='The full article text. Supports bold, italic, font size, and colour from the toolbar.'
+  const abTF=document.createElement('div')
+  const abTL=document.createElement('label');abTL.className='fl';abTL.textContent='Section Title (optional)';abTF.appendChild(abTL)
+  const abTP=document.createElement('p');abTP.className='fh';abTP.textContent='Displays above the body text in display font. Leave blank to skip.';abTF.appendChild(abTP)
+  const abTI=document.createElement('input');abTI.className='fi';abTI.value=item.bodyTitle||'';abTI.placeholder='e.g. The Approach'
+  const abTPrev=document.createElement('div');abTPrev.style.cssText='font-family:Anton,sans-serif;font-size:22px;text-transform:uppercase;color:var(--g900);letter-spacing:.02em;line-height:1.1;margin-top:4px;min-height:0'
+  abTPrev.textContent=item.bodyTitle||''
+  abTI.oninput=()=>{item.bodyTitle=abTI.value;abTPrev.textContent=abTI.value}
+  abTF.appendChild(abTI);abTF.appendChild(abTPrev);abBody.appendChild(abTF)
+  const abHint=document.createElement('p');abHint.style.cssText='font-size:12px;color:var(--g400);margin-top:12px';abHint.textContent='The full article text. Supports bold, italic, font size, and colour from the toolbar.'
   abBody.appendChild(abHint)
   const abBlock={html:item.body||'',marginTop:0,marginRight:0,marginBottom:0,marginLeft:0}
   abBody.appendChild(mkRT(abBlock,b=>{item.body=b.html}))
   abCard.appendChild(abBody);c.appendChild(abCard)
   renderBlocksSection(c,item)
+  // Publish row
+  const pubRowI=document.createElement('div');pubRowI.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:20px 0;border-top:1px solid var(--g200);margin-top:8px'
+  const pubLblI=document.createElement('div');pubLblI.innerHTML=`<span style="font-size:13px;font-weight:600;color:var(--g700)">Status: </span><span class="${item.status==='published'?'pub-b':'draft-b'}">${item.status==='published'?'Published':'Draft'}</span>`
+  const pubBtnI=document.createElement('button');pubBtnI.className=item.status==='published'?'btn-unpub':'btn-pub';pubBtnI.textContent=item.status==='published'?'Set to Draft':'Publish'
+  pubBtnI.onclick=async()=>{item.status=item.status==='published'?'draft':'published';pubLblI.innerHTML=`<span style="font-size:13px;font-weight:600;color:var(--g700)">Status: </span><span class="${item.status==='published'?'pub-b':'draft-b'}">${item.status==='published'?'Published':'Draft'}</span>`;pubBtnI.className=item.status==='published'?'btn-unpub':'btn-pub';pubBtnI.textContent=item.status==='published'?'Set to Draft':'Publish';await saveSection()}
+  pubRowI.appendChild(pubLblI);pubRowI.appendChild(pubBtnI);c.appendChild(pubRowI)
 }
 </script>
 </body>
