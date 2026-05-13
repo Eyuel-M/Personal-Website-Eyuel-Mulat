@@ -43,7 +43,7 @@ input,textarea,select,button{font-family:inherit}
 .ni.on .ic svg{stroke:#fff}
 .sb-foot{padding:16px;border-top:1px solid var(--g100)}
 .sb-foot a,.sb-foot button{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--g500);background:none;border:none;cursor:pointer;padding:8px 12px;border-radius:6px;width:100%;text-align:left;text-decoration:none;transition:all .12s}
-.sb-foot a:hover{color:var(--g900);background:var(--g50)}.sb-foot button:hover{color:#DC2626;background:var(--red50)}
+.sb-foot a:hover{color:var(--g900);background:var(--g50)}.sb-foot button:hover{color:#DC2626;background:var(--red50)}#preview-btn:hover{color:var(--navy)!important;background:var(--navy5)!important}
 
 /* Main */
 #main{flex:1;display:flex;flex-direction:column;overflow:hidden}
@@ -188,6 +188,7 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
     <nav id="sb-nav"></nav>
     <div class="sb-foot">
       <a href="/" target="_blank">↗ &nbsp;View Website</a>
+      <button id="preview-btn"><svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="14" height="14"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>&nbsp; Preview Page</button>
       <button id="logout-btn">→ &nbsp;Sign Out</button>
     </div>
   </aside>
@@ -274,6 +275,11 @@ document.getElementById('logout-btn').onclick=()=>{
   localStorage.removeItem(TOKEN_KEY);S.token=''
   document.getElementById('app').classList.remove('show')
   document.getElementById('login').style.display='flex'
+}
+const PREVIEW_URLS={site:'/',navigation:'/',hero:'/',slideshow:'/',about:'/about.html',services:'/',portfolio:'/work.html',insights:'/insights.html',contact:'/contact.html',clients:'/',footer:'/'}
+document.getElementById('preview-btn').onclick=()=>{
+  const url=PREVIEW_URLS[S.section]||'/'
+  window.open(url,'_blank')
 }
 
 async function initApp(){
@@ -1073,7 +1079,7 @@ function renderPortfolio(){
         }
         const addGalBtn=document.createElement('button');addGalBtn.className='bs';addGalBtn.textContent='+ Add Media';addGalBtn.onclick=()=>{item.gallery.push('');rgal()};galDiv.appendChild(addGalBtn);rgal();body.appendChild(galDiv)
         // Open full editor
-        const statusRow=document.createElement('div');statusRow.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid var(--g100)';const statusLbl=document.createElement('div');statusLbl.innerHTML=`<span style="font-size:12px;font-weight:600;color:var(--g700)">Status: </span><span class="${item.status==='published'?'pub-b':'draft-b'}">${item.status==='published'?'Published':'Draft'}</span>`;const statusBtn=document.createElement('button');statusBtn.className=item.status==='published'?'btn-unpub':'btn-pub';statusBtn.textContent=item.status==='published'?'Set to Draft':'Publish';statusBtn.onclick=()=>{item.status=item.status==='published'?'draft':'published';rpl()};statusRow.appendChild(statusLbl);statusRow.appendChild(statusBtn);body.appendChild(statusRow)
+        const statusRow=document.createElement('div');statusRow.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid var(--g100)';const statusLbl=document.createElement('div');statusLbl.innerHTML=`<span style="font-size:12px;font-weight:600;color:var(--g700)">Status: </span><span class="${item.status==='published'?'pub-b':'draft-b'}">${item.status==='published'?'Published':'Draft'}</span>`;const statusBtn=document.createElement('button');statusBtn.className=item.status==='published'?'btn-unpub':'btn-pub';statusBtn.textContent=item.status==='published'?'Set to Draft':'Publish';statusBtn.onclick=async()=>{item.status=item.status==='published'?'draft':'published';rpl();await saveSection('portfolio')};statusRow.appendChild(statusLbl);statusRow.appendChild(statusBtn);body.appendChild(statusRow)
         const openBtn=document.createElement('button');openBtn.className='bs';openBtn.style.cssText='width:100%;padding:10px;font-size:13px;font-weight:500;color:var(--navy);border-color:var(--navy20)';openBtn.textContent='Open Full Project Editor →';openBtn.onclick=()=>{S.editView='project';S.editIdx=i;render()};body.appendChild(openBtn)
         card.appendChild(body)
       }
@@ -1222,7 +1228,7 @@ function renderInsights(){
         g2.appendChild(catf);g2.appendChild(datf);body.appendChild(g2)
         const excf=document.createElement('div');const excl=document.createElement('label');excl.className='fl';excl.textContent='Excerpt';const exca=document.createElement('textarea');exca.className='fta';exca.rows=2;exca.value=item.excerpt||'';exca.oninput=()=>item.excerpt=exca.value;excf.appendChild(excl);excf.appendChild(exca);body.appendChild(excf)
         body.appendChild(mkIU({label:'Cover Image',value:item.image||'',onChange:v=>item.image=v,aspect:'16/9'}))
-        const statusRow2=document.createElement('div');statusRow2.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid var(--g100)';const statusLbl2=document.createElement('div');statusLbl2.innerHTML=`<span style="font-size:12px;font-weight:600;color:var(--g700)">Status: </span><span class="${item.status==='published'?'pub-b':'draft-b'}">${item.status==='published'?'Published':'Draft'}</span>`;const statusBtn2=document.createElement('button');statusBtn2.className=item.status==='published'?'btn-unpub':'btn-pub';statusBtn2.textContent=item.status==='published'?'Set to Draft':'Publish';statusBtn2.onclick=()=>{item.status=item.status==='published'?'draft':'published';ril()};statusRow2.appendChild(statusLbl2);statusRow2.appendChild(statusBtn2);body.appendChild(statusRow2)
+        const statusRow2=document.createElement('div');statusRow2.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid var(--g100)';const statusLbl2=document.createElement('div');statusLbl2.innerHTML=`<span style="font-size:12px;font-weight:600;color:var(--g700)">Status: </span><span class="${item.status==='published'?'pub-b':'draft-b'}">${item.status==='published'?'Published':'Draft'}</span>`;const statusBtn2=document.createElement('button');statusBtn2.className=item.status==='published'?'btn-unpub':'btn-pub';statusBtn2.textContent=item.status==='published'?'Set to Draft':'Publish';statusBtn2.onclick=async()=>{item.status=item.status==='published'?'draft':'published';ril();await saveSection('insights')};statusRow2.appendChild(statusLbl2);statusRow2.appendChild(statusBtn2);body.appendChild(statusRow2)
         const ob=document.createElement('button');ob.className='bs';ob.style.cssText='width:100%;padding:10px;font-size:13px;font-weight:500;color:var(--navy);border-color:var(--navy20)';ob.textContent='Open Full Article Editor →';ob.onclick=()=>{S.editView='insight';S.editIdx=i;render()};body.appendChild(ob)
         card.appendChild(body)
       }
