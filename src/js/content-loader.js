@@ -14,136 +14,155 @@
   const isPreview = new URLSearchParams(window.location.search).has('preview')
   const apiBase = isPreview ? '/api/preview' : '/api/content'
 
-  let data
+  // ── Page-specific field/block overrides ──────────────────────────────────
   try {
     const res = await fetch(`${apiBase}/${page}`)
-    if (!res.ok) return
-    data = await res.json()
-  } catch {
-    return // Admin server not running — silent fail, site works normally
-  }
+    if (res.ok) {
+      const data = await res.json()
+      const { fields = {}, blocks = [] } = data
 
-  const { fields = {}, blocks = [] } = data
+      // Apply field overrides to [data-editable] elements
+      document.querySelectorAll('[data-editable]').forEach(el => {
+        const id   = el.dataset.editable
+        const type = el.dataset.editableType || 'text'
+        const override = fields[id]
+        if (!override) return
 
-  // Apply field overrides to [data-editable] elements
-  document.querySelectorAll('[data-editable]').forEach(el => {
-    const id   = el.dataset.editable
-    const type = el.dataset.editableType || 'text'
-    const override = fields[id]
-    if (!override) return
-
-    // Apply content
-    if (type === 'image') {
-      if (override.value) {
-        el.src = override.value
-        el.style.display = override.value ? '' : 'none'
-      }
-    } else if (type === 'html') {
-      if (override.value) el.innerHTML = override.value
-    } else {
-      if (override.value !== undefined) el.textContent = override.value
-    }
-
-    // Apply spacing
-    const m = override.margin  || {}
-    const p = override.padding || {}
-    if (m.top    !== undefined) el.style.marginTop    = m.top    + 'px'
-    if (m.right  !== undefined) el.style.marginRight  = m.right  + 'px'
-    if (m.bottom !== undefined) el.style.marginBottom = m.bottom + 'px'
-    if (m.left   !== undefined) el.style.marginLeft   = m.left   + 'px'
-    if (p.top    !== undefined) el.style.paddingTop    = p.top    + 'px'
-    if (p.right  !== undefined) el.style.paddingRight  = p.right  + 'px'
-    if (p.bottom !== undefined) el.style.paddingBottom = p.bottom + 'px'
-    if (p.left   !== undefined) el.style.paddingLeft   = p.left   + 'px'
-
-    // Apply extra text styles
-    if (override.fontSize)   el.style.fontSize   = override.fontSize
-    if (override.fontWeight) el.style.fontWeight  = override.fontWeight
-    if (override.color)      el.style.color       = override.color
-  })
-
-  // Render custom blocks into #admin-blocks
-  const blockZone = document.getElementById('admin-blocks')
-  if (blockZone && blocks.length) {
-    blocks.forEach(block => {
-      const el = document.createElement('div')
-      el.style.cssText = [
-        block.margin?.top    ? `margin-top:${block.margin.top}px`       : '',
-        block.margin?.right  ? `margin-right:${block.margin.right}px`   : '',
-        block.margin?.bottom ? `margin-bottom:${block.margin.bottom}px` : 'margin-bottom:40px',
-        block.margin?.left   ? `margin-left:${block.margin.left}px`     : '',
-        block.padding?.top    ? `padding-top:${block.padding.top}px`    : '',
-        block.padding?.right  ? `padding-right:${block.padding.right}px`: '',
-        block.padding?.bottom ? `padding-bottom:${block.padding.bottom}px`: '',
-        block.padding?.left   ? `padding-left:${block.padding.left}px`  : '',
-      ].filter(Boolean).join(';')
-
-      if (block.type === 'image') {
-        if (!block.value) return
-        const img = document.createElement('img')
-        img.src = block.value
-        img.alt = block.label || ''
-        img.className = 'w-full object-cover'
-        if (block.height) img.style.height = block.height + 'px'
-        el.appendChild(img)
-
-      } else if (block.type === 'html') {
-        // Rich text block from admin block editor
-        if (block.title) {
-          const h = document.createElement('h2')
-          h.className = 'font-display text-[32px] md:text-[40px] uppercase leading-tight mb-6 reveal'
-          h.textContent = block.title
-          el.appendChild(h)
+        // Apply content
+        if (type === 'image') {
+          if (override.value) {
+            el.src = override.value
+            el.style.display = override.value ? '' : 'none'
+          }
+        } else if (type === 'html') {
+          if (override.value) el.innerHTML = override.value
+        } else {
+          if (override.value !== undefined) el.textContent = override.value
         }
-        const div = document.createElement('div')
-        div.className = 'text-base text-on-surface-variant leading-relaxed max-w-2xl reveal'
-        div.innerHTML = block.value || ''
-        el.appendChild(div)
 
-      } else if (block.type === 'grid2') {
-        // 2-column image grid
-        const grid = document.createElement('div')
-        grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:16px'
-        ;(block.images || []).slice(0, 2).forEach(src => {
-          if (!src) return
-          const img = document.createElement('img')
-          img.src = src; img.className = 'w-full object-cover aspect-square'
-          grid.appendChild(img)
+        // Apply spacing
+        const m = override.margin  || {}
+        const p = override.padding || {}
+        if (m.top    !== undefined) el.style.marginTop    = m.top    + 'px'
+        if (m.right  !== undefined) el.style.marginRight  = m.right  + 'px'
+        if (m.bottom !== undefined) el.style.marginBottom = m.bottom + 'px'
+        if (m.left   !== undefined) el.style.marginLeft   = m.left   + 'px'
+        if (p.top    !== undefined) el.style.paddingTop    = p.top    + 'px'
+        if (p.right  !== undefined) el.style.paddingRight  = p.right  + 'px'
+        if (p.bottom !== undefined) el.style.paddingBottom = p.bottom + 'px'
+        if (p.left   !== undefined) el.style.paddingLeft   = p.left   + 'px'
+
+        // Apply extra text styles
+        if (override.fontSize)   el.style.fontSize   = override.fontSize
+        if (override.fontWeight) el.style.fontWeight  = override.fontWeight
+        if (override.color)      el.style.color       = override.color
+      })
+
+      // Render custom blocks into #admin-blocks
+      const blockZone = document.getElementById('admin-blocks')
+      if (blockZone && blocks.length) {
+        blocks.forEach(block => {
+          const el = document.createElement('div')
+          el.style.cssText = [
+            block.margin?.top    ? `margin-top:${block.margin.top}px`       : '',
+            block.margin?.right  ? `margin-right:${block.margin.right}px`   : '',
+            block.margin?.bottom ? `margin-bottom:${block.margin.bottom}px` : 'margin-bottom:40px',
+            block.margin?.left   ? `margin-left:${block.margin.left}px`     : '',
+            block.padding?.top    ? `padding-top:${block.padding.top}px`    : '',
+            block.padding?.right  ? `padding-right:${block.padding.right}px`: '',
+            block.padding?.bottom ? `padding-bottom:${block.padding.bottom}px`: '',
+            block.padding?.left   ? `padding-left:${block.padding.left}px`  : '',
+          ].filter(Boolean).join(';')
+
+          if (block.type === 'image') {
+            if (!block.value) return
+            const img = document.createElement('img')
+            img.src = block.value
+            img.alt = block.label || ''
+            img.className = 'w-full object-cover'
+            if (block.height) img.style.height = block.height + 'px'
+            el.appendChild(img)
+
+          } else if (block.type === 'html') {
+            if (block.title) {
+              const h = document.createElement('h2')
+              h.className = 'font-display text-[32px] md:text-[40px] uppercase leading-tight mb-6 reveal'
+              h.textContent = block.title
+              el.appendChild(h)
+            }
+            const div = document.createElement('div')
+            div.className = 'text-base text-on-surface-variant leading-relaxed max-w-2xl reveal'
+            div.innerHTML = block.value || ''
+            el.appendChild(div)
+
+          } else if (block.type === 'grid2') {
+            const grid = document.createElement('div')
+            grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:16px'
+            ;(block.images || []).slice(0, 2).forEach(src => {
+              if (!src) return
+              const img = document.createElement('img')
+              img.src = src; img.className = 'w-full object-cover aspect-square'
+              grid.appendChild(img)
+            })
+            el.appendChild(grid)
+
+          } else if (block.type === 'grid2x2') {
+            const grid = document.createElement('div')
+            grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:16px'
+            ;(block.images || []).slice(0, 4).forEach(src => {
+              if (!src) return
+              const img = document.createElement('img')
+              img.src = src; img.className = 'w-full object-cover aspect-square'
+              grid.appendChild(img)
+            })
+            el.appendChild(grid)
+
+          } else if (block.type === 'heading') {
+            const h = document.createElement('h2')
+            h.className = 'font-display text-[40px] md:text-[56px] uppercase leading-tight reveal'
+            h.textContent = block.value || ''
+            el.appendChild(h)
+
+          } else if (block.type === 'divider') {
+            el.className = 'border-t border-black/10 my-12'
+
+          } else {
+            const p = document.createElement('p')
+            p.className = 'text-base text-on-surface-variant leading-relaxed max-w-2xl reveal'
+            if (block.fontSize) p.style.fontSize = block.fontSize
+            if (block.color)    p.style.color    = block.color
+            p.textContent = block.value || ''
+            el.appendChild(p)
+          }
+
+          blockZone.appendChild(el)
         })
-        el.appendChild(grid)
-
-      } else if (block.type === 'grid2x2') {
-        // 2×2 image grid
-        const grid = document.createElement('div')
-        grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:16px'
-        ;(block.images || []).slice(0, 4).forEach(src => {
-          if (!src) return
-          const img = document.createElement('img')
-          img.src = src; img.className = 'w-full object-cover aspect-square'
-          grid.appendChild(img)
-        })
-        el.appendChild(grid)
-
-      } else if (block.type === 'heading') {
-        const h = document.createElement('h2')
-        h.className = 'font-display text-[40px] md:text-[56px] uppercase leading-tight reveal'
-        h.textContent = block.value || ''
-        el.appendChild(h)
-
-      } else if (block.type === 'divider') {
-        el.className = 'border-t border-black/10 my-12'
-
-      } else {
-        // text block (default / legacy)
-        const p = document.createElement('p')
-        p.className = 'text-base text-on-surface-variant leading-relaxed max-w-2xl reveal'
-        if (block.fontSize) p.style.fontSize = block.fontSize
-        if (block.color)    p.style.color    = block.color
-        p.textContent = block.value || ''
-        el.appendChild(p)
       }
+    }
+  } catch {}
 
-      blockZone.appendChild(el)
-    })
-  }
+  // ── Navigation / logo override — runs on every page independently ─────────
+  try {
+    const navRes = await fetch(`${apiBase}/navigation`)
+    if (navRes.ok) {
+      const navData = await navRes.json()
+      const nf = navData.fields || {}
+      const logoText  = nf.logoText
+      const logoImage = nf.logoImage
+      if (logoText || logoImage) {
+        document.querySelectorAll('[data-nav-logo]').forEach(el => {
+          el.innerHTML = ''
+          if (logoImage) {
+            const img = document.createElement('img')
+            img.src = logoImage
+            img.alt = logoText || ''
+            img.style.cssText = 'height:28px;object-fit:contain;display:block'
+            el.appendChild(img)
+          } else {
+            el.textContent = logoText
+          }
+        })
+      }
+    }
+  } catch {}
 })()
