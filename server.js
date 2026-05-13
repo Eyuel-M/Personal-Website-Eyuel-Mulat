@@ -116,10 +116,13 @@ export function createApiApp() {
         const pf = path.join(CONTENT_DIR, 'portfolio.json')
         if (!fs.existsSync(pf)) return next()
         const portfolio = JSON.parse(fs.readFileSync(pf))
-        const item = (portfolio.items || []).find(p => p.slug === slug)
-        if (!item) return next()
+        const items = portfolio.items || []
+        const idx = items.findIndex(p => p.slug === slug)
+        if (idx < 0) return next()
+        const item = items[idx]
+        const nextItem = items.length > 1 ? items[(idx + 1) % items.length] : null
         res.setHeader('Content-Type', 'text/html; charset=utf-8')
-        return res.send(buildProjectPage(item))
+        return res.send(buildProjectPage(item, nextItem))
       } catch { return next() }
     }
     if ((m = req.url.match(/^\/insights\/([a-z0-9][a-z0-9-]*)\.html(\?.*)?$/i))) {
@@ -447,11 +450,23 @@ function headHTML(title, description = '') {
   <link rel="stylesheet" href="/src/css/main.css"/>`
 }
 
-function buildProjectPage({ slug, title, category, year, client, scope, description, role, overviewH2, overviewText, img1, deliverables, thumbnail }) {
+function buildProjectPage({ slug, title, category, year, client, scope, description, role, overviewH2, overviewText, img1, deliverables, thumbnail }, nextItem) {
   const dv = (deliverables && deliverables.length) ? deliverables : [{title:'',desc:''},{title:'',desc:''},{title:'',desc:''}]
   while (dv.length < 3) dv.push({title:'',desc:''})
   const heroSrc = thumbnail || ''
   const secondarySrc = img1 || ''
+  const nextSection = nextItem ? `
+    <section class="border-t border-black/10 bg-background">
+      <a href="/work/${nextItem.slug}.html" class="group block px-10 md:px-[80px] py-24">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-8">
+          <div>
+            <span class="label-caps text-[10px] text-on-surface-variant/60 tracking-[0.3em] block mb-4">Next Project</span>
+            <h2 class="font-display text-[48px] md:text-[72px] uppercase leading-none group-hover:text-accent transition-colors duration-300">${nextItem.title}</h2>
+          </div>
+          <span class="material-symbols-outlined text-accent text-5xl md:text-7xl transform group-hover:translate-x-3 group-hover:-translate-y-3 transition-transform duration-300">north_east</span>
+        </div>
+      </a>
+    </section>` : ''
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -539,7 +554,7 @@ ${navHTML()}
     <!-- Custom blocks added via admin -->
     <div id="admin-blocks" class="px-10 md:px-[80px]"></div>
   </main>
-
+${nextSection}
 ${footerHTML()}
   <script type="module" src="/src/js/main.js"></script>
   <script type="module" src="/src/js/content-loader.js"></script>
