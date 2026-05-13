@@ -348,7 +348,8 @@ async function saveSection(){
 }
 
 function mkProjectFields(p){
-  return {[`${p.slug}-title`]:{value:p.title},[`${p.slug}-category`]:{value:p.category},[`${p.slug}-year`]:{value:p.year},[`${p.slug}-year2`]:{value:p.year},[`${p.slug}-client`]:{value:p.client},[`${p.slug}-scope`]:{value:p.scope||p.category},[`${p.slug}-role`]:{value:p.role||'Creative Director'},[`${p.slug}-overview-h2`]:{value:p.overviewH2||''},[`${p.slug}-overview-text`]:{value:p.description},[`${p.slug}-hero-img`]:{value:p.thumbnail}}
+  const s=p.slug,dv=p.deliverables||[{},{},{}]
+  return {[`${s}-title`]:{value:p.title},[`${s}-category`]:{value:p.category},[`${s}-year`]:{value:p.year},[`${s}-year2`]:{value:p.year},[`${s}-client`]:{value:p.client},[`${s}-scope`]:{value:p.scope||p.category},[`${s}-role`]:{value:p.role||'Creative Director'},[`${s}-overview-h2`]:{value:p.overviewH2||''},[`${s}-overview-text`]:{value:p.overviewText||p.description||''},[`${s}-img-1`]:{value:p.img1||''},[`${s}-hero-img`]:{value:p.thumbnail},[`${s}-del-1-title`]:{value:(dv[0]||{}).title||''},[`${s}-del-1-desc`]:{value:(dv[0]||{}).desc||''},[`${s}-del-2-title`]:{value:(dv[1]||{}).title||''},[`${s}-del-2-desc`]:{value:(dv[1]||{}).desc||''},[`${s}-del-3-title`]:{value:(dv[2]||{}).title||''},[`${s}-del-3-desc`]:{value:(dv[2]||{}).desc||''}}
 }
 function mkArticleFields(a){
   return {[`${a.slug}-title`]:{value:a.title},[`${a.slug}-category`]:{value:a.category},[`${a.slug}-date`]:{value:a.date},[`${a.slug}-excerpt`]:{value:a.excerpt},[`${a.slug}-hero-img`]:{value:a.image},[`${a.slug}-body`]:{value:a.body}}
@@ -935,7 +936,7 @@ function renderPortfolio(){
     })
     // Add button
     const addBtn=document.createElement('button');addBtn.className='bdash';addBtn.textContent='+ Add Portfolio Item'
-    addBtn.onclick=()=>{p.items.push({id:Date.now(),slug:'new-project',title:'New Project',category:'Branding',client:'',description:'',scope:'',role:'',overviewH2:'',thumbnail:'',year:new Date().getFullYear().toString(),tags:[],gallery:[],blocks:[],archivedBlocks:[]});S.expandedProj=p.items.length-1;rpl()}
+    addBtn.onclick=()=>{p.items.push({id:Date.now(),slug:'new-project',title:'New Project',category:'Branding',client:'',description:'',scope:'',role:'',overviewH2:'',overviewText:'',img1:'',deliverables:[{title:'',desc:''},{title:'',desc:''},{title:'',desc:''}],thumbnail:'',year:new Date().getFullYear().toString(),tags:[],gallery:[],blocks:[],archivedBlocks:[]});S.expandedProj=p.items.length-1;rpl()}
     ld.appendChild(addBtn)
     // Archive
     if(p.archivedItems&&p.archivedItems.length){
@@ -1011,6 +1012,32 @@ function renderProjectEditor(){
   const cb=document.createElement('div');cb.className='sc-b sp'
   cb.appendChild(mkIU({label:'Preview Thumbnail',hint:'Used as card on home & work pages, and as hero on the project page (3:4 portrait)',value:item.thumbnail||'',onChange:v=>item.thumbnail=v,aspect:'3/4'}))
   cc.appendChild(cb);c.appendChild(cc)
+  // Overview text card
+  if(!item.deliverables||!Array.isArray(item.deliverables))item.deliverables=[{title:'',desc:''},{title:'',desc:''},{title:'',desc:''}]
+  while(item.deliverables.length<3)item.deliverables.push({title:'',desc:''})
+  const otCard=document.createElement('div');otCard.className='sc';otCard.style.marginBottom='24px';otCard.innerHTML='<div class="sc-h"><h3>Overview Text</h3></div>'
+  const otBody=document.createElement('div');otBody.className='sc-b sp'
+  const otHint=document.createElement('p');otHint.style.cssText='font-size:12px;color:var(--g400)';otHint.textContent='Descriptive text beside the overview heading. Use the rich editor for bold/italic emphasis.'
+  otBody.appendChild(otHint)
+  const otBlock={html:item.overviewText||'',marginTop:0,marginRight:0,marginBottom:0,marginLeft:0}
+  otBody.appendChild(mkRT(otBlock,b=>{item.overviewText=b.html}))
+  otCard.appendChild(otBody);c.appendChild(otCard)
+  // Secondary image card
+  const siCard=document.createElement('div');siCard.className='sc';siCard.style.marginBottom='24px';siCard.innerHTML='<div class="sc-h"><h3>Secondary Image</h3></div>'
+  const siBody=document.createElement('div');siBody.className='sc-b sp'
+  siBody.appendChild(mkIU({label:'Wide Detail Image',hint:'Panoramic image shown below the overview section (21:9 aspect)',value:item.img1||'',onChange:v=>item.img1=v,aspect:'21/9'}))
+  siCard.appendChild(siBody);c.appendChild(siCard)
+  // Deliverables card
+  const dvCard=document.createElement('div');dvCard.className='sc';dvCard.style.marginBottom='24px';dvCard.innerHTML='<div class="sc-h"><h3>Deliverables</h3></div>'
+  const dvBody=document.createElement('div');dvBody.className='sc-b sp'
+  item.deliverables.slice(0,3).forEach((del,di)=>{
+    const dvRow=document.createElement('div');dvRow.style.cssText='padding:16px;border:1px solid var(--g200);border-radius:10px'
+    const dvNum=document.createElement('div');dvNum.style.cssText='font-size:10px;font-weight:700;letter-spacing:.15em;color:var(--g400);margin-bottom:10px';dvNum.textContent='0'+(di+1)
+    const dvTF=document.createElement('div');const dvTL=document.createElement('label');dvTL.className='fl';dvTL.textContent='Title';const dvTI=document.createElement('input');dvTI.className='fi';dvTI.value=del.title||'';dvTI.placeholder='e.g. Brand Identity';dvTI.oninput=()=>del.title=dvTI.value;dvTF.appendChild(dvTL);dvTF.appendChild(dvTI);dvRow.appendChild(dvNum);dvRow.appendChild(dvTF)
+    const dvDF=document.createElement('div');dvDF.style.marginTop='12px';const dvDL=document.createElement('label');dvDL.className='fl';dvDL.textContent='Description';const dvDA=document.createElement('textarea');dvDA.className='fta';dvDA.rows=2;dvDA.value=del.desc||'';dvDA.placeholder='Brief description of this deliverable';dvDA.oninput=()=>del.desc=dvDA.value;dvDF.appendChild(dvDL);dvDF.appendChild(dvDA);dvRow.appendChild(dvDF)
+    dvBody.appendChild(dvRow)
+  })
+  dvCard.appendChild(dvBody);c.appendChild(dvCard)
   // Blocks
   renderBlocksSection(c,item)
 }
