@@ -87,12 +87,12 @@
           } else if (block.type === 'html') {
             if (block.title) {
               const h = document.createElement('h2')
-              h.className = 'font-display text-[32px] md:text-[40px] uppercase leading-tight mb-6 reveal'
+              h.className = 'font-display text-[32px] md:text-[40px] uppercase leading-tight mb-6'
               h.textContent = block.title
               el.appendChild(h)
             }
             const div = document.createElement('div')
-            div.className = 'text-base text-on-surface-variant leading-relaxed max-w-2xl reveal'
+            div.className = 'text-base text-on-surface-variant leading-relaxed max-w-2xl'
             div.innerHTML = block.value || ''
             el.appendChild(div)
 
