@@ -236,7 +236,15 @@ const S={
 async function api(method,url,body){
   const opts={method,headers:{'x-token':S.token,'Content-Type':'application/json'}}
   if(body!==undefined)opts.body=JSON.stringify(body)
-  return fetch(url,opts).then(r=>r.json())
+  const r=await fetch(url,opts)
+  if(r.status===401&&url!=='/api/login'){
+    localStorage.removeItem(TOKEN_KEY);S.token=''
+    document.getElementById('app').classList.remove('show')
+    document.getElementById('login').style.display='flex'
+    const el=document.getElementById('lerr');el.textContent='Session expired — please sign in again.';el.classList.add('show')
+    throw new Error('Unauthorized')
+  }
+  return r.json()
 }
 async function apiUpload(file){
   const fd=new FormData();fd.append('file',file)
@@ -251,10 +259,16 @@ document.getElementById('lbtn').onclick=doLogin
 document.getElementById('lpw').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()})
 async function doLogin(){
   const pw=document.getElementById('lpw').value.trim()
-  if(!pw)return
-  const j=await api('POST','/api/login',{password:pw})
-  if(j.token){S.token=j.token;localStorage.setItem(TOKEN_KEY,j.token);initApp()}
-  else{const el=document.getElementById('lerr');el.textContent=j.error||'Wrong password';el.classList.add('show')}
+  if(!pw){const el=document.getElementById('lerr');el.textContent='Please enter your password.';el.classList.add('show');return}
+  const btn=document.getElementById('lbtn');btn.disabled=true;btn.textContent='Signing in…'
+  const errEl=document.getElementById('lerr');errEl.classList.remove('show')
+  try{
+    const j=await api('POST','/api/login',{password:pw})
+    if(j.token){S.token=j.token;localStorage.setItem(TOKEN_KEY,j.token);initApp()}
+    else{errEl.textContent=j.error||'Wrong password';errEl.classList.add('show')}
+  }catch(e){
+    if(e.message!=='Unauthorized'){errEl.textContent='Could not reach the server. Make sure it is running.';errEl.classList.add('show')}
+  }finally{btn.disabled=false;btn.textContent='Sign In'}
 }
 document.getElementById('logout-btn').onclick=()=>{
   localStorage.removeItem(TOKEN_KEY);S.token=''
@@ -266,7 +280,10 @@ async function initApp(){
   document.getElementById('login').style.display='none'
   document.getElementById('app').classList.add('show')
   buildSidebar()
-  await switchSection('site')
+  try{await switchSection('site')}catch(e){
+    if(e.message==='Unauthorized')return
+    console.error(e)
+  }
 }
 if(S.token)initApp()
 
