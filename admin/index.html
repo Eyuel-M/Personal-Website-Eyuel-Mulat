@@ -385,13 +385,13 @@ async function saveSection(){
     else if(id==='portfolio'){
       await api('PUT','/api/content/portfolio',S.portfolio)
       for(const p of S.portfolio.items){
-        if(p.status==='published')await api('PUT',`/api/content/${p.slug}`,{fields:mkProjectFields(p),blocks:(p.blocks||[]).map(blockForLoader),archivedBlocks:p.archivedBlocks||[]})
+        await api('PUT',`/api/content/${p.slug}`,{fields:mkProjectFields(p),blocks:(p.blocks||[]).map(blockForLoader),archivedBlocks:p.archivedBlocks||[]})
       }
     }
     else if(id==='insights'){
       await api('PUT','/api/content/insights-data',S.insightsData)
       for(const a of S.insightsData.items){
-        if(a.status==='published')await api('PUT',`/api/content/${a.slug}`,{fields:mkArticleFields(a),blocks:(a.blocks||[]).map(blockForLoader),archivedBlocks:a.archivedBlocks||[]})
+        await api('PUT',`/api/content/${a.slug}`,{fields:mkArticleFields(a),blocks:(a.blocks||[]).map(blockForLoader),archivedBlocks:a.archivedBlocks||[]})
       }
     }
     else if(id==='hero'){await api('PUT','/api/content/home',{fields:S.data})}
@@ -1052,10 +1052,14 @@ function renderPortfolio(){
       const acts=document.createElement('div');acts.className='pc-acts'
       const eb=document.createElement('button');eb.className='bn';eb.textContent='Edit Full Project'
       eb.onclick=e=>{e.stopPropagation();S.editView='project';S.editIdx=i;render()}
+      const upB=document.createElement('button');upB.className='bic';upB.title='Move up';upB.innerHTML='↑';upB.disabled=i===0
+      upB.onclick=e=>{e.stopPropagation();if(i>0){[p.items[i-1],p.items[i]]=[p.items[i],p.items[i-1]];if(S.expandedProj===i)S.expandedProj=i-1;else if(S.expandedProj===i-1)S.expandedProj=i;rpl()}}
+      const dnB=document.createElement('button');dnB.className='bic';dnB.title='Move down';dnB.innerHTML='↓';dnB.disabled=i===p.items.length-1
+      dnB.onclick=e=>{e.stopPropagation();if(i<p.items.length-1){[p.items[i],p.items[i+1]]=[p.items[i+1],p.items[i]];if(S.expandedProj===i)S.expandedProj=i+1;else if(S.expandedProj===i+1)S.expandedProj=i;rpl()}}
       const ab=document.createElement('button');ab.className='bd';ab.textContent='Archive';ab.style.color='var(--amber500)'
       ab.onclick=e=>{e.stopPropagation();if(!p.archivedItems)p.archivedItems=[];p.archivedItems.unshift(p.items.splice(i,1)[0]);if(S.expandedProj===i)S.expandedProj=null;rpl()}
       const tog=document.createElement('span');tog.style.cssText='font-size:11px;color:var(--g400)';tog.textContent=S.expandedProj===i?'▲':'▼'
-      acts.appendChild(eb);acts.appendChild(ab);acts.appendChild(tog)
+      acts.appendChild(eb);acts.appendChild(upB);acts.appendChild(dnB);acts.appendChild(ab);acts.appendChild(tog)
       head.appendChild(hl);head.appendChild(acts)
       head.onclick=()=>{S.expandedProj=S.expandedProj===i?null:i;rpl()}
       card.appendChild(head)

@@ -447,7 +447,11 @@ function headHTML(title, description = '') {
   <link rel="stylesheet" href="/src/css/main.css"/>`
 }
 
-function buildProjectPage({ slug, title, category, year, client, scope, description, role }) {
+function buildProjectPage({ slug, title, category, year, client, scope, description, role, overviewH2, overviewText, img1, deliverables, thumbnail }) {
+  const dv = (deliverables && deliverables.length) ? deliverables : [{title:'',desc:''},{title:'',desc:''},{title:'',desc:''}]
+  while (dv.length < 3) dv.push({title:'',desc:''})
+  const heroSrc = thumbnail || ''
+  const secondarySrc = img1 || ''
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -489,7 +493,7 @@ ${navHTML()}
 
     <section class="px-10 md:px-[80px] mb-24 bg-background">
       <div class="w-full overflow-hidden aspect-[16/9] border-l border-black/10">
-        <img data-editable="${slug}-hero-img" data-editable-type="image" src="" alt="${title}" class="w-full h-full object-cover"/>
+        <img data-editable="${slug}-hero-img" data-editable-type="image" src="${heroSrc}" alt="${title}" class="w-full h-full object-cover"${heroSrc ? '' : ' style="display:none"'}/>
       </div>
     </section>
 
@@ -497,18 +501,16 @@ ${navHTML()}
       <div class="section-header reveal"><span class="label-caps tracking-[0.4em]">01 / Overview</span></div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24">
         <div class="reveal">
-          <h2 class="font-display text-[40px] md:text-[52px] uppercase leading-tight" data-editable="${slug}-overview-h2">Project Overview</h2>
+          <h2 class="font-display text-[40px] md:text-[52px] uppercase leading-tight" data-editable="${slug}-overview-h2">${overviewH2 || 'Project Overview'}</h2>
         </div>
-        <div class="reveal reveal-delay-2" data-editable="${slug}-overview-text" data-editable-type="html">
-          <p class="text-base text-on-surface-variant leading-relaxed">${description || ''}</p>
-        </div>
+        <div class="reveal reveal-delay-2" data-editable="${slug}-overview-text" data-editable-type="html">${overviewText || `<p class="text-base text-on-surface-variant leading-relaxed">${description || ''}</p>`}</div>
       </div>
     </section>
 
     <!-- ── Secondary Image ──────────────────────────────────────────────── -->
     <section class="px-10 md:px-[80px] mb-32 bg-background">
       <div class="w-full overflow-hidden aspect-[21/9] border-l border-black/10 reveal">
-        <img data-editable="${slug}-img-1" data-editable-type="image" src="" alt="${title}" class="w-full h-full object-cover" style="display:none"/>
+        <img data-editable="${slug}-img-1" data-editable-type="image" src="${secondarySrc}" alt="${title}" class="w-full h-full object-cover"${secondarySrc ? '' : ' style="display:none"'}/>
       </div>
     </section>
 
@@ -518,18 +520,18 @@ ${navHTML()}
       <div class="grid grid-cols-1 md:grid-cols-3 gap-x-16 gap-y-0">
         <div class="border-t border-black/10 py-8 reveal">
           <span class="label-caps text-[10px] text-accent tracking-[0.3em] block mb-3">01</span>
-          <h3 class="font-display text-2xl uppercase mb-3" data-editable="${slug}-del-1-title"></h3>
-          <p class="text-sm text-on-surface-variant leading-relaxed" data-editable="${slug}-del-1-desc"></p>
+          <h3 class="font-display text-2xl uppercase mb-3" data-editable="${slug}-del-1-title">${dv[0].title || ''}</h3>
+          <p class="text-sm text-on-surface-variant leading-relaxed" data-editable="${slug}-del-1-desc">${dv[0].desc || ''}</p>
         </div>
         <div class="border-t border-black/10 py-8 reveal reveal-delay-2">
           <span class="label-caps text-[10px] text-accent tracking-[0.3em] block mb-3">02</span>
-          <h3 class="font-display text-2xl uppercase mb-3" data-editable="${slug}-del-2-title"></h3>
-          <p class="text-sm text-on-surface-variant leading-relaxed" data-editable="${slug}-del-2-desc"></p>
+          <h3 class="font-display text-2xl uppercase mb-3" data-editable="${slug}-del-2-title">${dv[1].title || ''}</h3>
+          <p class="text-sm text-on-surface-variant leading-relaxed" data-editable="${slug}-del-2-desc">${dv[1].desc || ''}</p>
         </div>
         <div class="border-t border-black/10 py-8 reveal reveal-delay-3">
           <span class="label-caps text-[10px] text-accent tracking-[0.3em] block mb-3">03</span>
-          <h3 class="font-display text-2xl uppercase mb-3" data-editable="${slug}-del-3-title"></h3>
-          <p class="text-sm text-on-surface-variant leading-relaxed" data-editable="${slug}-del-3-desc"></p>
+          <h3 class="font-display text-2xl uppercase mb-3" data-editable="${slug}-del-3-title">${dv[2].title || ''}</h3>
+          <p class="text-sm text-on-surface-variant leading-relaxed" data-editable="${slug}-del-3-desc">${dv[2].desc || ''}</p>
         </div>
       </div>
     </section>
