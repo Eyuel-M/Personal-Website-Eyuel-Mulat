@@ -701,54 +701,36 @@ function renderBlocksSection(container,item){
 function renderSite(){
   const c=document.getElementById('editor-inner');c.innerHTML=''
   if(!S.data.siteTitle)Object.assign(S.data,{siteTitle:'Eyuel Mulat — Design Studio',metaDescription:'Strategic design for ambitious brands.',favicon:'',ogImage:''})
-  c.appendChild(mkSC('Site Identity',mkInput('Site Title','siteTitle',S.data),mkTextarea('Meta Description','metaDescription',S.data,2)))
-  c.appendChild(mkSC('SEO & Social',mkIU({label:'Favicon',hint:'Square icon (32×32)',value:S.data.favicon||'',onChange:v=>S.data.favicon=v,aspect:'1/1'}),mkIU({label:'OG Image',hint:'1200×630 — shown in link previews',value:S.data.ogImage||'',onChange:v=>S.data.ogImage=v,aspect:'16/9'})))
+  const sd=S.data
+  c.appendChild(mkSC('Site Identity',mkInput('Site Title','siteTitle',sd),mkTextarea('Meta Description','metaDescription',sd,2)))
+  c.appendChild(mkSC('SEO & Social',
+    mkIU({label:'Favicon',hint:'Square icon (32×32 or SVG)',value:sd.favicon||'',onChange:v=>{sd.favicon=v},aspect:'1/1'}),
+    mkIU({label:'OG Image',hint:'1200×630 — shown when sharing links',value:sd.ogImage||'',onChange:v=>{sd.ogImage=v},aspect:'16/9'})
+  ))
 }
 
 // ── Navigation ────────────────────────────────────────────────────────────────
 function renderNav(){
   const c=document.getElementById('editor-inner');c.innerHTML=''
-  if(!S.data.logoText)Object.assign(S.data,{logoText:'EYUEL MULAT',logoImage:'',navLinks:[{label:'About',href:'/about.html'},{label:'Work',href:'/work.html'},{label:'Insights',href:'/insights.html'},{label:'Contact',href:'/contact.html'}]})
+  if(!S.data.logoText)Object.assign(S.data,{logoText:'EYUEL MULAT',logoImage:'',logoHeight:28,logoMargins:{marginTop:0,marginRight:0,marginBottom:0,marginLeft:0},navLinks:[{label:'About',href:'/about.html'},{label:'Work',href:'/work.html'},{label:'Insights',href:'/insights.html'},{label:'Contact',href:'/contact.html'}]})
   if(!S.data.navLinks)S.data.navLinks=[]
-  const logoTextInputEl=mkInput('Logo Text','logoText',S.data)
-  logoTextInputEl.querySelector('input').addEventListener('input',()=>updatePrev())
-  const logoImgEl=mkIU({label:'Logo Image',hint:'Leave blank to use text',value:S.data.logoImage||'',onChange:v=>{S.data.logoImage=v;updatePrev()},aspect:'4/1'})
-  c.appendChild(mkSC('Logo',logoTextInputEl,logoImgEl))
-  const prevCard=document.createElement('div');prevCard.className='sc';prevCard.innerHTML='<div class="sc-h"><h3>Preview</h3></div>'
-  const prevBody=document.createElement('div');prevBody.className='sc-b'
-  prevBody.style.cssText='padding:0'
-  function updatePrev(){
-    prevBody.innerHTML=''
-    const logoText=S.data.logoText||'EYUEL MULAT'
-    const logoImage=S.data.logoImage||''
-    const row1=document.createElement('div')
-    row1.style.cssText='display:flex;align-items:center;gap:16px;padding:20px 24px;border-bottom:1px solid var(--g100)'
-    const lbl1=document.createElement('span')
-    lbl1.style.cssText='font-size:10px;color:var(--g400);min-width:80px;letter-spacing:.05em;text-transform:uppercase;font-weight:600'
-    lbl1.textContent='With name'
-    const prev1=document.createElement('div')
-    prev1.style.cssText='display:flex;align-items:center;gap:12px;flex:1;padding:12px 20px;background:#F8F7F4;border-radius:8px'
-    if(logoImage){const img=document.createElement('img');img.src=logoImage;img.style.cssText='height:28px;object-fit:contain';prev1.appendChild(img)}
-    const txt1=document.createElement('span')
-    txt1.style.cssText='font-family:Anton,display-font,sans-serif;font-size:20px;text-transform:uppercase;letter-spacing:.05em;color:#1B2A4A;line-height:1'
-    txt1.textContent=logoText
-    prev1.appendChild(txt1);row1.appendChild(lbl1);row1.appendChild(prev1)
-    const row2=document.createElement('div')
-    row2.style.cssText='display:flex;align-items:center;gap:16px;padding:20px 24px'
-    const lbl2=document.createElement('span')
-    lbl2.style.cssText='font-size:10px;color:var(--g400);min-width:80px;letter-spacing:.05em;text-transform:uppercase;font-weight:600'
-    lbl2.textContent='Dark nav'
-    const prev2=document.createElement('div')
-    prev2.style.cssText='display:flex;align-items:center;gap:12px;flex:1;padding:12px 20px;background:#1B2A4A;border-radius:8px'
-    if(logoImage){const img2=document.createElement('img');img2.src=logoImage;img2.style.cssText='height:28px;object-fit:contain;filter:brightness(0) invert(1)';prev2.appendChild(img2)}
-    const txt2=document.createElement('span')
-    txt2.style.cssText='font-family:Anton,display-font,sans-serif;font-size:20px;text-transform:uppercase;letter-spacing:.05em;color:#fff;line-height:1'
-    txt2.textContent=logoText
-    prev2.appendChild(txt2);row2.appendChild(lbl2);row2.appendChild(prev2)
-    prevBody.appendChild(row1);prevBody.appendChild(row2)
-  }
-  updatePrev()
-  prevCard.appendChild(prevBody);c.appendChild(prevCard)
+  if(!S.data.logoMargins)S.data.logoMargins={marginTop:0,marginRight:0,marginBottom:0,marginLeft:0}
+  if(S.data.logoHeight===undefined)S.data.logoHeight=28
+  // Height resizer
+  const szWrap=document.createElement('div')
+  const szRow=document.createElement('div');szRow.className='ms-lbl'
+  const szT=document.createElement('span');szT.textContent='Image Height'
+  const szV=document.createElement('span');szV.textContent=(S.data.logoHeight||28)+'px'
+  szRow.appendChild(szT);szRow.appendChild(szV)
+  const szInp=document.createElement('input');szInp.type='range';szInp.min=16;szInp.max=80;szInp.value=S.data.logoHeight||28
+  szInp.oninput=()=>{S.data.logoHeight=+szInp.value;szV.textContent=szInp.value+'px'}
+  szWrap.appendChild(szRow);szWrap.appendChild(szInp)
+  c.appendChild(mkSC('Logo',
+    mkInput('Logo Text','logoText',S.data),
+    mkIU({label:'Logo Image',hint:'Leave blank to use text',value:S.data.logoImage||'',onChange:v=>S.data.logoImage=v,aspect:'4/1'}),
+    szWrap,
+    mkMS(S.data.logoMargins,()=>{})
+  ))
   const lCard=document.createElement('div');lCard.className='sc';lCard.innerHTML='<div class="sc-h"><h3>Navigation Links</h3></div>'
   const lb=document.createElement('div');lb.className='sc-b'
   const ld=document.createElement('div');ld.className='sp4'

@@ -147,21 +147,46 @@
     if (navRes.ok) {
       const navData = await navRes.json()
       const nf = navData.fields || {}
-      const logoText  = nf.logoText
-      const logoImage = nf.logoImage
+      const logoText   = nf.logoText
+      const logoImage  = nf.logoImage
+      const logoHeight = nf.logoHeight || 28
+      const lm         = nf.logoMargins || {}
       if (logoText || logoImage) {
         document.querySelectorAll('[data-nav-logo]').forEach(el => {
+          if (lm.marginTop    !== undefined) el.style.marginTop    = lm.marginTop    + 'px'
+          if (lm.marginRight  !== undefined) el.style.marginRight  = lm.marginRight  + 'px'
+          if (lm.marginBottom !== undefined) el.style.marginBottom = lm.marginBottom + 'px'
+          if (lm.marginLeft   !== undefined) el.style.marginLeft   = lm.marginLeft   + 'px'
           el.innerHTML = ''
           if (logoImage) {
             const img = document.createElement('img')
             img.src = logoImage
             img.alt = logoText || ''
-            img.style.cssText = 'height:28px;object-fit:contain;display:block'
+            img.style.cssText = `height:${logoHeight}px;object-fit:contain;display:block`
             el.appendChild(img)
           } else {
             el.textContent = logoText
           }
         })
+      }
+    }
+  } catch {}
+
+  // ── Site settings — apply favicon and OG image ───────────────────────────
+  try {
+    const siteRes = await fetch(`${apiBase}/site`)
+    if (siteRes.ok) {
+      const siteData = await siteRes.json()
+      const sf = siteData.fields || {}
+      if (sf.favicon) {
+        let link = document.querySelector("link[rel~='icon']")
+        if (!link) { link = document.createElement('link'); link.rel = 'icon'; document.head.appendChild(link) }
+        link.href = sf.favicon
+      }
+      if (sf.ogImage) {
+        let meta = document.querySelector("meta[property='og:image']")
+        if (!meta) { meta = document.createElement('meta'); meta.setAttribute('property', 'og:image'); document.head.appendChild(meta) }
+        meta.setAttribute('content', sf.ogImage)
       }
     }
   } catch {}
