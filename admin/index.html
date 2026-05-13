@@ -443,7 +443,7 @@ function mkIU({label='',hint='',value='',onChange,aspect='16/9',acceptVideo=fals
     zone.className='iu-zone'+(url?' has':'')
     setMedia(url);setOv(url)
   }
-  setMedia(value);setOv(value);zone.appendChild(ov)
+  zone.appendChild(ov);setMedia(value);setOv(value)
   const fileIn=document.createElement('input');fileIn.type='file';fileIn.style.display='none'
   fileIn.accept=acceptVideo?'image/*,video/*,.gif,.mp4,.webm,.mov':'image/*,.gif'
   const urlIn=document.createElement('input');urlIn.className='iu-url';urlIn.type='text';urlIn.value=value||'';urlIn.placeholder='Or paste URL…'
