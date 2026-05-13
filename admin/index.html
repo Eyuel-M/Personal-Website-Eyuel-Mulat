@@ -38,7 +38,9 @@ input,textarea,select,button{font-family:inherit}
 .sb-sec{font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--g400);padding:0 12px;margin-bottom:12px;margin-top:4px;display:block}
 .ni{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:8px 12px;font-size:13px;color:var(--g700);background:none;border:none;border-radius:8px;cursor:pointer;transition:background .12s,color .12s;margin-bottom:2px}
 .ni:hover{background:var(--g100);color:var(--g900)}.ni.on{background:var(--navy);color:#fff}
-.ni .ic{font-size:14px;width:18px;text-align:center}
+.ni .ic{font-size:14px;width:18px;text-align:center;display:flex;align-items:center;justify-content:center}
+.ni .ic svg{width:16px;height:16px;flex-shrink:0}
+.ni.on .ic svg{stroke:#fff}
 .sb-foot{padding:16px;border-top:1px solid var(--g100)}
 .sb-foot a,.sb-foot button{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--g500);background:none;border:none;cursor:pointer;padding:8px 12px;border-radius:6px;width:100%;text-align:left;text-decoration:none;transition:all .12s}
 .sb-foot a:hover{color:var(--g900);background:var(--g50)}.sb-foot button:hover{color:#DC2626;background:var(--red50)}
@@ -145,6 +147,14 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 .ab-btn{font-size:11px;border:1px dashed var(--g300);background:none;border-radius:8px;padding:8px 16px;color:var(--g500);cursor:pointer;transition:all .12s}
 .ab-btn:hover{border-color:var(--navy);color:var(--navy);background:var(--navy5)}
 
+/* Draft/Publish status */
+.draft-b{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;background:#FEF3C7;color:#92400E;border-radius:4px;border:1px solid #FDE68A;margin-left:4px}
+.pub-b{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;background:#F0FDF4;color:#15803D;border-radius:4px;border:1px solid #86efac;margin-left:4px}
+.btn-pub{background:var(--navy);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:opacity .12s}
+.btn-pub:hover{opacity:.85}
+.btn-unpub{background:none;border:1px solid var(--g300);border-radius:6px;padding:6px 14px;font-size:11px;color:var(--g600);cursor:pointer;transition:all .12s}
+.btn-unpub:hover{border-color:var(--navy);color:var(--navy)}
+
 /* Misc */
 .pg-intro{font-size:13px;color:var(--g500);margin-bottom:24px}
 .back-btn{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--g500);background:none;border:none;cursor:pointer;padding:0;margin-bottom:24px;transition:color .12s}
@@ -195,18 +205,18 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 
 <script>
 const SECTIONS=[
-  {id:'site',label:'Site Settings',icon:'⚙️'},
-  {id:'navigation',label:'Logo & Nav',icon:'🔖'},
-  {id:'hero',label:'Hero',icon:'🏠'},
-  {id:'slideshow',label:'Slideshow',icon:'🎞'},
-  {id:'about',label:'About',icon:'👤'},
-  {id:'capabilities',label:'Capabilities',icon:'✦'},
-  {id:'portfolio',label:'Portfolio',icon:'🖼'},
-  {id:'categories',label:'Categories',icon:'🏷'},
-  {id:'insights',label:'Insights',icon:'📝'},
-  {id:'contact',label:'Contact',icon:'📬'},
-  {id:'clients',label:'Clients',icon:'👥'},
-  {id:'footer',label:'Footer',icon:'🗒'},
+  {id:'site',label:'Site Settings',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>'},
+  {id:'navigation',label:'Logo & Nav',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>'},
+  {id:'hero',label:'Hero',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>'},
+  {id:'slideshow',label:'Slideshow',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3H8M12 3v4"/></svg>'},
+  {id:'about',label:'About',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>'},
+  {id:'capabilities',label:'Capabilities',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 3.9 2.4-7.4L2 9.4h7.6z"/></svg>'},
+  {id:'portfolio',label:'Portfolio',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>'},
+  {id:'categories',label:'Categories',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>'},
+  {id:'insights',label:'Insights',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>'},
+  {id:'contact',label:'Contact',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>'},
+  {id:'clients',label:'Clients',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>'},
+  {id:'footer',label:'Footer',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="15" x2="21" y2="15"/></svg>'},
 ]
 const TOKEN_KEY='em_token'
 const UID=()=>Math.random().toString(36).slice(2,8)
@@ -331,13 +341,13 @@ async function saveSection(){
     else if(id==='portfolio'){
       await api('PUT','/api/content/portfolio',S.portfolio)
       for(const p of S.portfolio.items){
-        await api('PUT',`/api/content/${p.slug}`,{fields:mkProjectFields(p),blocks:(p.blocks||[]).map(blockForLoader),archivedBlocks:p.archivedBlocks||[]})
+        if(p.status==='published')await api('PUT',`/api/content/${p.slug}`,{fields:mkProjectFields(p),blocks:(p.blocks||[]).map(blockForLoader),archivedBlocks:p.archivedBlocks||[]})
       }
     }
     else if(id==='insights'){
       await api('PUT','/api/content/insights-data',S.insightsData)
       for(const a of S.insightsData.items){
-        await api('PUT',`/api/content/${a.slug}`,{fields:mkArticleFields(a),blocks:(a.blocks||[]).map(blockForLoader),archivedBlocks:a.archivedBlocks||[]})
+        if(a.status==='published')await api('PUT',`/api/content/${a.slug}`,{fields:mkArticleFields(a),blocks:(a.blocks||[]).map(blockForLoader),archivedBlocks:a.archivedBlocks||[]})
       }
     }
     else if(id==='hero'){await api('PUT','/api/content/home',{fields:S.data})}
@@ -436,8 +446,8 @@ function mkIU({label='',hint='',value='',onChange,aspect='16/9',acceptVideo=fals
     }
   }
   function setOv(url){
-    if(url){ov.innerHTML='<span class="iu-ch">↑ Change image</span>'}
-    else{ov.innerHTML=`<div class="iu-ph"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="color:var(--g300)"><rect x="3" y="3" width="18" height="18" rx="2" stroke-width="1.5"/><circle cx="8.5" cy="8.5" r="1.5" stroke-width="1.5"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m21 15-5-5L5 21"/></svg><p><span>Click to browse</span> or drag &amp; drop</p><p style="font-size:10px;color:var(--g300)">JPG, PNG, WEBP${acceptVideo?', MP4':''}${', GIF'}</p></div>`}
+    if(url){const isVid=/\.(mp4|webm|mov|avi|mkv)$/i.test(url);ov.innerHTML=`<span class="iu-ch">↑ Change ${isVid?'video':'image'}</span>`}
+    else{ov.innerHTML=`<div class="iu-ph"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="color:var(--g300)"><rect x="3" y="3" width="18" height="18" rx="2" stroke-width="1.5"/><circle cx="8.5" cy="8.5" r="1.5" stroke-width="1.5"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m21 15-5-5L5 21"/></svg><p><span>Click to browse</span> or drag &amp; drop</p><p style="font-size:10px;color:var(--g300)">JPG, PNG, WEBP${acceptVideo?', MP4, WEBM':''}, GIF</p></div>`}
   }
   function update(url){
     cur=url;onChange(url);urlIn.value=url
@@ -656,7 +666,45 @@ function renderNav(){
   const c=document.getElementById('editor-inner');c.innerHTML=''
   if(!S.data.logoText)Object.assign(S.data,{logoText:'EYUEL MULAT',logoImage:'',navLinks:[{label:'About',href:'/about.html'},{label:'Work',href:'/work.html'},{label:'Insights',href:'/insights.html'},{label:'Contact',href:'/contact.html'}]})
   if(!S.data.navLinks)S.data.navLinks=[]
-  c.appendChild(mkSC('Logo',mkInput('Logo Text','logoText',S.data),mkIU({label:'Logo Image',hint:'Leave blank to use text',value:S.data.logoImage||'',onChange:v=>S.data.logoImage=v,aspect:'4/1'})))
+  const logoTextInputEl=mkInput('Logo Text','logoText',S.data)
+  logoTextInputEl.querySelector('input').addEventListener('input',()=>updatePrev())
+  const logoImgEl=mkIU({label:'Logo Image',hint:'Leave blank to use text',value:S.data.logoImage||'',onChange:v=>{S.data.logoImage=v;updatePrev()},aspect:'4/1'})
+  c.appendChild(mkSC('Logo',logoTextInputEl,logoImgEl))
+  const prevCard=document.createElement('div');prevCard.className='sc';prevCard.innerHTML='<div class="sc-h"><h3>Preview</h3></div>'
+  const prevBody=document.createElement('div');prevBody.className='sc-b'
+  prevBody.style.cssText='padding:0'
+  function updatePrev(){
+    prevBody.innerHTML=''
+    const logoText=S.data.logoText||'EYUEL MULAT'
+    const logoImage=S.data.logoImage||''
+    const row1=document.createElement('div')
+    row1.style.cssText='display:flex;align-items:center;gap:16px;padding:20px 24px;border-bottom:1px solid var(--g100)'
+    const lbl1=document.createElement('span')
+    lbl1.style.cssText='font-size:10px;color:var(--g400);min-width:80px;letter-spacing:.05em;text-transform:uppercase;font-weight:600'
+    lbl1.textContent='With name'
+    const prev1=document.createElement('div')
+    prev1.style.cssText='display:flex;align-items:center;gap:12px;flex:1;padding:12px 20px;background:#F8F7F4;border-radius:8px'
+    if(logoImage){const img=document.createElement('img');img.src=logoImage;img.style.cssText='height:28px;object-fit:contain';prev1.appendChild(img)}
+    const txt1=document.createElement('span')
+    txt1.style.cssText='font-family:Anton,display-font,sans-serif;font-size:20px;text-transform:uppercase;letter-spacing:.05em;color:#1B2A4A;line-height:1'
+    txt1.textContent=logoText
+    prev1.appendChild(txt1);row1.appendChild(lbl1);row1.appendChild(prev1)
+    const row2=document.createElement('div')
+    row2.style.cssText='display:flex;align-items:center;gap:16px;padding:20px 24px'
+    const lbl2=document.createElement('span')
+    lbl2.style.cssText='font-size:10px;color:var(--g400);min-width:80px;letter-spacing:.05em;text-transform:uppercase;font-weight:600'
+    lbl2.textContent='Dark nav'
+    const prev2=document.createElement('div')
+    prev2.style.cssText='display:flex;align-items:center;gap:12px;flex:1;padding:12px 20px;background:#1B2A4A;border-radius:8px'
+    if(logoImage){const img2=document.createElement('img');img2.src=logoImage;img2.style.cssText='height:28px;object-fit:contain;filter:brightness(0) invert(1)';prev2.appendChild(img2)}
+    const txt2=document.createElement('span')
+    txt2.style.cssText='font-family:Anton,display-font,sans-serif;font-size:20px;text-transform:uppercase;letter-spacing:.05em;color:#fff;line-height:1'
+    txt2.textContent=logoText
+    prev2.appendChild(txt2);row2.appendChild(lbl2);row2.appendChild(prev2)
+    prevBody.appendChild(row1);prevBody.appendChild(row2)
+  }
+  updatePrev()
+  prevCard.appendChild(prevBody);c.appendChild(prevCard)
   const lCard=document.createElement('div');lCard.className='sc';lCard.innerHTML='<div class="sc-h"><h3>Navigation Links</h3></div>'
   const lb=document.createElement('div');lb.className='sc-b'
   const ld=document.createElement('div');ld.className='sp4'
@@ -951,6 +999,7 @@ function renderPortfolio(){
       const tt=document.createElement('span');tt.className='pt';tt.textContent=item.title||'Untitled'
       const yr=document.createElement('span');yr.className='py';yr.textContent=item.year||''
       hl.appendChild(cb);hl.appendChild(tt);hl.appendChild(yr)
+      if(item.status!=='published'){const db=document.createElement('span');db.className='draft-b';db.textContent='Draft';hl.appendChild(db)}
       const acts=document.createElement('div');acts.className='pc-acts'
       const eb=document.createElement('button');eb.className='bn';eb.textContent='Edit Full Project'
       eb.onclick=e=>{e.stopPropagation();S.editView='project';S.editIdx=i;render()}
@@ -991,9 +1040,9 @@ function renderPortfolio(){
         g3b.appendChild(scf);g3b.appendChild(rof);body.appendChild(g3b)
         const ovf=document.createElement('div');const ovl=document.createElement('label');ovl.className='fl';ovl.textContent='Overview Heading';const ovi=document.createElement('input');ovi.className='fi';ovi.value=item.overviewH2||'';ovi.placeholder='Project tagline or key statement';ovi.oninput=()=>item.overviewH2=ovi.value;ovf.appendChild(ovl);ovf.appendChild(ovi);body.appendChild(ovf)
         // Image
-        body.appendChild(mkIU({label:'Preview Thumbnail',hint:'Card image shown on home & work pages (3:4 portrait)',value:item.thumbnail||'',onChange:v=>item.thumbnail=v,aspect:'3/4'}))
+        body.appendChild(mkIU({label:'Preview Thumbnail',hint:'Card image shown on home & work pages (3:4 portrait)',value:item.thumbnail||'',onChange:v=>item.thumbnail=v,aspect:'3/4',acceptVideo:true}))
         // Gallery
-        const galDiv=document.createElement('div');const galL=document.createElement('label');galL.className='fl';galL.textContent='Project Gallery';const galH=document.createElement('p');galH.className='fh';galH.textContent='Extra images for the project detail page.';galDiv.appendChild(galL);galDiv.appendChild(galH)
+        const galDiv=document.createElement('div');const galL=document.createElement('label');galL.className='fl';galL.textContent='Project Gallery';const galH=document.createElement('p');galH.className='fh';galH.textContent='Extra images or videos for the project detail page.';galDiv.appendChild(galL);galDiv.appendChild(galH)
         if(!item.gallery)item.gallery=[]
         function rgal(){
           galDiv.querySelectorAll('.gal-row').forEach(e=>e.remove())
@@ -1005,8 +1054,9 @@ function renderPortfolio(){
             const addBtn2=galDiv.querySelector('.bs');galDiv.insertBefore(row,addBtn2)
           })
         }
-        const addGalBtn=document.createElement('button');addGalBtn.className='bs';addGalBtn.textContent='+ Add Image';addGalBtn.onclick=()=>{item.gallery.push('');rgal()};galDiv.appendChild(addGalBtn);rgal();body.appendChild(galDiv)
+        const addGalBtn=document.createElement('button');addGalBtn.className='bs';addGalBtn.textContent='+ Add Media';addGalBtn.onclick=()=>{item.gallery.push('');rgal()};galDiv.appendChild(addGalBtn);rgal();body.appendChild(galDiv)
         // Open full editor
+        const statusRow=document.createElement('div');statusRow.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid var(--g100)';const statusLbl=document.createElement('div');statusLbl.innerHTML=\`<span style="font-size:12px;font-weight:600;color:var(--g700)">Status: </span><span class="\${item.status==='published'?'pub-b':'draft-b'}">\${item.status==='published'?'Published':'Draft'}</span>\`;const statusBtn=document.createElement('button');statusBtn.className=item.status==='published'?'btn-unpub':'btn-pub';statusBtn.textContent=item.status==='published'?'Set to Draft':'Publish';statusBtn.onclick=()=>{item.status=item.status==='published'?'draft':'published';rpl()};statusRow.appendChild(statusLbl);statusRow.appendChild(statusBtn);body.appendChild(statusRow)
         const openBtn=document.createElement('button');openBtn.className='bs';openBtn.style.cssText='width:100%;padding:10px;font-size:13px;font-weight:500;color:var(--navy);border-color:var(--navy20)';openBtn.textContent='Open Full Project Editor →';openBtn.onclick=()=>{S.editView='project';S.editIdx=i;render()};body.appendChild(openBtn)
         card.appendChild(body)
       }
@@ -1014,7 +1064,7 @@ function renderPortfolio(){
     })
     // Add button
     const addBtn=document.createElement('button');addBtn.className='bdash';addBtn.textContent='+ Add Portfolio Item'
-    addBtn.onclick=()=>{p.items.push({id:Date.now(),slug:'new-project',title:'New Project',category:'Branding',client:'',description:'',scope:'',role:'',overviewH2:'',overviewText:'',img1:'',deliverables:[{title:'',desc:''},{title:'',desc:''},{title:'',desc:''}],thumbnail:'',year:new Date().getFullYear().toString(),tags:[],gallery:[],blocks:[],archivedBlocks:[]});S.expandedProj=p.items.length-1;rpl()}
+    addBtn.onclick=()=>{p.items.push({id:Date.now(),slug:'new-project',title:'New Project',category:'Branding',client:'',description:'',scope:'',role:'',overviewH2:'',overviewText:'',img1:'',deliverables:[{title:'',desc:''},{title:'',desc:''},{title:'',desc:''}],thumbnail:'',year:new Date().getFullYear().toString(),tags:[],gallery:[],blocks:[],archivedBlocks:[],status:'draft'});S.expandedProj=p.items.length-1;rpl()}
     ld.appendChild(addBtn)
     // Archive
     if(p.archivedItems&&p.archivedItems.length){
@@ -1088,7 +1138,7 @@ function renderProjectEditor(){
   // Cover image
   const cc=document.createElement('div');cc.className='sc';cc.style.marginBottom='24px';cc.innerHTML='<div class="sc-h"><h3>Project Image</h3></div>'
   const cb=document.createElement('div');cb.className='sc-b sp'
-  cb.appendChild(mkIU({label:'Preview Thumbnail',hint:'Used as card on home & work pages, and as hero on the project page (3:4 portrait)',value:item.thumbnail||'',onChange:v=>item.thumbnail=v,aspect:'3/4'}))
+  cb.appendChild(mkIU({label:'Preview Thumbnail',hint:'Used as card on home & work pages, and as hero on the project page (3:4 portrait)',value:item.thumbnail||'',onChange:v=>item.thumbnail=v,aspect:'3/4',acceptVideo:true}))
   cc.appendChild(cb);c.appendChild(cc)
   // Overview text card
   if(!item.deliverables||!Array.isArray(item.deliverables))item.deliverables=[{title:'',desc:''},{title:'',desc:''},{title:'',desc:''}]
@@ -1103,7 +1153,7 @@ function renderProjectEditor(){
   // Secondary image card
   const siCard=document.createElement('div');siCard.className='sc';siCard.style.marginBottom='24px';siCard.innerHTML='<div class="sc-h"><h3>Secondary Image</h3></div>'
   const siBody=document.createElement('div');siBody.className='sc-b sp'
-  siBody.appendChild(mkIU({label:'Wide Detail Image',hint:'Panoramic image shown below the overview section (21:9 aspect)',value:item.img1||'',onChange:v=>item.img1=v,aspect:'21/9'}))
+  siBody.appendChild(mkIU({label:'Wide Detail Image',hint:'Panoramic image shown below the overview section (21:9 aspect)',value:item.img1||'',onChange:v=>item.img1=v,aspect:'21/9',acceptVideo:true}))
   siCard.appendChild(siBody);c.appendChild(siCard)
   // Deliverables card
   const dvCard=document.createElement('div');dvCard.className='sc';dvCard.style.marginBottom='24px';dvCard.innerHTML='<div class="sc-h"><h3>Deliverables</h3></div>'
@@ -1135,6 +1185,7 @@ function renderInsights(){
       const tt=document.createElement('span');tt.className='pt';tt.textContent=item.title||'Untitled'
       const dt=document.createElement('span');dt.className='py';dt.textContent=item.date||''
       hl.appendChild(cb);hl.appendChild(tt);hl.appendChild(dt)
+      if(item.status!=='published'){const idb=document.createElement('span');idb.className='draft-b';idb.textContent='Draft';hl.appendChild(idb)}
       const acts=document.createElement('div');acts.className='pc-acts'
       const eb=document.createElement('button');eb.className='bn';eb.textContent='Edit Full Article';eb.onclick=e=>{e.stopPropagation();S.editView='insight';S.editIdx=i;render()}
       const ab=document.createElement('button');ab.className='bd';ab.textContent='Archive';ab.style.color='var(--amber500)'
@@ -1154,13 +1205,14 @@ function renderInsights(){
         g2.appendChild(catf);g2.appendChild(datf);body.appendChild(g2)
         const excf=document.createElement('div');const excl=document.createElement('label');excl.className='fl';excl.textContent='Excerpt';const exca=document.createElement('textarea');exca.className='fta';exca.rows=2;exca.value=item.excerpt||'';exca.oninput=()=>item.excerpt=exca.value;excf.appendChild(excl);excf.appendChild(exca);body.appendChild(excf)
         body.appendChild(mkIU({label:'Cover Image',value:item.image||'',onChange:v=>item.image=v,aspect:'16/9'}))
+        const statusRow2=document.createElement('div');statusRow2.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid var(--g100)';const statusLbl2=document.createElement('div');statusLbl2.innerHTML=`<span style="font-size:12px;font-weight:600;color:var(--g700)">Status: </span><span class="${item.status==='published'?'pub-b':'draft-b'}">${item.status==='published'?'Published':'Draft'}</span>`;const statusBtn2=document.createElement('button');statusBtn2.className=item.status==='published'?'btn-unpub':'btn-pub';statusBtn2.textContent=item.status==='published'?'Set to Draft':'Publish';statusBtn2.onclick=()=>{item.status=item.status==='published'?'draft':'published';ril()};statusRow2.appendChild(statusLbl2);statusRow2.appendChild(statusBtn2);body.appendChild(statusRow2)
         const ob=document.createElement('button');ob.className='bs';ob.style.cssText='width:100%;padding:10px;font-size:13px;font-weight:500;color:var(--navy);border-color:var(--navy20)';ob.textContent='Open Full Article Editor →';ob.onclick=()=>{S.editView='insight';S.editIdx=i;render()};body.appendChild(ob)
         card.appendChild(body)
       }
       ld.appendChild(card)
     })
     const addBtn=document.createElement('button');addBtn.className='bdash';addBtn.textContent='+ Add Article'
-    addBtn.onclick=()=>{ins.items.push({id:Date.now(),slug:'new-article',title:'New Article',category:'Essay',date:'',excerpt:'',image:'',body:'',blocks:[],archivedBlocks:[]});S.expandedInsight=ins.items.length-1;ril()};ld.appendChild(addBtn)
+    addBtn.onclick=()=>{ins.items.push({id:Date.now(),slug:'new-article',title:'New Article',category:'Essay',date:'',excerpt:'',image:'',body:'',blocks:[],archivedBlocks:[],status:'draft'});S.expandedInsight=ins.items.length-1;ril()};ld.appendChild(addBtn)
     if(ins.archivedItems&&ins.archivedItems.length){
       const arch=document.createElement('div');arch.className='arch';arch.style.marginTop='16px'
       const ah=document.createElement('button');ah.className='arch-h'
