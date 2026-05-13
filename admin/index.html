@@ -734,18 +734,78 @@ function renderSlideshow(){
 // ── About ─────────────────────────────────────────────────────────────────────
 function renderAbout(){
   const c=document.getElementById('editor-inner');c.innerHTML=''
-  const def={'about-hero-label':'Creative Director','about-h1':'Making brands that endure.','about-intro':"I'm a creative director and brand strategist working at the intersection of visual identity and strategic thinking. Every project is an opportunity to build something that lasts.",'about-img':'','about-phil-1-title':'Listen before designing','about-phil-1-desc':"Understanding the problem space deeply before reaching for solutions. The best visual systems emerge from genuine understanding of a brand's truth — not from decoration applied over uncertainty.",'about-phil-2-title':'Build systems, not assets','about-phil-2-desc':"Every visual decision exists within a framework. Scalable identity systems outlast individual deliverables — they adapt to every touchpoint with consistency, from digital to print to environment.",'about-phil-3-title':'Precision over decoration','about-phil-3-desc':"Remove everything that doesn't earn its place. Architectural restraint isn't minimalism by default — it's intentionality at every scale, knowing when to add and when to hold back.",'service-1-title':'Brand Strategy','service-1-desc':'Positioning audits, competitive landscapes, brand architecture, and the narrative frameworks that guide every visual and verbal decision.','service-2-title':'Visual Identity','service-2-desc':'Logo systems, color palettes, typeface selection, and the full visual language that makes a brand instantly recognisable across every touchpoint.','service-3-title':'Creative Direction','service-3-desc':'Art directing photo shoots, campaign visuals, and cross-channel brand moments — ensuring every image and execution is consistent with the brand core idea.','service-4-title':'Typography','service-4-desc':'Type system design, custom lettering, and hierarchical scales that carry meaning and voice — from display headlines to dense body copy.','service-5-title':'Digital Systems','service-5-desc':'Design systems, component libraries, and UI frameworks that translate brand logic into scalable digital products with precision and consistency.','service-6-title':'Editorial Design','service-6-desc':'Annual reports, brand books, and publication design — structured grid layouts that give written content the authority and clarity it deserves.'}
-  Object.keys(def).forEach(k=>{if(S.data[k]===undefined)S.data[k]=def[k]})
+  if(S.data['about-hero-label']===undefined)S.data['about-hero-label']='Creative Director'
+  if(S.data['about-h1']===undefined)S.data['about-h1']='Making brands that endure.'
+  if(S.data['about-intro']===undefined)S.data['about-intro']="I'm a creative director and brand strategist working at the intersection of visual identity and strategic thinking. Every project is an opportunity to build something that lasts."
+  if(S.data['about-img']===undefined)S.data['about-img']=''
+  if(!Array.isArray(S.data.philosophyItems))S.data.philosophyItems=[{title:'Listen before designing',desc:"Understanding the problem space deeply before reaching for solutions. The best visual systems emerge from genuine understanding of a brand's truth — not from decoration applied over uncertainty."},{title:'Build systems, not assets',desc:"Every visual decision exists within a framework. Scalable identity systems outlast individual deliverables — they adapt to every touchpoint with consistency, from digital to print to environment."},{title:'Precision over decoration',desc:"Remove everything that doesn't earn its place. Architectural restraint isn't minimalism by default — it's intentionality at every scale, knowing when to add and when to hold back."}]
+  if(!Array.isArray(S.data.archivedPhilosophyItems))S.data.archivedPhilosophyItems=[]
+  if(!Array.isArray(S.data.serviceItems))S.data.serviceItems=[{title:'Brand Strategy',desc:'Positioning audits, competitive landscapes, brand architecture, and the narrative frameworks that guide every visual and verbal decision.'},{title:'Visual Identity',desc:"Logo systems, color palettes, typeface selection, and the full visual language that makes a brand instantly recognisable across every touchpoint."},{title:'Creative Direction',desc:"Art directing photo shoots, campaign visuals, and cross-channel brand moments — ensuring every image and execution is consistent with the brand's core idea."},{title:'Typography',desc:'Type system design, custom lettering, and hierarchical scales that carry meaning and voice — from display headlines to dense body copy.'},{title:'Digital Systems',desc:'Design systems, component libraries, and UI frameworks that translate brand logic into scalable digital products with precision and consistency.'},{title:'Editorial Design',desc:'Annual reports, brand books, and publication design — structured grid layouts that give written content the authority and clarity it deserves.'}]
+  if(!Array.isArray(S.data.archivedServiceItems))S.data.archivedServiceItems=[]
+  if(!Array.isArray(S.data.processItems))S.data.processItems=[{heading:'Choose the Strategy',accentWord:'Strategy',stepLabel:'00-1 Step',desc:'Selecting the optimal path for brand growth through intensive research and structural auditing of market landscapes.'},{heading:'Define the Identity',accentWord:'Identity',stepLabel:'00-2 Step',desc:'Developing the core visual grammar and systemic logic that will underpin every future brand touchpoint.'}]
+  if(!Array.isArray(S.data.archivedProcessItems))S.data.archivedProcessItems=[]
   c.appendChild(mkSC('Hero',mkInput('Eyebrow Label','about-hero-label',S.data),mkInput('Headline','about-h1',S.data),mkTextarea('Intro Paragraph','about-intro',S.data,3)))
   c.appendChild(mkSC('Header Image',mkIU({label:'Wide Photo',hint:'21:9 — full-width image below the hero',value:S.data['about-img']||'',onChange:v=>S.data['about-img']=v,aspect:'21/9'})))
+  function mkDynList(container,arr,archived,rowLabel,singularLabel,mkFields,newItem){
+    function render(){
+      container.innerHTML=''
+      arr.forEach((item,i)=>{
+        const f=document.createElement('div');f.style.cssText='padding:16px;border:1px solid var(--g200);border-radius:10px'
+        const hdr=document.createElement('div');hdr.style.cssText='display:flex;justify-content:space-between;align-items:center;margin-bottom:12px'
+        const lbl=document.createElement('div');lbl.style.cssText='font-size:10px;font-weight:700;letter-spacing:.15em;color:var(--g400)';lbl.textContent=rowLabel+' '+String(i+1).padStart(2,'0')
+        const ab=document.createElement('button');ab.className='bd';ab.textContent='Archive';ab.style.color='var(--amber500)';ab.onclick=()=>{archived.unshift(arr.splice(i,1)[0]);render()}
+        hdr.appendChild(lbl);hdr.appendChild(ab);f.appendChild(hdr)
+        mkFields(f,item)
+        container.appendChild(f)
+      })
+      const add=document.createElement('button');add.className='bdash';add.textContent='+ Add '+singularLabel;add.onclick=()=>{arr.push(newItem());render()};container.appendChild(add)
+      if(archived.length){
+        const arch=document.createElement('div');arch.style.cssText='margin-top:8px;border:1px solid var(--amber200,#fde68a);border-radius:10px;background:var(--amber50,#fffbeb)'
+        const ah=document.createElement('div');ah.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:10px 14px;cursor:pointer'
+        let open=false
+        const ahl=document.createElement('div');ahl.className='arch-hl';ahl.innerHTML=`<span style="color:var(--amber500)">⊘</span><span style="font-size:13px;font-weight:500;color:var(--amber800)">Archive — ${archived.length} item${archived.length!==1?'s':''}</span>`
+        const arr2=document.createElement('span');arr2.style.cssText='color:var(--amber500);font-size:11px';arr2.textContent='▼'
+        ah.appendChild(ahl);ah.appendChild(arr2);arch.appendChild(ah)
+        const abody=document.createElement('div');abody.style.cssText='padding:0 14px 14px;display:none'
+        archived.forEach((it2,j)=>{
+          const row=document.createElement('div');row.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--amber200,#fde68a)'
+          const nm=document.createElement('span');nm.style.fontSize='13px';nm.textContent=it2.title||it2.heading||'Untitled';row.appendChild(nm)
+          const btns=document.createElement('div');btns.style.cssText='display:flex;gap:6px'
+          const rb=document.createElement('button');rb.className='bn';rb.textContent='Restore';rb.onclick=()=>{arr.push(archived.splice(j,1)[0]);render()}
+          const db=document.createElement('button');db.className='bd';db.textContent='Delete';db.onclick=()=>{if(confirm('Delete permanently?')){archived.splice(j,1);render()}}
+          btns.appendChild(rb);btns.appendChild(db);row.appendChild(btns);abody.appendChild(row)
+        })
+        ah.onclick=()=>{open=!open;abody.style.display=open?'':'none';arr2.textContent=open?'▲':'▼'}
+        arch.appendChild(abody);container.appendChild(arch)
+      }
+    }
+    render()
+  }
   const philCard=document.createElement('div');philCard.className='sc';philCard.innerHTML='<div class="sc-h"><h3>Philosophy</h3></div>'
   const philBody=document.createElement('div');philBody.className='sc-b sp'
-  ;[1,2,3].forEach(n=>{const f=document.createElement('div');f.style.cssText='padding:16px;border:1px solid var(--g200);border-radius:10px';const num=document.createElement('div');num.style.cssText='font-size:10px;font-weight:700;letter-spacing:.15em;color:var(--g400);margin-bottom:10px';num.textContent='Principle 0'+n;f.appendChild(num);f.appendChild(mkInput('Heading','about-phil-'+n+'-title',S.data));const dd=document.createElement('div');dd.style.marginTop='12px';dd.appendChild(mkTextarea('Description','about-phil-'+n+'-desc',S.data,2));f.appendChild(dd);philBody.appendChild(f)})
+  mkDynList(philBody,S.data.philosophyItems,S.data.archivedPhilosophyItems,'Principle','Principle',(f,item)=>{
+    const tf=document.createElement('div');const tl=document.createElement('label');tl.className='fl';tl.textContent='Heading';const ti=document.createElement('input');ti.className='fi';ti.value=item.title||'';ti.oninput=()=>item.title=ti.value;tf.appendChild(tl);tf.appendChild(ti);f.appendChild(tf)
+    const dd=document.createElement('div');dd.style.marginTop='12px';const dl=document.createElement('label');dl.className='fl';dl.textContent='Description';const da=document.createElement('textarea');da.className='fta';da.rows=2;da.value=item.desc||'';da.oninput=()=>item.desc=da.value;dd.appendChild(dl);dd.appendChild(da);f.appendChild(dd)
+  },()=>({title:'New Principle',desc:''}))
   philCard.appendChild(philBody);c.appendChild(philCard)
   const expCard=document.createElement('div');expCard.className='sc';expCard.innerHTML='<div class="sc-h"><h3>Expertise / Services</h3></div>'
   const expBody=document.createElement('div');expBody.className='sc-b sp'
-  ;[1,2,3,4,5,6].forEach(n=>{const f=document.createElement('div');f.style.cssText='padding:16px;border:1px solid var(--g200);border-radius:10px';const num=document.createElement('div');num.style.cssText='font-size:10px;font-weight:700;letter-spacing:.15em;color:var(--g400);margin-bottom:10px';num.textContent='Service 0'+n;f.appendChild(num);f.appendChild(mkInput('Title','service-'+n+'-title',S.data));const dd=document.createElement('div');dd.style.marginTop='12px';dd.appendChild(mkTextarea('Description','service-'+n+'-desc',S.data,2));f.appendChild(dd);expBody.appendChild(f)})
+  mkDynList(expBody,S.data.serviceItems,S.data.archivedServiceItems,'Service','Service',(f,item)=>{
+    const tf=document.createElement('div');const tl=document.createElement('label');tl.className='fl';tl.textContent='Title';const ti=document.createElement('input');ti.className='fi';ti.value=item.title||'';ti.oninput=()=>item.title=ti.value;tf.appendChild(tl);tf.appendChild(ti);f.appendChild(tf)
+    const dd=document.createElement('div');dd.style.marginTop='12px';const dl=document.createElement('label');dl.className='fl';dl.textContent='Description';const da=document.createElement('textarea');da.className='fta';da.rows=2;da.value=item.desc||'';da.oninput=()=>item.desc=da.value;dd.appendChild(dl);dd.appendChild(da);f.appendChild(dd)
+  },()=>({title:'New Service',desc:''}))
   expCard.appendChild(expBody);c.appendChild(expCard)
+  const procCard=document.createElement('div');procCard.className='sc';procCard.innerHTML='<div class="sc-h"><h3>Process</h3></div>'
+  const procBody=document.createElement('div');procBody.className='sc-b sp'
+  mkDynList(procBody,S.data.processItems,S.data.archivedProcessItems,'Step','Step',(f,item)=>{
+    const g=document.createElement('div');g.className='g2'
+    const hf=document.createElement('div');const hl=document.createElement('label');hl.className='fl';hl.textContent='Heading';const hi=document.createElement('input');hi.className='fi';hi.value=item.heading||'';hi.oninput=()=>item.heading=hi.value;hf.appendChild(hl);hf.appendChild(hi)
+    const af=document.createElement('div');const al=document.createElement('label');al.className='fl';al.textContent='Accent Word';const ai=document.createElement('input');ai.className='fi';ai.placeholder='e.g. Strategy';ai.value=item.accentWord||'';ai.oninput=()=>item.accentWord=ai.value;af.appendChild(al);af.appendChild(ai)
+    g.appendChild(hf);g.appendChild(af);f.appendChild(g)
+    const sf=document.createElement('div');sf.style.marginTop='12px';const sl=document.createElement('label');sl.className='fl';sl.textContent='Step Label';const si=document.createElement('input');si.className='fi';si.placeholder='e.g. 00-1 Step';si.value=item.stepLabel||'';si.oninput=()=>item.stepLabel=si.value;sf.appendChild(sl);sf.appendChild(si);f.appendChild(sf)
+    const dd=document.createElement('div');dd.style.marginTop='12px';const dl=document.createElement('label');dl.className='fl';dl.textContent='Description';const da=document.createElement('textarea');da.className='fta';da.rows=2;da.value=item.desc||'';da.oninput=()=>item.desc=da.value;dd.appendChild(dl);dd.appendChild(da);f.appendChild(dd)
+  },()=>({heading:'New Step',accentWord:'',stepLabel:'',desc:''}))
+  procCard.appendChild(procBody);c.appendChild(procCard)
 }
 
 // ── Capabilities ──────────────────────────────────────────────────────────────

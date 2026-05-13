@@ -64,7 +64,7 @@
         <span class="label-caps opacity-40">Approach</span>
       </div>
 
-      <div>
+      <div id="about-philosophy-list">
         <!-- Principle 01 -->
         <div class="border-t border-black/10 py-14 grid grid-cols-12 gap-8 items-start reveal">
           <div class="col-span-2 md:col-span-1">
@@ -115,7 +115,7 @@
         <span class="label-caps opacity-40">Skills</span>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-[80px]">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-[80px]" id="about-expertise-list">
 
         <div class="border-t border-black/10 group cursor-default reveal">
           <div class="py-8 flex justify-between items-center">
@@ -187,7 +187,7 @@
         <span class="label-caps opacity-40">Methodology</span>
       </div>
 
-      <div class="space-y-6">
+      <div class="space-y-6" id="about-process-list">
         <!-- Step 01 -->
         <div class="bg-surface-container-low border border-black/10 rounded-[40px] p-10 md:p-16 flex flex-col md:flex-row items-center gap-12 group hover:bg-surface-container transition-colors reveal">
           <div class="w-full md:w-1/2 flex justify-center md:justify-start">
@@ -275,5 +275,61 @@
 
   <script type="module" src="/src/js/main.js"></script>
   <script type="module" src="/src/js/content-loader.js"></script>
+  <script type="module">
+;(async()=>{
+  try{
+    const res=await fetch('/api/content/about')
+    if(!res.ok)return
+    const data=await res.json()
+    const f=data?.fields||{}
+    if(Array.isArray(f.philosophyItems)&&f.philosophyItems.length){
+      const el=document.getElementById('about-philosophy-list')
+      if(el){
+        el.innerHTML=''
+        f.philosophyItems.forEach((item,i)=>{
+          const div=document.createElement('div')
+          div.className='border-t border-black/10 py-14 grid grid-cols-12 gap-8 items-start'
+          div.innerHTML=`<div class="col-span-2 md:col-span-1"><span class="font-display text-5xl text-on-surface/10">${String(i+1).padStart(2,'0')}</span></div><div class="col-span-10 md:col-span-5"><h3 class="font-display text-[32px] uppercase leading-tight">${item.title||''}</h3></div><div class="col-span-12 md:col-span-6"><p class="text-base text-on-surface-variant leading-relaxed">${item.desc||''}</p></div>`
+          el.appendChild(div)
+        })
+        el.insertAdjacentHTML('beforeend','<div class="border-t border-black/10"></div>')
+      }
+    }
+    if(Array.isArray(f.serviceItems)&&f.serviceItems.length){
+      const el=document.getElementById('about-expertise-list')
+      if(el){
+        el.innerHTML=''
+        f.serviceItems.forEach(item=>{
+          const div=document.createElement('div')
+          div.className='border-t border-black/10 group cursor-default'
+          div.innerHTML=`<div class="py-8 flex justify-between items-center"><h3 class="font-display text-[28px] uppercase group-hover:text-accent transition-colors duration-300">${item.title||''}</h3><span class="text-accent transition-transform duration-300 group-hover:rotate-45 inline-block">+</span></div><div class="max-h-0 overflow-hidden transition-[max-height] duration-500 ease-out group-hover:max-h-40"><p class="text-sm text-on-surface-variant leading-relaxed pb-8 max-w-sm">${item.desc||''}</p></div>`
+          el.appendChild(div)
+        })
+      }
+    }
+    if(Array.isArray(f.processItems)&&f.processItems.length){
+      const el=document.getElementById('about-process-list')
+      if(el){
+        el.innerHTML=''
+        f.processItems.forEach((item,i)=>{
+          const isEven=i%2===1
+          const num=String(i+1).padStart(2,'0')
+          const numColor=i===0?'text-primary/80':'text-on-surface/10'
+          const hw=item.heading||''
+          const aw=item.accentWord||''
+          const headingHTML=aw&&hw?hw.replace(new RegExp(aw),'<span class="text-accent">'+aw+'</span>'):hw
+          const sl=item.stepLabel||('00-'+(i+1)+' Step')
+          const textCol=`<div class="w-full md:w-1/2${isEven?' order-2 md:order-1':''} flex flex-col gap-5"><div class="flex items-center gap-4"><span class="label-caps text-[10px] text-accent">${sl}</span><div class="h-px flex-grow bg-black/10"></div></div><h3 class="font-display text-4xl md:text-5xl uppercase leading-tight">${headingHTML}</h3><p class="text-base text-on-surface-variant leading-relaxed max-w-md">${item.desc||''}</p></div>`
+          const numCol=`<div class="w-full md:w-1/2${isEven?' order-1 md:order-2 flex justify-center md:justify-end':' flex justify-center md:justify-start'}"><span class="font-display text-[100px] md:text-[200px] leading-none ${numColor} select-none">${num}</span></div>`
+          const div=document.createElement('div')
+          div.className='bg-surface-container-low border border-black/10 rounded-[40px] p-10 md:p-16 flex flex-col md:flex-row items-center gap-12 group hover:bg-surface-container transition-colors'
+          div.innerHTML=isEven?textCol+numCol:numCol+textCol
+          el.appendChild(div)
+        })
+      }
+    }
+  }catch(e){}
+})()
+  </script>
 </body>
 </html>

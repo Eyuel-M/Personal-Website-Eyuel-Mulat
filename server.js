@@ -51,6 +51,35 @@ seedIfMissing('home.json', {
   },
 })
 
+seedIfMissing('about.json', {
+  fields: {
+    'about-hero-label': 'Creative Director',
+    'about-h1': 'Making brands that endure.',
+    'about-intro': "I'm a creative director and brand strategist working at the intersection of visual identity and strategic thinking. Every project is an opportunity to build something that lasts.",
+    'about-img': '',
+    philosophyItems: [
+      {title:'Listen before designing',desc:"Understanding the problem space deeply before reaching for solutions. The best visual systems emerge from genuine understanding of a brand's truth — not from decoration applied over uncertainty."},
+      {title:'Build systems, not assets',desc:"Every visual decision exists within a framework. Scalable identity systems outlast individual deliverables — they adapt to every touchpoint with consistency, from digital to print to environment."},
+      {title:'Precision over decoration',desc:"Remove everything that doesn't earn its place. Architectural restraint isn't minimalism by default — it's intentionality at every scale, knowing when to add and when to hold back."},
+    ],
+    archivedPhilosophyItems: [],
+    serviceItems: [
+      {title:'Brand Strategy',desc:'Positioning audits, competitive landscapes, brand architecture, and the narrative frameworks that guide every visual and verbal decision.'},
+      {title:'Visual Identity',desc:"Logo systems, color palettes, typeface selection, and the full visual language that makes a brand instantly recognisable across every touchpoint."},
+      {title:'Creative Direction',desc:"Art directing photo shoots, campaign visuals, and cross-channel brand moments — ensuring every image and execution is consistent with the brand's core idea."},
+      {title:'Typography',desc:'Type system design, custom lettering, and hierarchical scales that carry meaning and voice — from display headlines to dense body copy.'},
+      {title:'Digital Systems',desc:'Design systems, component libraries, and UI frameworks that translate brand logic into scalable digital products with precision and consistency.'},
+      {title:'Editorial Design',desc:'Annual reports, brand books, and publication design — structured grid layouts that give written content the authority and clarity it deserves.'},
+    ],
+    archivedServiceItems: [],
+    processItems: [
+      {heading:'Choose the Strategy',accentWord:'Strategy',stepLabel:'00-1 Step',desc:'Selecting the optimal path for brand growth through intensive research and structural auditing of market landscapes.'},
+      {heading:'Define the Identity',accentWord:'Identity',stepLabel:'00-2 Step',desc:'Developing the core visual grammar and systemic logic that will underpin every future brand touchpoint.'},
+    ],
+    archivedProcessItems: [],
+  },
+})
+
 seedIfMissing('slides.json', [
   {media:'https://lh3.googleusercontent.com/aida-public/AB6AXuDOWQNwCA_Sy3BPn64hPnpoO02uP_2_I6oW5rpYeyhmhbJcwdODE21QCKmNBnLYpjNRQvkZI7H-37UsPWD4dPdVF7KLHyKL4fMT6LjMz1R1Riqe4PDbEd8ECAxfvke5UBMQ2RnMElW_xDtjq2oan1PCWh863-eSkEa-k_8ihQV0Ww3edsCB43nZJJJqts4HseBRGEvomTagI29z3PqwNDUNQddqSueZb4rURX2KArszCjq8N-BVQXNl1h9vIjUAO0ihvRIynh-y3AM',title:''},
   {media:'https://lh3.googleusercontent.com/aida-public/AB6AXuBga90sr654rVPGPEaB3kJeifl98bSDxlZBsKWfUjsSFqSEteMcDzxZ2X8DI9wNnkiRQXmSPw2yPmztXBYxqj0GuDwUG1Acgtf8ZsPJYMCoHKuPOAdAK38hAzLpvGLwdL5W3U-6cG6Sc8hV6n30pgK_smwSP8kievA0z2dr8GJOsyctxdUC5RCqkfCnoZM-gaS6sG0aXQwWmbDLjY9nGrNFCRA_fLcJJEN4pNxaLHdDkwIZkpTEijUa6bP7s3cbA-WYecL_HK6Yg_0',title:''},
