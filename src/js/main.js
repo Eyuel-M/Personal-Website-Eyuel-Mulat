@@ -164,3 +164,29 @@ document.querySelectorAll('.dot-grid').forEach((section) => {
     section.style.setProperty('--dot-glow', '0')
   })
 })
+
+// ─── Footer social links: load from admin and apply ──────────────────────────
+;(async () => {
+  try {
+    const res = await fetch('/api/content/footer')
+    if (!res.ok) return
+    const data = await res.json()
+    const links = data?.fields?.socialLinks
+    if (!Array.isArray(links) || !links.length) return
+    const footer = document.querySelector('footer')
+    if (!footer) return
+    const followSpan = Array.from(footer.querySelectorAll('span')).find(el => el.textContent.trim() === 'Follow')
+    if (!followSpan) return
+    const container = followSpan.parentElement
+    container.querySelectorAll('a').forEach(a => a.remove())
+    links.forEach(link => {
+      if (!link.label) return
+      const a = document.createElement('a')
+      a.href = link.url || '#'
+      if (link.url) { a.target = '_blank'; a.rel = 'noopener noreferrer' }
+      a.className = 'label-caps text-[11px] tracking-[0.2em] text-background/80 hover:text-background transition-colors'
+      a.textContent = link.label
+      container.appendChild(a)
+    })
+  } catch(e) {}
+})()

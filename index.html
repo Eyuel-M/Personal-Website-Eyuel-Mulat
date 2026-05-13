@@ -333,7 +333,7 @@
         <span class="label-caps tracking-[0.4em] text-on-surface-variant/50">Clients & Partners</span>
         <span class="label-caps text-[10px] text-on-surface-variant/30 tracking-[0.3em]">Selected</span>
       </div>
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 divide-x divide-y divide-black/8 border border-black/8">
+      <div class="clients-grid-wrap grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 divide-x divide-y divide-black/8 border border-black/8">
 
         <div class="flex items-center justify-center py-12 px-6 group reveal">
           <span class="font-display text-[20px] uppercase text-on-surface/20 group-hover:text-on-surface/60 transition-colors duration-500 text-center leading-tight">Nexus<br>Technologies</span>
@@ -361,6 +361,56 @@
 
       </div>
     </section>
+    <script>
+;(async () => {
+  try {
+    const res = await fetch('/api/clients')
+    if (!res.ok) return
+    const clients = await res.json()
+    if (!Array.isArray(clients) || !clients.length) return
+    const section = document.querySelector('.clients-grid-wrap')
+    if (!section) return
+    // rebuild
+    section.innerHTML = ''
+    if (clients.length <= 6) {
+      section.className = 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 divide-x divide-y divide-black/8 border border-black/8'
+      clients.forEach(cl => {
+        const cell = document.createElement('div')
+        cell.className = 'flex items-center justify-center py-12 px-6 group'
+        const inner = cl.logo
+          ? `<img src="${cl.logo}" alt="${cl.name}" class="h-8 object-contain opacity-30 group-hover:opacity-70 transition-opacity duration-500"/>`
+          : `<span class="font-display text-[20px] uppercase text-on-surface/20 group-hover:text-on-surface/60 transition-colors duration-500 text-center leading-tight">${cl.name.replace(' ','<br>')}</span>`
+        cell.innerHTML = inner
+        section.appendChild(cell)
+      })
+    } else {
+      // Marquee mode
+      section.className = 'overflow-hidden border-t border-b border-black/8'
+      section.style.cssText += ';position:relative'
+      const track = document.createElement('div')
+      track.style.cssText = 'display:flex;width:max-content'
+      const buildItems = () => clients.map(cl => {
+        const cell = document.createElement('div')
+        cell.style.cssText = 'display:flex;align-items:center;justify-content:center;padding:48px 40px;border-right:1px solid rgba(0,0,0,0.08);flex-shrink:0;width:calc(100vw / 6)'
+        const inner = cl.logo
+          ? `<img src="${cl.logo}" alt="${cl.name}" style="height:32px;object-fit:contain;opacity:0.3" />`
+          : `<span style="font-family:Anton,sans-serif;font-size:20px;text-transform:uppercase;color:rgba(12,12,12,0.2);text-align:center;line-height:1.2">${cl.name.replace(' ','<br>')}</span>`
+        cell.innerHTML = inner
+        return cell
+      })
+      buildItems().forEach(el => track.appendChild(el))
+      buildItems().forEach(el => track.appendChild(el))
+      section.appendChild(track)
+      const itemW = window.innerWidth / 6
+      const totalW = clients.length * itemW
+      const styleEl = document.createElement('style')
+      styleEl.textContent = `@keyframes clients-march{from{transform:translateX(0)}to{transform:translateX(-${totalW}px)}} .clients-march{animation:clients-march ${clients.length * 4}s linear infinite} .clients-march:hover{animation-play-state:paused}`
+      document.head.appendChild(styleEl)
+      track.classList.add('clients-march')
+    }
+  } catch(e) {}
+})()
+</script>
 
   </main>
 

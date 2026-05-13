@@ -713,7 +713,7 @@ function renderSlideshow(){
   if(!Array.isArray(S.data))S.data=[]
   const slides=S.data
   function rsl(){
-    c.innerHTML='<p class="pg-intro">Hero slideshow images — displayed in order.</p>'
+    c.innerHTML='<p class="pg-intro">The fast-cycling image montage shown below the hero section on the homepage. Add or remove images here — they will cycle automatically on the site. Drag to reorder.</p>'
     slides.forEach((sl,i)=>{
       const card=document.createElement('div');card.className='sc';card.style.marginBottom='16px'
       card.innerHTML=`<div class="sc-h" style="display:flex;justify-content:space-between;align-items:center"><h3>Slide ${i+1}</h3><button class="bd" data-i="${i}">Remove</button></div>`
@@ -734,17 +734,18 @@ function renderSlideshow(){
 // ── About ─────────────────────────────────────────────────────────────────────
 function renderAbout(){
   const c=document.getElementById('editor-inner');c.innerHTML=''
-  if(!S.data.headline)Object.assign(S.data,{headline:'Design is thinking made visual.',bio:'Eyuel Mulat is a design director and brand strategist based in Addis Ababa.',portraitImage:'',stat1Label:'Years Active',stat1Value:'8+',stat2Label:'Projects',stat2Value:'120+',stat3Label:'Clients',stat3Value:'60+'})
-  c.appendChild(mkSC('Portrait',mkIU({label:'Portrait Image',hint:'Best at 800×1000',value:S.data.portraitImage||'',onChange:v=>S.data.portraitImage=v,aspect:'4/5'})))
-  c.appendChild(mkSC('Text',mkInput('Headline','headline',S.data),mkTextarea('Bio','bio',S.data,4)))
-  const sg=document.createElement('div');sg.className='g3'
-  ;['1','2','3'].forEach(n=>{
-    const d=document.createElement('div');d.className='sp4'
-    const lf=document.createElement('div');const ll=document.createElement('label');ll.className='fl';ll.textContent='Label';const li=document.createElement('input');li.className='fi';li.value=S.data['stat'+n+'Label']||'';li.oninput=()=>S.data['stat'+n+'Label']=li.value;lf.appendChild(ll);lf.appendChild(li)
-    const vf=document.createElement('div');const vl=document.createElement('label');vl.className='fl';vl.textContent='Value';const vi=document.createElement('input');vi.className='fi';vi.value=S.data['stat'+n+'Value']||'';vi.oninput=()=>S.data['stat'+n+'Value']=vi.value;vf.appendChild(vl);vf.appendChild(vi)
-    d.appendChild(lf);d.appendChild(vf);sg.appendChild(d)
-  })
-  c.appendChild(mkSC('Stats',sg))
+  const def={'about-hero-label':'Creative Director','about-h1':'Making brands that endure.','about-intro':"I'm a creative director and brand strategist working at the intersection of visual identity and strategic thinking. Every project is an opportunity to build something that lasts.",'about-img':'','about-phil-1-title':'Listen before designing','about-phil-1-desc':"Understanding the problem space deeply before reaching for solutions. The best visual systems emerge from genuine understanding of a brand's truth — not from decoration applied over uncertainty.",'about-phil-2-title':'Build systems, not assets','about-phil-2-desc':"Every visual decision exists within a framework. Scalable identity systems outlast individual deliverables — they adapt to every touchpoint with consistency, from digital to print to environment.",'about-phil-3-title':'Precision over decoration','about-phil-3-desc':"Remove everything that doesn't earn its place. Architectural restraint isn't minimalism by default — it's intentionality at every scale, knowing when to add and when to hold back.",'service-1-title':'Brand Strategy','service-1-desc':'Positioning audits, competitive landscapes, brand architecture, and the narrative frameworks that guide every visual and verbal decision.','service-2-title':'Visual Identity','service-2-desc':'Logo systems, color palettes, typeface selection, and the full visual language that makes a brand instantly recognisable across every touchpoint.','service-3-title':'Creative Direction','service-3-desc':'Art directing photo shoots, campaign visuals, and cross-channel brand moments — ensuring every image and execution is consistent with the brand core idea.','service-4-title':'Typography','service-4-desc':'Type system design, custom lettering, and hierarchical scales that carry meaning and voice — from display headlines to dense body copy.','service-5-title':'Digital Systems','service-5-desc':'Design systems, component libraries, and UI frameworks that translate brand logic into scalable digital products with precision and consistency.','service-6-title':'Editorial Design','service-6-desc':'Annual reports, brand books, and publication design — structured grid layouts that give written content the authority and clarity it deserves.'}
+  Object.keys(def).forEach(k=>{if(S.data[k]===undefined)S.data[k]=def[k]})
+  c.appendChild(mkSC('Hero',mkInput('Eyebrow Label','about-hero-label',S.data),mkInput('Headline','about-h1',S.data),mkTextarea('Intro Paragraph','about-intro',S.data,3)))
+  c.appendChild(mkSC('Header Image',mkIU({label:'Wide Photo',hint:'21:9 — full-width image below the hero',value:S.data['about-img']||'',onChange:v=>S.data['about-img']=v,aspect:'21/9'})))
+  const philCard=document.createElement('div');philCard.className='sc';philCard.innerHTML='<div class="sc-h"><h3>Philosophy</h3></div>'
+  const philBody=document.createElement('div');philBody.className='sc-b sp'
+  ;[1,2,3].forEach(n=>{const f=document.createElement('div');f.style.cssText='padding:16px;border:1px solid var(--g200);border-radius:10px';const num=document.createElement('div');num.style.cssText='font-size:10px;font-weight:700;letter-spacing:.15em;color:var(--g400);margin-bottom:10px';num.textContent='Principle 0'+n;f.appendChild(num);f.appendChild(mkInput('Heading','about-phil-'+n+'-title',S.data));const dd=document.createElement('div');dd.style.marginTop='12px';dd.appendChild(mkTextarea('Description','about-phil-'+n+'-desc',S.data,2));f.appendChild(dd);philBody.appendChild(f)})
+  philCard.appendChild(philBody);c.appendChild(philCard)
+  const expCard=document.createElement('div');expCard.className='sc';expCard.innerHTML='<div class="sc-h"><h3>Expertise / Services</h3></div>'
+  const expBody=document.createElement('div');expBody.className='sc-b sp'
+  ;[1,2,3,4,5,6].forEach(n=>{const f=document.createElement('div');f.style.cssText='padding:16px;border:1px solid var(--g200);border-radius:10px';const num=document.createElement('div');num.style.cssText='font-size:10px;font-weight:700;letter-spacing:.15em;color:var(--g400);margin-bottom:10px';num.textContent='Service 0'+n;f.appendChild(num);f.appendChild(mkInput('Title','service-'+n+'-title',S.data));const dd=document.createElement('div');dd.style.marginTop='12px';dd.appendChild(mkTextarea('Description','service-'+n+'-desc',S.data,2));f.appendChild(dd);expBody.appendChild(f)})
+  expCard.appendChild(expBody);c.appendChild(expCard)
 }
 
 // ── Capabilities ──────────────────────────────────────────────────────────────
@@ -850,9 +851,26 @@ function renderContact(){
 // ── Footer ────────────────────────────────────────────────────────────────────
 function renderFooter(){
   const c=document.getElementById('editor-inner');c.innerHTML=''
-  if(!S.data.email)Object.assign(S.data,{email:'hello@eyuelmulat.com',phone:'+251 95 355 3856',address:'Addis Ababa, Ethiopia',copyright:'© 2024 Eyuel Mulat',instagram:'',linkedin:'',behance:''})
+  if(!S.data.email)Object.assign(S.data,{email:'hello@eyuelmulat.com',phone:'+251 95 355 3856',address:'Addis Ababa, Ethiopia',copyright:'© 2024 Eyuel Mulat'})
+  if(!Array.isArray(S.data.socialLinks))S.data.socialLinks=[{label:'Instagram',url:''},{label:'LinkedIn',url:''},{label:'Behance',url:''}]
   c.appendChild(mkSC('Contact Info',mkInput('Email','email',S.data),mkInput('Phone','phone',S.data),mkInput('Address','address',S.data)))
-  c.appendChild(mkSC('Social Links',mkInput('Instagram URL','instagram',S.data),mkInput('LinkedIn URL','linkedin',S.data),mkInput('Behance URL','behance',S.data)))
+  const slCard=document.createElement('div');slCard.className='sc';slCard.innerHTML='<div class="sc-h"><h3>Social Links</h3></div>'
+  const slBody=document.createElement('div');slBody.className='sc-b sp'
+  const slList=document.createElement('div');slList.className='sp4'
+  function rsl(){
+    slList.innerHTML=''
+    S.data.socialLinks.forEach((link,i)=>{
+      const row=document.createElement('div');row.style.cssText='display:flex;gap:8px;align-items:flex-end'
+      const lf=document.createElement('div');lf.style.cssText='flex:1;min-width:100px'
+      const ll=document.createElement('label');ll.className='fl';ll.textContent='Label';const li=document.createElement('input');li.className='fi';li.value=link.label||'';li.placeholder='Instagram';li.oninput=()=>link.label=li.value;lf.appendChild(ll);lf.appendChild(li)
+      const uf=document.createElement('div');uf.style.cssText='flex:2'
+      const ul=document.createElement('label');ul.className='fl';ul.textContent='URL';const ui=document.createElement('input');ui.className='fi';ui.type='url';ui.value=link.url||'';ui.placeholder='https://instagram.com/…';ui.oninput=()=>link.url=ui.value;uf.appendChild(ul);uf.appendChild(ui)
+      const db=document.createElement('button');db.className='bd';db.textContent='✕';db.style.marginBottom='2px';db.title='Remove';db.onclick=()=>{S.data.socialLinks.splice(i,1);rsl()}
+      row.appendChild(lf);row.appendChild(uf);row.appendChild(db);slList.appendChild(row)
+    })
+    const add=document.createElement('button');add.className='bs';add.textContent='+ Add Link';add.onclick=()=>{S.data.socialLinks.push({label:'Platform',url:''});rsl()};slList.appendChild(add)
+  }
+  rsl();slBody.appendChild(slList);slCard.appendChild(slBody);c.appendChild(slCard)
   c.appendChild(mkSC('Copyright',mkInput('Copyright Text','copyright',S.data)))
 }
 
