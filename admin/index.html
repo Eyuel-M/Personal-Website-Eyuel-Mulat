@@ -1301,10 +1301,12 @@ function renderAccount(){
       const j=await api('POST','/api/account/test-email',{})
       if(j.error){testMsg.style.color='var(--red600)';testMsg.textContent=j.error}
       else{testMsg.style.color='var(--green700)';testMsg.textContent='Test email sent! Check your recovery inbox.'}
-    }catch{testMsg.style.color='var(--red600)';testMsg.textContent='Failed to send.'}
+    }catch(err){testMsg.style.color='var(--red600)';testMsg.textContent=err.message||'Failed to send.'}
     finally{testBtn.disabled=false;testBtn.textContent='Send test email to recovery address'}
   }
-  c.appendChild(mkSC('Email Sending (Gmail SMTP)',helpNote,smtpUser,smtpPassDiv,testBtn,testMsg))
+  const saveNote=document.createElement('p');saveNote.className='fh';saveNote.style.color='#6B7280'
+  saveNote.textContent='Save your settings above before clicking test.'
+  c.appendChild(mkSC('Email Sending (Gmail SMTP)',helpNote,smtpUser,smtpPassDiv,saveNote,testBtn,testMsg))
 }
 
 async function downloadBrief(filename,displayName){

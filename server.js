@@ -552,6 +552,12 @@ app.post('/api/insight', auth, (req, res) => {
     res.json(fs.existsSync(f) ? JSON.parse(fs.readFileSync(f)) : [])
   })
 
+  // JSON error handler — catches unhandled async route errors in Express 5
+  // eslint-disable-next-line no-unused-vars
+  app.use((err, req, res, next) => {
+    res.status(err.status || 500).json({ error: err.message || 'Internal server error' })
+  })
+
   return app
 }
 
@@ -787,6 +793,6 @@ if (isMain) {
   app.use(express.static(path.join(__dirname)))
   app.listen(PORT, () => {
     console.log(`\n  ◆ Site + Admin  →  http://localhost:${PORT}`)
-    console.log(`    Password      →  ${ADMIN_PASS}\n`)
+    console.log(`    Password      →  ${DEFAULT_PASS}\n`)
   })
 }
