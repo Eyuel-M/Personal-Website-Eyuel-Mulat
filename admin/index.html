@@ -1031,7 +1031,7 @@ function renderSlideshow(){
 function renderAbout(){
   const c=document.getElementById('editor-inner');c.innerHTML=''
   if(S.data['about-hero-label']===undefined)S.data['about-hero-label']='Creative Director'
-  if(S.data['about-h1']===undefined)S.data['about-h1']='Making brands that endure.'
+  if(S.data['about-h1']===undefined)S.data['about-h1']='Making brands<br><span class="text-on-surface/25">that</span> <span class="text-accent">endure.</span>'
   if(S.data['about-intro']===undefined)S.data['about-intro']="I'm a creative director and brand strategist working at the intersection of visual identity and strategic thinking. Every project is an opportunity to build something that lasts."
   if(S.data['about-img']===undefined)S.data['about-img']=''
   if(!Array.isArray(S.data.philosophyItems))S.data.philosophyItems=[{title:'Listen before designing',desc:"Understanding the problem space deeply before reaching for solutions. The best visual systems emerge from genuine understanding of a brand's truth — not from decoration applied over uncertainty."},{title:'Build systems, not assets',desc:"Every visual decision exists within a framework. Scalable identity systems outlast individual deliverables — they adapt to every touchpoint with consistency, from digital to print to environment."},{title:'Precision over decoration',desc:"Remove everything that doesn't earn its place. Architectural restraint isn't minimalism by default — it's intentionality at every scale, knowing when to add and when to hold back."}]
@@ -1040,7 +1040,10 @@ function renderAbout(){
   if(!Array.isArray(S.data.archivedServiceItems))S.data.archivedServiceItems=[]
   if(!Array.isArray(S.data.processItems))S.data.processItems=[{heading:'Choose the Strategy',accentWord:'Strategy',stepLabel:'00-1 Step',desc:'Selecting the optimal path for brand growth through intensive research and structural auditing of market landscapes.'},{heading:'Define the Identity',accentWord:'Identity',stepLabel:'00-2 Step',desc:'Developing the core visual grammar and systemic logic that will underpin every future brand touchpoint.'}]
   if(!Array.isArray(S.data.archivedProcessItems))S.data.archivedProcessItems=[]
-  c.appendChild(mkSC('Hero',mkInput('Eyebrow Label','about-hero-label',S.data),mkInput('Headline','about-h1',S.data),mkTextarea('Intro Paragraph','about-intro',S.data,3)))
+  c.appendChild(mkSC('Hero',
+    mkInput('Eyebrow Label','about-hero-label',S.data,'Small caps label above the heading — e.g. "Creative Director"'),
+    mkTextarea('Heading','about-h1',S.data,3,'Supports HTML — use &lt;br&gt; for line breaks, &lt;span class="text-accent"&gt;…&lt;/span&gt; for orange, &lt;span class="text-on-surface/25"&gt;…&lt;/span&gt; for muted.'),
+    mkTextarea('Intro Paragraph','about-intro',S.data,3)))
   c.appendChild(mkSC('Header Image',mkIU({label:'Wide Photo',hint:'21:9 — full-width image below the hero',value:S.data['about-img']||'',onChange:v=>S.data['about-img']=v,aspect:'21/9'})))
   function mkDynList(container,arr,archived,rowLabel,singularLabel,mkFields,newItem){
     function render(){
