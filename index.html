@@ -92,12 +92,7 @@
         <span class="label-caps opacity-40">Expertise</span>
       </div>
 
-      <!-- Scroll container wrapper (arrows injected by JS when > 3 caps) -->
-      <div id="caps-scroll-wrapper" style="position:relative">
-        <!-- Arrow buttons — hidden by default, shown when >3 caps exist -->
-        <button id="caps-arrow-left" onclick="scrollCaps(-1)" style="display:none;position:absolute;left:-20px;top:50%;transform:translateY(-50%);z-index:10;width:44px;height:44px;border-radius:50%;border:1px solid #0C0C0C;background:#fff;cursor:pointer;font-size:16px;line-height:1;align-items:center;justify-content:center">←</button>
-        <button id="caps-arrow-right" onclick="scrollCaps(1)" style="display:none;position:absolute;right:-20px;top:50%;transform:translateY(-50%);z-index:10;width:44px;height:44px;border-radius:50%;border:1px solid #0C0C0C;background:#fff;cursor:pointer;font-size:16px;line-height:1;align-items:center;justify-content:center">→</button>
-
+      <div id="caps-scroll-wrapper">
         <div id="caps-grid" class="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-24">
 
           <div class="flex flex-col items-start gap-10 group reveal" data-cap-item>
@@ -159,97 +154,75 @@
         const grid = document.getElementById('caps-grid')
         if (!grid) return
 
-        // If API has caps data, replace the static items
-        const existingItems = grid.querySelectorAll('[data-cap-item]')
-        if (caps.length > 0) {
-          // Replace static content with API data
-          existingItems.forEach((el, i) => {
-            if (caps[i]) {
-              const titleEl = el.querySelector('[data-cap-title]')
-              const descEl = el.querySelector('[data-cap-desc]')
-              const iconEl = el.querySelector('[data-cap-icon]')
-              if (titleEl) titleEl.textContent = caps[i].title || ''
-              if (descEl) descEl.textContent = caps[i].description || ''
-              if (iconEl && caps[i].icon) {
-                const ico = caps[i].icon.trim()
-                if (ico.startsWith('<svg')) {
-                  iconEl.innerHTML = ico
-                  const s = iconEl.querySelector('svg'); if (s) s.setAttribute('class','w-full h-full stroke-current fill-none')
-                } else if (/\.(mp4|webm|mov)$/i.test(ico)) {
-                  iconEl.innerHTML = `<video src="${ico}" autoplay muted loop playsinline class="w-full h-full object-contain"></video>`
-                } else {
-                  iconEl.innerHTML = `<img src="${ico}" class="w-full h-full object-contain" alt="${caps[i].title}"/>`
-                }
-              }
-            }
-          })
-          // Add extra items if API has more than static HTML
-          if (caps.length > existingItems.length) {
-            for (let i = existingItems.length; i < caps.length; i++) {
-              const cap = caps[i]
-              const div = document.createElement('div')
-              div.className = 'flex flex-col items-start gap-10 group reveal'
-              div.setAttribute('data-cap-item', '')
-              div.innerHTML = `
-                <div class="w-16 h-16 text-on-surface/30 group-hover:text-accent transition-colors duration-500">
-                  ${cap.icon
-                    ? (cap.icon.trim().startsWith('<svg')
-                        ? cap.icon
-                        : (/\.(mp4|webm|mov)$/i.test(cap.icon)
-                            ? `<video src="${cap.icon}" autoplay muted loop playsinline class="w-full h-full object-contain"></video>`
-                            : `<img src="${cap.icon}" class="w-full h-full object-contain" alt="${cap.title}"/>`))
-                    : `<svg class="w-full h-full stroke-current fill-none" style="stroke-width:1.5" viewBox="0 0 100 100"><rect x="20" y="20" width="60" height="60"/><line x1="20" x2="80" y1="20" y2="80"/></svg>`}
-                </div>
-                <div>
-                  <h3 class="font-display text-4xl uppercase mb-4">${cap.title || ''}</h3>
-                  <p class="text-base text-on-surface-variant leading-relaxed">${cap.description || ''}</p>
-                </div>`
-              grid.appendChild(div)
-            }
+        // Always rebuild grid from scratch with consistent item structure
+        grid.innerHTML = ''
+        caps.forEach((cap, i) => {
+          const ico = (cap.icon || '').trim()
+          let iconHTML
+          if (ico.startsWith('<svg')) {
+            const tmp = document.createElement('div'); tmp.innerHTML = ico
+            const svg = tmp.querySelector('svg')
+            if (svg) svg.setAttribute('class','w-full h-full stroke-current fill-none')
+            iconHTML = tmp.innerHTML
+          } else if (/\.(mp4|webm|mov)$/i.test(ico)) {
+            iconHTML = `<video src="${ico}" autoplay muted loop playsinline class="w-full h-full object-contain"></video>`
+          } else if (ico) {
+            iconHTML = `<img src="${ico}" class="w-full h-full object-contain" alt="${cap.title||''}"/>`
+          } else {
+            iconHTML = `<svg class="w-full h-full stroke-current fill-none" style="stroke-width:1.5" viewBox="0 0 100 100"><rect x="20" y="20" width="60" height="60"/><line x1="20" x2="80" y1="20" y2="80"/></svg>`
           }
-        }
+          const div = document.createElement('div')
+          div.className = 'flex flex-col items-start gap-10 group reveal is-visible'
+          div.setAttribute('data-cap-item','')
+          div.innerHTML = `<div class="w-16 h-16 text-on-surface/30 group-hover:text-accent transition-colors duration-500" data-cap-icon>${iconHTML}</div><div><h3 class="font-display text-4xl uppercase mb-4" data-cap-title>${cap.title||''}</h3><p class="text-base text-on-surface-variant leading-relaxed" data-cap-desc>${cap.description||''}</p></div>`
+          grid.appendChild(div)
+        })
 
-        // Enable scroll mode if more than 3
+        // Subtle scroll nav below the grid (only when >3 caps)
         if (caps.length > 3) {
-          const wrapper = document.getElementById('caps-scroll-wrapper')
-          const leftBtn = document.getElementById('caps-arrow-left')
-          const rightBtn = document.getElementById('caps-arrow-right')
-
-          // Switch grid to horizontal scroll
-          grid.style.display = 'flex'
-          grid.style.overflowX = 'auto'
-          grid.style.scrollBehavior = 'smooth'
-          grid.style.scrollSnapType = 'x mandatory'
-          grid.style.gap = '48px'
-          grid.style.paddingBottom = '8px'
-          grid.style.scrollbarWidth = 'none'
-          // Hide scrollbar webkit
-          grid.style.msOverflowStyle = 'none'
-
-          const allItems = grid.querySelectorAll('[data-cap-item]')
-          allItems.forEach(item => {
-            item.style.minWidth = 'calc(33.333% - 32px)'
-            item.style.scrollSnapAlign = 'start'
-            item.style.flexShrink = '0'
-          })
-
-          // Show arrow buttons
-          leftBtn.style.display = 'flex'
-          rightBtn.style.display = 'flex'
-
-          wrapper.style.padding = '0 30px'
+          const PER_ROW = 3
+          const totalRows = Math.ceil(caps.length / PER_ROW)
+          const navEl = document.createElement('div')
+          navEl.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:16px;margin-top:32px'
+          const prevBtn = document.createElement('button')
+          prevBtn.style.cssText = 'background:none;border:none;cursor:pointer;color:rgba(0,0,0,.3);font-size:18px;line-height:1;padding:4px 8px;transition:color .15s'
+          prevBtn.innerHTML = '←'
+          const nextBtn = document.createElement('button')
+          nextBtn.style.cssText = prevBtn.style.cssText
+          nextBtn.innerHTML = '→'
+          const dotsEl = document.createElement('div')
+          dotsEl.style.cssText = 'display:flex;gap:6px'
+          let page = 0
+          const allItems = [...grid.querySelectorAll('[data-cap-item]')]
+          function goToPage(p) {
+            page = Math.max(0, Math.min(totalRows - 1, p))
+            allItems.forEach((el, i) => {
+              const rowIdx = Math.floor(i / PER_ROW)
+              el.style.display = rowIdx === page ? '' : 'none'
+            })
+            dotsEl.querySelectorAll('.cap-dot').forEach((d,i) => {
+              d.style.background = i === page ? '#0C0C0C' : 'rgba(0,0,0,.2)'
+            })
+            prevBtn.style.color = page === 0 ? 'rgba(0,0,0,.15)' : 'rgba(0,0,0,.5)'
+            nextBtn.style.color = page === totalRows-1 ? 'rgba(0,0,0,.15)' : 'rgba(0,0,0,.5)'
+          }
+          for (let i = 0; i < totalRows; i++) {
+            const dot = document.createElement('button')
+            dot.className = 'cap-dot'
+            dot.style.cssText = 'width:6px;height:6px;border-radius:50%;border:none;cursor:pointer;padding:0;transition:background .2s'
+            dot.onclick = () => goToPage(i)
+            dotsEl.appendChild(dot)
+          }
+          prevBtn.onclick = () => goToPage(page - 1)
+          nextBtn.onclick = () => goToPage(page + 1)
+          navEl.appendChild(prevBtn); navEl.appendChild(dotsEl); navEl.appendChild(nextBtn)
+          grid.parentElement.insertAdjacentElement('afterend', navEl)
+          goToPage(0)
         }
       } catch(e) {
         // silently fail — static content remains
       }
     })()
-
-    function scrollCaps(dir) {
-      const grid = document.getElementById('caps-grid')
-      if (!grid) return
-      const itemWidth = grid.querySelector('[data-cap-item]')?.offsetWidth || 400
-      grid.scrollBy({ left: dir * (itemWidth + 48), behavior: 'smooth' })
-    }
     </script>
 
     <!-- ── CTA ────────────────────────────────────────────────────────────── -->
@@ -459,6 +432,38 @@
       })
       container.appendChild(grid)
     })()
+  </script>
+  <script>
+  // ── Slideshow: load from API, replace static images ─────────────────────────
+  ;(async function(){
+    const r = await fetch('/api/slides').catch(()=>null)
+    if (!r || !r.ok) return
+    const slides = (await r.json()).filter(s => s.media || s.image)
+    if (!slides.length) return
+    const container = document.querySelector('.hero-slideshow')
+    if (!container) return
+    const N = slides.length
+    const period = (1.8 * N / 3).toFixed(2)  // keep per-slide visibility constant
+    const stagger = (period / N).toFixed(2)
+    const style = document.createElement('style')
+    style.textContent = slides.map((_,i) =>
+      `.hsd-${i}{animation:slide-flash ${period}s ${(i*stagger).toFixed(2)}s infinite}`
+    ).join('\n')
+    document.head.appendChild(style)
+    container.innerHTML = ''
+    slides.forEach((s,i) => {
+      const src = s.media || s.image
+      if (/\.(mp4|webm|mov)$/i.test(src)) {
+        const v = document.createElement('video')
+        v.src=src; v.autoplay=true; v.muted=true; v.loop=true; v.playsInline=true
+        v.className=`hero-slide hsd-${i} w-full h-full object-cover`; container.appendChild(v)
+      } else {
+        const img = document.createElement('img')
+        img.src=src; img.alt=s.title||''
+        img.className=`hero-slide hsd-${i} w-full h-full object-cover`; container.appendChild(img)
+      }
+    })
+  })()
   </script>
 </body>
 </html>

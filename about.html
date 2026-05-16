@@ -317,7 +317,8 @@
           const numColor=i%2===0?'text-primary/80':'text-on-surface/10'
           const hw=item.heading||''
           const aw=item.accentWord||''
-          const headingHTML=aw&&hw?hw.replace(new RegExp(aw),'<span class="text-accent">'+aw+'</span>'):hw
+          const escaped=aw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')
+          const headingHTML=aw&&hw?hw.replace(new RegExp(escaped,'i'),'<span class="text-accent">$&</span>'):hw
           const sl=item.stepLabel||('00-'+(i+1)+' Step')
           const textCol=`<div class="w-full md:w-1/2${isEven?' order-2 md:order-1':''} flex flex-col gap-5"><div class="flex items-center gap-4"><span class="label-caps text-[10px] text-accent">${sl}</span><div class="h-px flex-grow bg-black/10"></div></div><h3 class="font-display text-4xl md:text-5xl uppercase leading-tight">${headingHTML}</h3><p class="text-base text-on-surface-variant leading-relaxed max-w-md">${item.desc||''}</p></div>`
           const numCol=`<div class="w-full md:w-1/2${isEven?' order-1 md:order-2 flex justify-center md:justify-end':' flex justify-center md:justify-start'}"><span class="font-display text-[100px] md:text-[200px] leading-none ${numColor} select-none">${num}</span></div>`

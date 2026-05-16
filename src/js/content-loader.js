@@ -197,19 +197,41 @@
           })
         }
       }
-      // Footer nav links
-      if (Array.isArray(nf.footerLinks) && nf.footerLinks.length) {
+    }
+  } catch {}
+
+  // ── Footer page links ─────────────────────────────────────────────────────
+  try {
+    const footerRes = await fetch(`${apiBase}/footer`)
+    if (footerRes.ok) {
+      const footerData = await footerRes.json()
+      const footerLinks = (footerData.fields || {}).footerLinks
+      if (Array.isArray(footerLinks) && footerLinks.length) {
         const footerPagesEl = document.querySelector('[data-footer-pages]')
         if (footerPagesEl) {
-          const allLinks = Array.isArray(nf.navLinks) ? nf.navLinks : []
-          footerPagesEl.innerHTML = ''
-          allLinks.filter(l => nf.footerLinks.includes(l.href)).forEach(l => {
-            const a = document.createElement('a')
-            a.href = l.href
-            a.textContent = l.label
-            a.className = 'label-caps text-[11px] tracking-[0.2em] text-background/80 hover:text-background transition-colors'
-            footerPagesEl.appendChild(a)
+          let allNavLinks = []
+          try {
+            const nc = JSON.parse(localStorage.getItem('em_nav_cache') || '{}')
+            allNavLinks = Array.isArray(nc.navLinks) ? nc.navLinks : []
+          } catch {}
+          const selected = footerLinks.map(href => {
+            const found = allNavLinks.find(l => l.href === href)
+            return found || { href, label: href.replace(/\//g,'').replace('.html','') }
           })
+          footerPagesEl.innerHTML = ''
+          footerPagesEl.style.cssText = 'display:flex;gap:32px;align-items:flex-start'
+          for (let c = 0; c < selected.length; c += 4) {
+            const col = document.createElement('div')
+            col.style.cssText = 'display:flex;flex-direction:column;gap:12px'
+            selected.slice(c, c + 4).forEach(l => {
+              const a = document.createElement('a')
+              a.href = l.href
+              a.textContent = l.label
+              a.className = 'label-caps text-[11px] tracking-[0.2em] text-background/80 hover:text-background transition-colors'
+              col.appendChild(a)
+            })
+            footerPagesEl.appendChild(col)
+          }
         }
       }
     }
