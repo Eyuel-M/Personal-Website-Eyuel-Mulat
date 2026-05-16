@@ -1031,7 +1031,7 @@ function renderSlideshow(){
 function renderAbout(){
   const c=document.getElementById('editor-inner');c.innerHTML=''
   if(S.data['about-hero-label']===undefined)S.data['about-hero-label']='Creative Director'
-  if(S.data['about-h1']===undefined)S.data['about-h1']='Making brands<br><span class="text-on-surface/25">that</span> <span class="text-accent">endure.</span>'
+  if(S.data['about-h1']===undefined)S.data['about-h1']='Making <span class="text-on-surface/25">brands</span><br>that <span class="text-accent">endure.</span>'
   if(S.data['about-intro']===undefined)S.data['about-intro']="I'm a creative director and brand strategist working at the intersection of visual identity and strategic thinking. Every project is an opportunity to build something that lasts."
   if(S.data['about-img']===undefined)S.data['about-img']=''
   if(!Array.isArray(S.data.philosophyItems))S.data.philosophyItems=[{title:'Listen before designing',desc:"Understanding the problem space deeply before reaching for solutions. The best visual systems emerge from genuine understanding of a brand's truth — not from decoration applied over uncertainty."},{title:'Build systems, not assets',desc:"Every visual decision exists within a framework. Scalable identity systems outlast individual deliverables — they adapt to every touchpoint with consistency, from digital to print to environment."},{title:'Precision over decoration',desc:"Remove everything that doesn't earn its place. Architectural restraint isn't minimalism by default — it's intentionality at every scale, knowing when to add and when to hold back."}]
