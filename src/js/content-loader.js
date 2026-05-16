@@ -200,26 +200,62 @@
     }
   } catch {}
 
-  // ── Footer page links ─────────────────────────────────────────────────────
+  // ── Footer — email, phone, address, copyright, social links, pages ────────
   try {
     const footerRes = await fetch(`${apiBase}/footer`)
     if (footerRes.ok) {
-      const footerData = await footerRes.json()
-      const footerLinks = (footerData.fields || {}).footerLinks
-      if (Array.isArray(footerLinks) && footerLinks.length) {
-        const footerPagesEl = document.querySelector('[data-footer-pages]')
-        if (footerPagesEl) {
-          let allNavLinks = []
-          try {
-            const nc = JSON.parse(localStorage.getItem('em_nav_cache') || '{}')
-            allNavLinks = Array.isArray(nc.navLinks) ? nc.navLinks : []
-          } catch {}
-          const selected = footerLinks.map(href => {
-            const found = allNavLinks.find(l => l.href === href)
-            return found || { href, label: href.replace(/\//g,'').replace('.html','') }
+      const ff = (await footerRes.json()).fields || {}
+
+      if (ff.email) {
+        document.querySelectorAll('[data-footer-email]').forEach(el => {
+          el.textContent = ff.email
+          if (el.tagName === 'A') el.href = 'mailto:' + ff.email
+        })
+      }
+      if (ff.phone) {
+        document.querySelectorAll('[data-footer-phone]').forEach(el => el.textContent = ff.phone)
+      }
+      if (ff.address) {
+        document.querySelectorAll('[data-footer-address]').forEach(el => el.textContent = ff.address)
+      }
+      if (ff.copyright) {
+        document.querySelectorAll('[data-footer-copyright]').forEach(el => el.textContent = ff.copyright)
+      }
+
+      if (Array.isArray(ff.socialLinks) && ff.socialLinks.length) {
+        document.querySelectorAll('[data-footer-social]').forEach(el => {
+          const header = el.querySelector('span')
+          el.innerHTML = ''
+          if (header) el.appendChild(header)
+          ff.socialLinks.forEach(link => {
+            if (!link.label) return
+            const a = document.createElement('a')
+            a.href = link.url || '#'
+            a.textContent = link.label
+            a.className = 'label-caps text-[11px] tracking-[0.2em] text-background/80 hover:text-background transition-colors'
+            el.appendChild(a)
           })
-          footerPagesEl.innerHTML = ''
-          footerPagesEl.style.cssText = 'display:flex;gap:32px;align-items:flex-start'
+        })
+      }
+
+      if (Array.isArray(ff.footerLinks) && ff.footerLinks.length) {
+        let allNavLinks = []
+        try {
+          const nc = JSON.parse(localStorage.getItem('em_nav_cache') || '{}')
+          allNavLinks = Array.isArray(nc.navLinks) ? nc.navLinks : []
+        } catch {}
+        const selected = ff.footerLinks.map(href => {
+          const found = allNavLinks.find(l => l.href === href)
+          return found || { href, label: href.replace(/\//g, '').replace('.html', '') }
+        })
+        document.querySelectorAll('[data-footer-pages]').forEach(el => {
+          el.innerHTML = ''
+          const header = document.createElement('span')
+          header.className = 'label-caps text-[10px] tracking-[0.3em] text-background/50 mb-3 block'
+          header.textContent = 'Pages'
+          el.appendChild(header)
+          const row = document.createElement('div')
+          row.style.cssText = 'display:flex;flex-direction:row;gap:32px;align-items:flex-start'
           for (let c = 0; c < selected.length; c += 4) {
             const col = document.createElement('div')
             col.style.cssText = 'display:flex;flex-direction:column;gap:12px'
@@ -230,9 +266,10 @@
               a.className = 'label-caps text-[11px] tracking-[0.2em] text-background/80 hover:text-background transition-colors'
               col.appendChild(a)
             })
-            footerPagesEl.appendChild(col)
+            row.appendChild(col)
           }
-        }
+          el.appendChild(row)
+        })
       }
     }
   } catch {}
