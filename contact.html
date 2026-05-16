@@ -72,7 +72,7 @@
         </div>
 
         <!-- Right: Full Form -->
-        <form class="lg:col-span-8 reveal reveal-delay-2" action="#" onsubmit="return false" novalidate>
+        <form class="lg:col-span-8 reveal reveal-delay-2" novalidate>
 
           <!-- ── 01 / Your Details ──────────────────────────────────────── -->
           <div class="mb-16">
@@ -305,44 +305,135 @@
         </form>
 
         <script>
-        document.querySelector('form').addEventListener('submit', async function(e) {
-          e.preventDefault()
-          const btn = document.getElementById('form-submit-btn')
-          const successEl = document.getElementById('form-success')
-          const errorEl = document.getElementById('form-error')
-          btn.disabled = true
-          btn.style.opacity = '0.5'
-          errorEl.style.display = 'none'
-          const fd = new FormData(this)
-          const data = {
-            name:      fd.get('full_name') || '',
-            company:   fd.get('company') || '',
-            email:     fd.get('email') || '',
-            phone:     fd.get('phone') || '',
-            phone_alt: fd.get('phone_alt') || '',
-            services:  fd.getAll('services[]'),
-            timeline:  fd.get('timeline') || '',
-            message:   fd.get('message') || '',
-            brief:     (fd.get('brief') && fd.get('brief').name) ? fd.get('brief').name : '',
+        (function () {
+          const form = document.querySelector('form')
+
+          function makeError(msg, id) {
+            const p = document.createElement('p')
+            if (id) p.id = id
+            p.className = 'field-error'
+            p.style.cssText = "font-family:'Hanken Grotesk',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.05em;color:#dc2626;margin-top:8px"
+            p.textContent = msg
+            return p
           }
-          try {
-            const res = await fetch('/api/enquiry', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(data)
-            })
-            if (res.ok) {
-              this.style.display = 'none'
-              successEl.style.display = ''
-            } else {
-              throw new Error('failed')
+
+          function clearErrors() {
+            form.querySelectorAll('.field-error').forEach(el => el.remove())
+            form.querySelectorAll('.form-field').forEach(el => (el.style.borderBottomColor = ''))
+          }
+
+          // Live-clear errors on input
+          form.addEventListener('input', function (e) {
+            const el = e.target
+            if (!el.matches('.form-field')) return
+            el.style.borderBottomColor = ''
+            const next = el.nextElementSibling
+            if (next && next.classList.contains('field-error')) next.remove()
+          })
+          form.addEventListener('change', function (e) {
+            if (e.target.name === 'services[]') {
+              const err = document.getElementById('services-error')
+              if (err) err.remove()
             }
-          } catch {
-            errorEl.style.display = ''
-            btn.disabled = false
-            btn.style.opacity = ''
-          }
-        })
+          })
+
+          form.addEventListener('submit', async function (e) {
+            e.preventDefault()
+            clearErrors()
+
+            const fd = new FormData(this)
+            let firstErrorEl = null
+
+            function markError(input, msg) {
+              input.style.borderBottomColor = '#dc2626'
+              const errP = makeError(msg)
+              input.after(errP)
+              if (!firstErrorEl) firstErrorEl = errP
+            }
+
+            // Full Name (required)
+            const nameInput = form.querySelector('[name="full_name"]')
+            if (!(fd.get('full_name') || '').trim()) markError(nameInput, 'Please enter your full name.')
+
+            // Email (required + format)
+            const emailInput = form.querySelector('[name="email"]')
+            const emailVal   = (fd.get('email') || '').trim()
+            if (!emailVal) {
+              markError(emailInput, 'Please enter your email address.')
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+              markError(emailInput, 'Please enter a valid email address.')
+            }
+
+            // Services — at least 2 must be selected
+            const checkedServices = fd.getAll('services[]')
+            if (checkedServices.length < 2) {
+              const firstCb = form.querySelector('.service-check')
+              const grid    = firstCb && firstCb.parentNode
+              const errP    = makeError(checkedServices.length === 0
+                ? 'Please select at least 2 services.'
+                : 'Please select at least one more service (minimum 2).', 'services-error')
+              if (grid) grid.after(errP)
+              if (!firstErrorEl) firstErrorEl = errP
+            }
+
+            // Project Brief / message (required)
+            const messageInput = form.querySelector('[name="message"]')
+            if (!(fd.get('message') || '').trim()) markError(messageInput, 'Please describe your project.')
+
+            if (firstErrorEl) {
+              firstErrorEl.scrollIntoView({ behavior: 'smooth', block: 'center' })
+              return
+            }
+
+            // ── All valid — submit ─────────────────────────────────────────
+            const btn       = document.getElementById('form-submit-btn')
+            const successEl = document.getElementById('form-success')
+            const errorEl   = document.getElementById('form-error')
+            btn.disabled       = true
+            btn.style.opacity  = '0.5'
+            errorEl.style.display = 'none'
+
+            const data = {
+              name:      fd.get('full_name') || '',
+              company:   fd.get('company')   || '',
+              email:     emailVal,
+              phone:     fd.get('phone')     || '',
+              phone_alt: fd.get('phone_alt') || '',
+              services:  checkedServices,
+              timeline:  fd.get('timeline')  || '',
+              message:   fd.get('message')   || '',
+              brief:     (fd.get('brief') && fd.get('brief').name) ? fd.get('brief').name : '',
+            }
+
+            try {
+              const res = await fetch('/api/enquiry', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify(data),
+              })
+              if (!res.ok) throw new Error()
+
+              // Freeze form in place — values stay visible but nothing is interactive
+              form.querySelectorAll('input, textarea').forEach(el => {
+                el.disabled      = true
+                el.style.opacity = '0.6'
+              })
+              form.querySelectorAll('label.service-check, label.timeline-pill').forEach(el => {
+                el.style.cursor        = 'default'
+                el.style.pointerEvents = 'none'
+              })
+              const uploadZone = document.getElementById('file-upload-zone')
+              if (uploadZone) { uploadZone.style.pointerEvents = 'none'; uploadZone.style.opacity = '0.5' }
+              btn.style.display       = 'none'
+              successEl.style.display = ''
+
+            } catch {
+              errorEl.style.display = ''
+              btn.disabled          = false
+              btn.style.opacity     = ''
+            }
+          })
+        })()
         </script>
 
       </div>
