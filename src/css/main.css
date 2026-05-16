@@ -163,7 +163,18 @@
   transition: color 0.2s ease;
 }
 .nav-link:hover     { color: #0F0F0F; }
-.nav-link.is-active { color: #FF4F00; }
+.nav-link.is-active { color: #FF4F00; position: relative; }
+.nav-link.is-active::after {
+  content: '';
+  position: absolute;
+  bottom: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  background: #FF4F00;
+  border-radius: 50%;
+}
 
 .nav-cta {
   font-family: 'Hanken Grotesk', sans-serif;

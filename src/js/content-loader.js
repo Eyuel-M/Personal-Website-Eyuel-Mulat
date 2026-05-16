@@ -184,7 +184,7 @@
             a.href = l.href
             a.textContent = l.label
             a.className = 'nav-link'
-            if (currentPage === l.href || currentPage.startsWith(l.href.replace('.html',''))) a.classList.add('active')
+            if (currentPage === l.href || currentPage.startsWith(l.href.replace('.html',''))) a.classList.add('is-active')
             midNav.appendChild(a)
           })
         }
@@ -205,6 +205,12 @@
     const footerRes = await fetch(`${apiBase}/footer`)
     if (footerRes.ok) {
       const ff = (await footerRes.json()).fields || {}
+
+      if (ff.footerLogo) {
+        document.querySelectorAll('[data-footer-logo]').forEach(el => {
+          el.innerHTML = `<img src="${ff.footerLogo}" alt="" style="width:100%;height:auto;display:block;object-fit:contain">`
+        })
+      }
 
       if (ff.email) {
         document.querySelectorAll('[data-footer-email]').forEach(el => {

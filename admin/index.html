@@ -1237,6 +1237,8 @@ function renderFooter(){
   if(!S.data.email)Object.assign(S.data,{email:'hello@eyuelmulat.com',phone:'+251 95 355 3856',address:'Addis Ababa, Ethiopia',copyright:'© 2024 Eyuel Mulat'})
   if(!Array.isArray(S.data.socialLinks))S.data.socialLinks=[{label:'Instagram',url:''},{label:'LinkedIn',url:''},{label:'Behance',url:''}]
   if(!Array.isArray(S.data.footerLinks))S.data.footerLinks=['/about.html','/work.html','/insights.html','/contact.html']
+  if(S.data.footerLogo===undefined)S.data.footerLogo=''
+  c.appendChild(mkSC('Footer Logo',mkIU({label:'Brand Logo Image',hint:'Upload a wide PNG or SVG with a transparent background — recommended size 1600 × 160 px (10:1 ratio). Use a light/white version since the footer background is dark. Replaces the large text logo at the bottom of the footer.',value:S.data.footerLogo||'',onChange:v=>{S.data.footerLogo=v},aspect:'10/1'})))
   c.appendChild(mkSC('Contact Info',mkInput('Email','email',S.data),mkInput('Phone','phone',S.data),mkInput('Address','address',S.data)))
   // Footer pages — pull available links from nav
   const navData=JSON.parse(localStorage.getItem('em_nav_cache')||'null')
