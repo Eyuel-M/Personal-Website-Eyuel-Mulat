@@ -146,10 +146,13 @@ export function createApiApp() {
         const af = path.join(CONTENT_DIR, 'insights-data.json')
         if (!fs.existsSync(af)) return next()
         const insightsData = JSON.parse(fs.readFileSync(af))
-        const item = (insightsData.items || []).find(a => a.slug === slug)
-        if (!item) return next()
+        const items = insightsData.items || []
+        const idx = items.findIndex(a => a.slug === slug)
+        if (idx < 0) return next()
+        const item = items[idx]
+        const nextItem = items.length > 1 ? items[(idx + 1) % items.length] : null
         res.setHeader('Content-Type', 'text/html; charset=utf-8')
-        return res.send(buildInsightPage(item))
+        return res.send(buildInsightPage(item, nextItem))
       } catch { return next() }
     }
     next()
@@ -731,7 +734,19 @@ ${footerHTML()}
 </html>`
 }
 
-function buildInsightPage({ slug, title, category, date, excerpt, body }) {
+function buildInsightPage({ slug, title, category, date, excerpt, body }, nextItem) {
+  const nextSection = nextItem ? `
+    <section class="border-t border-black/10 bg-background">
+      <a href="/insights/${nextItem.slug}.html" class="group block px-10 md:px-[80px] py-24">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-8">
+          <div>
+            <span class="label-caps text-[10px] text-on-surface-variant/60 tracking-[0.3em] block mb-4">Next Insight</span>
+            <h2 class="font-display text-[48px] md:text-[72px] uppercase leading-none group-hover:text-accent transition-colors duration-300">${nextItem.title}</h2>
+          </div>
+          <span class="material-symbols-outlined text-accent text-5xl md:text-7xl transform group-hover:translate-x-3 group-hover:-translate-y-3 transition-transform duration-300">north_east</span>
+        </div>
+      </a>
+    </section>` : ''
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -777,7 +792,7 @@ ${navHTML()}
     <!-- Custom blocks added via admin -->
     <div id="admin-blocks" class="px-10 md:px-[80px]"></div>
   </main>
-
+${nextSection}
 ${footerHTML()}
   <script type="module" src="/src/js/main.js"></script>
   <script type="module" src="/src/js/content-loader.js"></script>
