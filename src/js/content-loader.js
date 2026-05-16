@@ -14,11 +14,12 @@
   const isPreview = new URLSearchParams(window.location.search).has('preview')
   const apiBase = isPreview ? '/api/preview' : '/api/content'
 
+  // sessionStorage cache helper — eliminates content flash on repeat visits
+  function getCached(key) { try { const v = sessionStorage.getItem('em_cl_' + key); return v ? JSON.parse(v) : null } catch { return null } }
+  function setCache(key, data) { try { sessionStorage.setItem('em_cl_' + key, JSON.stringify(data)) } catch {} }
+
   // ── Page-specific field/block overrides ──────────────────────────────────
-  try {
-    const res = await fetch(`${apiBase}/${page}`)
-    if (res.ok) {
-      const data = await res.json()
+  function applyPageData(data) {
       const { fields = {}, blocks = [] } = data
 
       // Apply field overrides to [data-editable] elements
@@ -140,143 +141,162 @@
         })
       }
     }
+
+  const cachedPage = getCached(page)
+  if (cachedPage) applyPageData(cachedPage)
+
+  try {
+    const res = await fetch(`${apiBase}/${page}`)
+    if (res.ok) {
+      const data = await res.json()
+      setCache(page, data)
+      applyPageData(data)
+    }
   } catch {}
 
   // ── Navigation / logo override — runs on every page independently ─────────
+  function applyNavData(navData) {
+    const nf = navData.fields || {}
+    const logoText   = nf.logoText
+    const logoImage  = nf.logoImage
+    const logoHeight = nf.logoHeight || 28
+    const lm         = nf.logoMargins || {}
+    if (logoText || logoImage) {
+      document.querySelectorAll('[data-nav-logo]').forEach(el => {
+        if (lm.marginTop    !== undefined) el.style.marginTop    = lm.marginTop    + 'px'
+        if (lm.marginRight  !== undefined) el.style.marginRight  = lm.marginRight  + 'px'
+        if (lm.marginBottom !== undefined) el.style.marginBottom = lm.marginBottom + 'px'
+        if (lm.marginLeft   !== undefined) el.style.marginLeft   = lm.marginLeft   + 'px'
+        el.innerHTML = ''
+        if (logoImage) {
+          const img = document.createElement('img')
+          img.src = logoImage
+          img.alt = logoText || ''
+          img.style.cssText = `height:${logoHeight}px;object-fit:contain;display:block`
+          el.appendChild(img)
+        } else {
+          el.textContent = logoText
+        }
+      })
+    }
+    const links = Array.isArray(nf.navLinks) ? nf.navLinks : []
+    if (links.length) {
+      const midNav = document.querySelector('nav .hidden.md\\:flex')
+      if (midNav) {
+        const currentPage = window.location.pathname
+        midNav.innerHTML = ''
+        links.filter(l => l.href !== '/contact.html').forEach(l => {
+          const a = document.createElement('a')
+          a.href = l.href
+          a.textContent = l.label
+          a.className = 'nav-link'
+          if (currentPage === l.href || currentPage.startsWith(l.href.replace('.html',''))) a.classList.add('is-active')
+          midNav.appendChild(a)
+        })
+      }
+      const ctaLink = links.find(l => l.href === '/contact.html')
+      if (ctaLink) {
+        document.querySelectorAll('[data-nav="contact"]').forEach(el => {
+          el.href = ctaLink.href
+          el.textContent = ctaLink.label
+        })
+      }
+    }
+  }
+
+  const cachedNav = getCached('navigation')
+  if (cachedNav) applyNavData(cachedNav)
+
   try {
     const navRes = await fetch(`${apiBase}/navigation`)
     if (navRes.ok) {
       const navData = await navRes.json()
-      const nf = navData.fields || {}
-      const logoText   = nf.logoText
-      const logoImage  = nf.logoImage
-      const logoHeight = nf.logoHeight || 28
-      const lm         = nf.logoMargins || {}
-      if (logoText || logoImage) {
-        document.querySelectorAll('[data-nav-logo]').forEach(el => {
-          if (lm.marginTop    !== undefined) el.style.marginTop    = lm.marginTop    + 'px'
-          if (lm.marginRight  !== undefined) el.style.marginRight  = lm.marginRight  + 'px'
-          if (lm.marginBottom !== undefined) el.style.marginBottom = lm.marginBottom + 'px'
-          if (lm.marginLeft   !== undefined) el.style.marginLeft   = lm.marginLeft   + 'px'
-          el.innerHTML = ''
-          if (logoImage) {
-            const img = document.createElement('img')
-            img.src = logoImage
-            img.alt = logoText || ''
-            img.style.cssText = `height:${logoHeight}px;object-fit:contain;display:block`
-            el.appendChild(img)
-          } else {
-            el.textContent = logoText
-          }
-        })
-      }
-      // Apply dynamic nav links (middle section)
-      const links = Array.isArray(nf.navLinks) ? nf.navLinks : []
-      if (links.length) {
-        // The CTA link (contact) stays in place; middle links go in the hidden-md flex row
-        const midNav = document.querySelector('nav .hidden.md\\:flex')
-        if (midNav) {
-          const currentPage = window.location.pathname
-          midNav.innerHTML = ''
-          // All links except /contact.html go in the middle
-          links.filter(l => l.href !== '/contact.html').forEach(l => {
-            const a = document.createElement('a')
-            a.href = l.href
-            a.textContent = l.label
-            a.className = 'nav-link'
-            if (currentPage === l.href || currentPage.startsWith(l.href.replace('.html',''))) a.classList.add('is-active')
-            midNav.appendChild(a)
-          })
-        }
-        // Update CTA link if contact href changed
-        const ctaLink = links.find(l => l.href === '/contact.html')
-        if (ctaLink) {
-          document.querySelectorAll('[data-nav="contact"]').forEach(el => {
-            el.href = ctaLink.href
-            el.textContent = ctaLink.label
-          })
-        }
-      }
+      setCache('navigation', navData)
+      applyNavData(navData)
     }
   } catch {}
 
   // ── Footer — email, phone, address, copyright, social links, pages ────────
+  function applyFooterData(ff) {
+    if (ff.footerLogo) {
+      document.querySelectorAll('[data-footer-logo]').forEach(el => {
+        el.innerHTML = `<img src="${ff.footerLogo}" alt="" style="width:100%;height:auto;display:block;object-fit:contain">`
+      })
+    }
+    if (ff.email) {
+      document.querySelectorAll('[data-footer-email]').forEach(el => {
+        el.textContent = ff.email
+        if (el.tagName === 'A') el.href = 'mailto:' + ff.email
+      })
+    }
+    if (ff.phone) {
+      document.querySelectorAll('[data-footer-phone]').forEach(el => el.textContent = ff.phone)
+    }
+    if (ff.address) {
+      document.querySelectorAll('[data-footer-address]').forEach(el => el.textContent = ff.address)
+    }
+    if (ff.copyright) {
+      document.querySelectorAll('[data-footer-copyright]').forEach(el => el.textContent = ff.copyright)
+    }
+    if (Array.isArray(ff.socialLinks) && ff.socialLinks.length) {
+      document.querySelectorAll('[data-footer-social]').forEach(el => {
+        const header = el.querySelector('span')
+        el.innerHTML = ''
+        if (header) el.appendChild(header)
+        ff.socialLinks.forEach(link => {
+          if (!link.label) return
+          const a = document.createElement('a')
+          a.href = link.url || '#'
+          a.textContent = link.label
+          a.className = 'label-caps text-[11px] tracking-[0.2em] text-background/80 hover:text-background transition-colors'
+          el.appendChild(a)
+        })
+      })
+    }
+    if (Array.isArray(ff.footerLinks) && ff.footerLinks.length) {
+      let allNavLinks = []
+      try {
+        const nc = JSON.parse(localStorage.getItem('em_nav_cache') || '{}')
+        allNavLinks = Array.isArray(nc.navLinks) ? nc.navLinks : []
+      } catch {}
+      const selected = ff.footerLinks.map(href => {
+        const found = allNavLinks.find(l => l.href === href)
+        return found || { href, label: href.replace(/\//g, '').replace('.html', '') }
+      })
+      document.querySelectorAll('[data-footer-pages]').forEach(el => {
+        el.innerHTML = ''
+        const header = document.createElement('span')
+        header.className = 'label-caps text-[10px] tracking-[0.3em] text-background/50 mb-3 block'
+        header.textContent = 'Pages'
+        el.appendChild(header)
+        const row = document.createElement('div')
+        row.style.cssText = 'display:flex;flex-direction:row;gap:32px;align-items:flex-start'
+        for (let c = 0; c < selected.length; c += 4) {
+          const col = document.createElement('div')
+          col.style.cssText = 'display:flex;flex-direction:column;gap:12px'
+          selected.slice(c, c + 4).forEach(l => {
+            const a = document.createElement('a')
+            a.href = l.href
+            a.textContent = l.label
+            a.className = 'label-caps text-[11px] tracking-[0.2em] text-background/80 hover:text-background transition-colors'
+            col.appendChild(a)
+          })
+          row.appendChild(col)
+        }
+        el.appendChild(row)
+      })
+    }
+  }
+
+  const cachedFooter = getCached('footer')
+  if (cachedFooter) applyFooterData(cachedFooter.fields || {})
+
   try {
     const footerRes = await fetch(`${apiBase}/footer`)
     if (footerRes.ok) {
-      const ff = (await footerRes.json()).fields || {}
-
-      if (ff.footerLogo) {
-        document.querySelectorAll('[data-footer-logo]').forEach(el => {
-          el.innerHTML = `<img src="${ff.footerLogo}" alt="" style="width:100%;height:auto;display:block;object-fit:contain">`
-        })
-      }
-
-      if (ff.email) {
-        document.querySelectorAll('[data-footer-email]').forEach(el => {
-          el.textContent = ff.email
-          if (el.tagName === 'A') el.href = 'mailto:' + ff.email
-        })
-      }
-      if (ff.phone) {
-        document.querySelectorAll('[data-footer-phone]').forEach(el => el.textContent = ff.phone)
-      }
-      if (ff.address) {
-        document.querySelectorAll('[data-footer-address]').forEach(el => el.textContent = ff.address)
-      }
-      if (ff.copyright) {
-        document.querySelectorAll('[data-footer-copyright]').forEach(el => el.textContent = ff.copyright)
-      }
-
-      if (Array.isArray(ff.socialLinks) && ff.socialLinks.length) {
-        document.querySelectorAll('[data-footer-social]').forEach(el => {
-          const header = el.querySelector('span')
-          el.innerHTML = ''
-          if (header) el.appendChild(header)
-          ff.socialLinks.forEach(link => {
-            if (!link.label) return
-            const a = document.createElement('a')
-            a.href = link.url || '#'
-            a.textContent = link.label
-            a.className = 'label-caps text-[11px] tracking-[0.2em] text-background/80 hover:text-background transition-colors'
-            el.appendChild(a)
-          })
-        })
-      }
-
-      if (Array.isArray(ff.footerLinks) && ff.footerLinks.length) {
-        let allNavLinks = []
-        try {
-          const nc = JSON.parse(localStorage.getItem('em_nav_cache') || '{}')
-          allNavLinks = Array.isArray(nc.navLinks) ? nc.navLinks : []
-        } catch {}
-        const selected = ff.footerLinks.map(href => {
-          const found = allNavLinks.find(l => l.href === href)
-          return found || { href, label: href.replace(/\//g, '').replace('.html', '') }
-        })
-        document.querySelectorAll('[data-footer-pages]').forEach(el => {
-          el.innerHTML = ''
-          const header = document.createElement('span')
-          header.className = 'label-caps text-[10px] tracking-[0.3em] text-background/50 mb-3 block'
-          header.textContent = 'Pages'
-          el.appendChild(header)
-          const row = document.createElement('div')
-          row.style.cssText = 'display:flex;flex-direction:row;gap:32px;align-items:flex-start'
-          for (let c = 0; c < selected.length; c += 4) {
-            const col = document.createElement('div')
-            col.style.cssText = 'display:flex;flex-direction:column;gap:12px'
-            selected.slice(c, c + 4).forEach(l => {
-              const a = document.createElement('a')
-              a.href = l.href
-              a.textContent = l.label
-              a.className = 'label-caps text-[11px] tracking-[0.2em] text-background/80 hover:text-background transition-colors'
-              col.appendChild(a)
-            })
-            row.appendChild(col)
-          }
-          el.appendChild(row)
-        })
-      }
+      const footerData = await footerRes.json()
+      setCache('footer', footerData)
+      applyFooterData(footerData.fields || {})
     }
   } catch {}
 

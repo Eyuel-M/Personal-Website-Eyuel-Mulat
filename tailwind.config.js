@@ -22,7 +22,7 @@ export default {
         'outline-variant':       '#C8C6C0',
       },
       fontFamily: {
-        display: ['Anton', 'sans-serif'],
+        display: ['Anton', 'Impact', 'Haettenschweiler', '"Arial Black"', 'sans-serif'],
         sans:    ['Hanken Grotesk', 'sans-serif'],
       },
     },
