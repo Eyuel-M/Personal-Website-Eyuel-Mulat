@@ -4,13 +4,13 @@ import cors from 'cors'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import nodemailer from 'nodemailer'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const PORT = process.env.PORT || 3001
 
-const ADMIN_PASS  = process.env.ADMIN_PASS  || 'admin2024'
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@eyuelmulat.com'
-const ADMIN_TOKEN = 'em-' + Buffer.from(ADMIN_PASS + ':eyuelmulat').toString('base64')
+const DEFAULT_PASS  = process.env.ADMIN_PASS  || 'admin2024'
+const DEFAULT_EMAIL = process.env.ADMIN_EMAIL || 'admin@eyuelmulat.com'
 
 const CONTENT_DIR = path.join(__dirname, 'content')
 const UPLOADS_DIR = path.join(__dirname, 'public', 'uploads')
@@ -18,6 +18,16 @@ const BRIEFS_DIR  = path.join(__dirname, 'content', 'briefs')
 fs.mkdirSync(CONTENT_DIR, { recursive: true })
 fs.mkdirSync(UPLOADS_DIR, { recursive: true })
 fs.mkdirSync(BRIEFS_DIR,  { recursive: true })
+
+function getAccount () {
+  const f = path.join(CONTENT_DIR, 'account.json')
+  const d = { email: DEFAULT_EMAIL, password: DEFAULT_PASS, recoveryEmail: '', smtpUser: '', smtpPass: '' }
+  if (!fs.existsSync(f)) return d
+  try { return { ...d, ...JSON.parse(fs.readFileSync(f, 'utf8')) } } catch { return d }
+}
+function makeToken (pw) {
+  return 'em-' + Buffer.from(pw + ':eyuelmulat').toString('base64')
+}
 
 // ── Seed content files if they don't exist ───────────────────────────────────
 function seedIfMissing(filename, data) {
@@ -182,7 +192,7 @@ export function createApiApp() {
   })
 
   function auth(req, res, next) {
-    if (req.headers['x-token'] === ADMIN_TOKEN) return next()
+    if (req.headers['x-token'] === makeToken(getAccount().password)) return next()
     res.status(401).json({ error: 'Unauthorized' })
   }
 
@@ -190,11 +200,104 @@ export function createApiApp() {
 
   // Login
   app.post('/api/login', (req, res) => {
-    if (req.body.email === ADMIN_EMAIL && req.body.password === ADMIN_PASS) {
-      res.json({ token: ADMIN_TOKEN })
+    const acct = getAccount()
+    if (req.body.email === acct.email && req.body.password === acct.password) {
+      res.json({ token: makeToken(acct.password) })
     } else {
       res.status(401).json({ error: 'Invalid email or password' })
     }
+  })
+
+  // ── Account settings ───────────────────────────────────────────────────────
+  app.get('/api/account', auth, (req, res) => {
+    const { password: _, ...safe } = getAccount()
+    res.json(safe)
+  })
+  app.put('/api/account', auth, (req, res) => {
+    const acct = getAccount()
+    const updated = { ...acct,
+      email:         req.body.email         ?? acct.email,
+      recoveryEmail: req.body.recoveryEmail ?? acct.recoveryEmail,
+      smtpUser:      req.body.smtpUser      ?? acct.smtpUser,
+      smtpPass:      req.body.smtpPass      ?? acct.smtpPass,
+    }
+    fs.writeFileSync(path.join(CONTENT_DIR, 'account.json'), JSON.stringify(updated, null, 2))
+    res.json({ ok: true })
+  })
+  app.put('/api/account/password', auth, (req, res) => {
+    const { currentPassword, newPassword } = req.body
+    const acct = getAccount()
+    if (!newPassword || newPassword.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters.' })
+    if (currentPassword !== acct.password) return res.status(401).json({ error: 'Current password is incorrect.' })
+    const updated = { ...acct, password: newPassword }
+    fs.writeFileSync(path.join(CONTENT_DIR, 'account.json'), JSON.stringify(updated, null, 2))
+    res.json({ ok: true, token: makeToken(newPassword) })
+  })
+  app.post('/api/account/test-email', auth, async (req, res) => {
+    const acct = getAccount()
+    if (!acct.recoveryEmail) return res.status(400).json({ error: 'No recovery email configured.' })
+    if (!acct.smtpUser || !acct.smtpPass) return res.status(400).json({ error: 'SMTP credentials not saved yet.' })
+    try {
+      const t = nodemailer.createTransport({ service: 'gmail', auth: { user: acct.smtpUser, pass: acct.smtpPass } })
+      await t.sendMail({
+        from: `"Eyuel Mulat Admin" <${acct.smtpUser}>`,
+        to: acct.recoveryEmail,
+        subject: 'Test email — Eyuel Mulat Admin',
+        html: '<div style="font-family:sans-serif;padding:24px;max-width:420px"><h2>Test email</h2><p>Your email configuration is working correctly.</p></div>',
+      })
+      res.json({ ok: true })
+    } catch(e) { res.status(500).json({ error: e.message || 'Send failed.' }) }
+  })
+
+  // ── Forgot / reset password ────────────────────────────────────────────────
+  const resetCodes  = new Map()  // code  → { expires }
+  const resetTokens = new Map()  // token → { expires }
+
+  async function sendResetEmail (toAddress, code) {
+    const acct = getAccount()
+    if (!acct.smtpUser || !acct.smtpPass) throw new Error('Email sending is not configured. Set up Gmail SMTP in Account Settings first.')
+    const t = nodemailer.createTransport({ service: 'gmail', auth: { user: acct.smtpUser, pass: acct.smtpPass } })
+    await t.sendMail({
+      from: `"Eyuel Mulat Admin" <${acct.smtpUser}>`,
+      to: toAddress,
+      subject: 'Password reset code',
+      text:  `Your reset code is: ${code}\n\nExpires in 15 minutes.`,
+      html:  `<div style="font-family:sans-serif;max-width:440px;padding:32px"><h2 style="margin:0 0 20px">Reset your password</h2><p style="color:#555;margin:0 0 16px">Your reset code is:</p><p style="font-size:40px;font-weight:700;letter-spacing:.35em;font-family:monospace;margin:0 0 20px;color:#111">${code}</p><p style="color:#9CA3AF;font-size:13px">Expires in 15 minutes. If you did not request this, ignore this email.</p></div>`,
+    })
+  }
+
+  app.post('/api/auth/forgot', async (req, res) => {
+    const acct = getAccount()
+    const email = (req.body.email || '').trim().toLowerCase()
+    if (email !== acct.email.toLowerCase()) return res.status(400).json({ error: 'No account found with that email.' })
+    if (!acct.recoveryEmail) return res.status(400).json({ error: 'No recovery email configured. Set one in Account Settings.' })
+    const code = String(Math.floor(100000 + Math.random() * 900000))
+    resetCodes.set(code, { expires: Date.now() + 15 * 60 * 1000 })
+    try {
+      await sendResetEmail(acct.recoveryEmail, code)
+      res.json({ ok: true })
+    } catch(e) { resetCodes.delete(code); res.status(500).json({ error: e.message || 'Failed to send email.' }) }
+  })
+  app.post('/api/auth/verify-code', (req, res) => {
+    const code = String(req.body.code || '').trim()
+    const entry = resetCodes.get(code)
+    if (!entry) return res.status(400).json({ error: 'Invalid code.' })
+    if (Date.now() > entry.expires) { resetCodes.delete(code); return res.status(400).json({ error: 'Code has expired. Please request a new one.' }) }
+    resetCodes.delete(code)
+    const token = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2)
+    resetTokens.set(token, { expires: Date.now() + 10 * 60 * 1000 })
+    res.json({ ok: true, resetToken: token })
+  })
+  app.post('/api/auth/reset-password', (req, res) => {
+    const { resetToken, newPassword } = req.body
+    const entry = resetTokens.get(resetToken)
+    if (!entry) return res.status(400).json({ error: 'Invalid or expired reset session. Please start over.' })
+    if (Date.now() > entry.expires) { resetTokens.delete(resetToken); return res.status(400).json({ error: 'Reset session expired. Please start over.' }) }
+    if (!newPassword || newPassword.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters.' })
+    const acct = getAccount()
+    fs.writeFileSync(path.join(CONTENT_DIR, 'account.json'), JSON.stringify({ ...acct, password: newPassword }, null, 2))
+    resetTokens.delete(resetToken)
+    res.json({ ok: true })
   })
 
 // Get content for a page
