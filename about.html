@@ -314,7 +314,7 @@
         f.processItems.forEach((item,i)=>{
           const isEven=i%2===1
           const num=String(i+1).padStart(2,'0')
-          const numColor=i===0?'text-primary/80':'text-on-surface/10'
+          const numColor=i%2===0?'text-primary/80':'text-on-surface/10'
           const hw=item.heading||''
           const aw=item.accentWord||''
           const headingHTML=aw&&hw?hw.replace(new RegExp(aw),'<span class="text-accent">'+aw+'</span>'):hw

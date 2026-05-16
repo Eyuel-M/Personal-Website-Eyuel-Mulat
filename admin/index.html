@@ -333,7 +333,8 @@ const SECTIONS=[
 const TOKEN_KEY='em_token'
 const UID=()=>Math.random().toString(36).slice(2,8)
 const slugify=s=>s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')
-const CATS=['Branding','Strategy','Print','Digital','Editorial','Motion','Web Design','Identity','Other']
+let CATS=['Branding','Strategy','Print','Digital','Editorial','Motion','Web Design','Identity','Other']
+async function refreshCats(){try{const cats=await api('GET','/api/categories');if(Array.isArray(cats)&&cats.length)CATS=cats.map(c=>c.name).filter(Boolean)}catch{}}
 
 const S={
   token:localStorage.getItem(TOKEN_KEY)||'',
@@ -547,13 +548,14 @@ async function loadSection(id){
       S.data=(cd&&cd.fields)||{};S.contactSvcs=svcs||[];return
     }
     if(id==='portfolio'){
-      const d=await api('GET','/api/content/portfolio')
+      const [d]=await Promise.all([api('GET','/api/content/portfolio'),refreshCats()])
       S.portfolio={title:'Work',subtitle:'Selected Projects',items:[],archivedItems:[],...(d||{})}
       if(!Array.isArray(S.portfolio.items))S.portfolio.items=[]
       if(!Array.isArray(S.portfolio.archivedItems))S.portfolio.archivedItems=[]
       return
     }
     if(id==='insights'){
+      await refreshCats()
       const d=await api('GET','/api/content/insights-data')
       S.insightsData={items:[],archivedItems:[],...(d||{})}
       if(!Array.isArray(S.insightsData.items))S.insightsData.items=[]
@@ -599,7 +601,10 @@ async function saveSection(){
     else if(id==='enquiries'){/* read-only section, nothing to save */}
     else if(id==='account'){await api('PUT','/api/account',S.data)}
     else if(id==='hero'){await api('PUT','/api/content/home',{fields:S.data})}
-    else{await api('PUT',`/api/content/${id}`,{fields:S.data})}
+    else{
+      await api('PUT',`/api/content/${id}`,{fields:S.data})
+      if(id==='navigation')localStorage.setItem('em_nav_cache',JSON.stringify(S.data))
+    }
     showSaving(true)
   }catch(e){showSaving(false,true,'Save failed')}
   btn.disabled=false;btn.textContent='Save Changes'
@@ -936,28 +941,45 @@ function renderNav(){
     szWrap,
     mkMS(S.data.logoMargins,()=>{})
   ))
-  const lCard=document.createElement('div');lCard.className='sc';lCard.innerHTML='<div class="sc-h"><h3>Navigation Links</h3></div>'
+  const CORE_HREFS=['/about.html','/work.html','/insights.html','/contact.html']
+  if(!Array.isArray(S.data.navArchivedLinks))S.data.navArchivedLinks=[]
+  const lCard=document.createElement('div');lCard.className='sc';lCard.innerHTML='<div class="sc-h"><h3>Navigation Links</h3><p style="font-size:12px;color:var(--g400);margin:0">Built-in pages (grey) cannot be deleted. New pages can be archived. Reorder with ↑ ↓ — order is left-to-right in the nav, with Contact always last.</p></div>'
   const lb=document.createElement('div');lb.className='sc-b'
   const ld=document.createElement('div');ld.className='sp4'
   function rnl(){
     ld.innerHTML=''
     S.data.navLinks.forEach((lnk,i)=>{
-      const row=document.createElement('div');row.style.cssText='display:flex;gap:8px;align-items:flex-end'
+      const isCore=CORE_HREFS.includes(lnk.href)||lnk.locked
+      const row=document.createElement('div');row.style.cssText='display:flex;gap:8px;align-items:flex-end;padding:8px;border-radius:8px;background:'+(isCore?'#f9fafb':'#fff')
       const lf=document.createElement('div');lf.style.flex='1'
       const ll=document.createElement('label');ll.className='fl';ll.textContent='Label'
-      const li=document.createElement('input');li.className='fi';li.value=lnk.label;li.oninput=()=>lnk.label=li.value
+      const li=document.createElement('input');li.className='fi';li.value=lnk.label;li.disabled=isCore;li.style.background=isCore?'#f3f4f6':'';li.oninput=()=>lnk.label=li.value
       lf.appendChild(ll);lf.appendChild(li)
       const hf=document.createElement('div');hf.style.flex='2'
       const hl2=document.createElement('label');hl2.className='fl';hl2.textContent='URL'
-      const hi=document.createElement('input');hi.className='fi';hi.value=lnk.href;hi.oninput=()=>lnk.href=hi.value
+      const hi=document.createElement('input');hi.className='fi';hi.value=lnk.href;hi.disabled=isCore;hi.style.background=isCore?'#f3f4f6':'';hi.oninput=()=>lnk.href=hi.value
       hf.appendChild(hl2);hf.appendChild(hi)
-      const db=document.createElement('button');db.className='bd';db.textContent='✕';db.style.marginBottom='2px'
-      db.onclick=()=>{S.data.navLinks.splice(i,1);rnl()}
-      row.appendChild(lf);row.appendChild(hf);row.appendChild(db);ld.appendChild(row)
+      const btns=document.createElement('div');btns.style.cssText='display:flex;gap:4px;margin-bottom:2px'
+      const ub=document.createElement('button');ub.className='bic';ub.title='Move up';ub.innerHTML='↑';ub.disabled=i===0;ub.onclick=()=>{[S.data.navLinks[i-1],S.data.navLinks[i]]=[S.data.navLinks[i],S.data.navLinks[i-1]];rnl()}
+      const db2=document.createElement('button');db2.className='bic';db2.title='Move down';db2.innerHTML='↓';db2.disabled=i===S.data.navLinks.length-1;db2.onclick=()=>{[S.data.navLinks[i],S.data.navLinks[i+1]]=[S.data.navLinks[i+1],S.data.navLinks[i]];rnl()}
+      btns.appendChild(ub);btns.appendChild(db2)
+      if(!isCore){const ab=document.createElement('button');ab.className='bd';ab.textContent='Archive';ab.style.cssText='font-size:11px;padding:4px 8px;color:var(--amber500)';ab.onclick=()=>{S.data.navArchivedLinks.unshift(S.data.navLinks.splice(i,1)[0]);rnl()};btns.appendChild(ab)}
+      row.appendChild(lf);row.appendChild(hf);row.appendChild(btns);ld.appendChild(row)
     })
-    const add=document.createElement('button');add.className='bs';add.textContent='+ Add Link'
-    add.onclick=()=>{S.data.navLinks.push({label:'New Link',href:'/'});rnl()}
+    const add=document.createElement('button');add.className='bs';add.textContent='+ Add Page Link'
+    add.onclick=()=>{S.data.navLinks.push({label:'New Page',href:'/new-page.html'});rnl()}
     ld.appendChild(add)
+    if(S.data.navArchivedLinks&&S.data.navArchivedLinks.length){
+      const arch=document.createElement('div');arch.style.cssText='margin-top:8px;border:1px solid var(--amber200,#fde68a);border-radius:10px;background:var(--amber50,#fffbeb);padding:10px 14px'
+      arch.innerHTML=`<div style="font-size:12px;font-weight:600;color:var(--amber800);margin-bottom:8px">Archived Pages — ${S.data.navArchivedLinks.length}</div>`
+      S.data.navArchivedLinks.forEach((lnk,j)=>{
+        const r=document.createElement('div');r.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-top:1px solid var(--amber200,#fde68a)'
+        const nm=document.createElement('span');nm.style.fontSize='13px';nm.textContent=lnk.label+' ('+lnk.href+')'
+        const rb=document.createElement('button');rb.className='bn';rb.style.fontSize='11px';rb.textContent='Restore';rb.onclick=()=>{S.data.navLinks.push(S.data.navArchivedLinks.splice(j,1)[0]);rnl()}
+        r.appendChild(nm);r.appendChild(rb);arch.appendChild(r)
+      })
+      ld.appendChild(arch)
+    }
   }
   rnl();lb.appendChild(ld);lCard.appendChild(lb);c.appendChild(lCard)
 }
@@ -978,11 +1000,6 @@ function renderHero(){
     mkFV('Eyebrow Label','hero-label','Small caps text above the heading — e.g. "Strategy & Design"'),
     mkFV('Heading','hero-heading','Supports HTML — use <br> for line breaks, <span class="text-accent">…</span> for accent color.',true),
     mkFV('Description','hero-subtitle','The paragraph of text below the heading.',true)
-  ))
-  c.appendChild(mkSC('Featured Project',
-    mkFV('Featured Project Title','featured-title'),
-    mkFV('Description','featured-desc','Short blurb shown in the home page feature block.',true),
-    mkIU({label:'Featured Image',hint:'Landscape — displayed in the home page feature block',value:(S.data['featured-img']&&S.data['featured-img'].value)||'',onChange:v=>{if(!S.data['featured-img'])S.data['featured-img']={};S.data['featured-img'].value=v},aspect:'16/9'})
   ))
 }
 
@@ -1190,9 +1207,14 @@ function renderClients(){
 // ── Contact ───────────────────────────────────────────────────────────────────
 function renderContact(){
   const c=document.getElementById('editor-inner');c.innerHTML=''
-  if(!S.data.email)Object.assign(S.data,{email:'hello@eyuelmulat.com',phone:'+251 95 355 3856',address:'Addis Ababa, Ethiopia',headline:"Let's Make Something Great",subline:'Ready to elevate your brand? We\'d love to hear from you.'})
+  if(!S.data['contact-email'])Object.assign(S.data,{'contact-email':'hello@eyuelmulat.com','contact-phone':'+251 95 355 3856','contact-h1':'Get in Touch','contact-subtitle':'Available for brand strategy, visual identity, and digital build projects. Working with forward-thinking brands worldwide.'})
   if(!Array.isArray(S.contactSvcs))S.contactSvcs=['Brand Strategy','Visual Identity','Creative Direction','Typography','Digital Systems','Editorial Design']
-  c.appendChild(mkSC('Contact Details',mkInput('Email Address','email',S.data),mkInput('Phone','phone',S.data),mkInput('Address','address',S.data),mkInput('Section Headline','headline',S.data),mkTextarea('Section Subline','subline',S.data,2)))
+  c.appendChild(mkSC('Contact Page Text',
+    mkInput('Eyebrow Text','contact-h1',S.data,'Small caps label above the main heading — e.g. "Get in Touch"'),
+    mkInput('Email Address','contact-email',S.data,'','email'),
+    mkInput('Phone','contact-phone',S.data),
+    mkTextarea('Side Description','contact-subtitle',S.data,3,'Short paragraph shown in the left column beside the form.')
+  ))
   const svcsCard=document.createElement('div');svcsCard.className='sc';svcsCard.innerHTML='<div class="sc-h"><h3>Services Checklist</h3></div>'
   const sb=document.createElement('div');sb.className='sc-b'
   const sd=document.createElement('div');sd.className='sp4'
@@ -1214,7 +1236,21 @@ function renderFooter(){
   const c=document.getElementById('editor-inner');c.innerHTML=''
   if(!S.data.email)Object.assign(S.data,{email:'hello@eyuelmulat.com',phone:'+251 95 355 3856',address:'Addis Ababa, Ethiopia',copyright:'© 2024 Eyuel Mulat'})
   if(!Array.isArray(S.data.socialLinks))S.data.socialLinks=[{label:'Instagram',url:''},{label:'LinkedIn',url:''},{label:'Behance',url:''}]
+  if(!Array.isArray(S.data.footerLinks))S.data.footerLinks=['/about.html','/work.html','/insights.html','/contact.html']
   c.appendChild(mkSC('Contact Info',mkInput('Email','email',S.data),mkInput('Phone','phone',S.data),mkInput('Address','address',S.data)))
+  // Footer pages — pull available links from nav
+  const navData=JSON.parse(localStorage.getItem('em_nav_cache')||'null')
+  const allLinks=(navData&&navData.navLinks)||[{label:'About',href:'/about.html'},{label:'Work',href:'/work.html'},{label:'Insights',href:'/insights.html'},{label:'Contact',href:'/contact.html'}]
+  const fpCard=document.createElement('div');fpCard.className='sc';fpCard.innerHTML='<div class="sc-h"><h3>Footer Pages</h3><p style="font-size:12px;color:var(--g400);margin:0">Choose which nav pages appear in the footer.</p></div>'
+  const fpBody=document.createElement('div');fpBody.className='sc-b sp'
+  allLinks.forEach(lnk=>{
+    const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:10px;padding:6px 0'
+    const cb=document.createElement('input');cb.type='checkbox';cb.style.cssText='width:16px;height:16px;accent-color:#111;cursor:pointer';cb.checked=S.data.footerLinks.includes(lnk.href)
+    cb.onchange=()=>{if(cb.checked){if(!S.data.footerLinks.includes(lnk.href))S.data.footerLinks.push(lnk.href)}else{S.data.footerLinks=S.data.footerLinks.filter(h=>h!==lnk.href)}}
+    const lbl=document.createElement('label');lbl.style.cssText='font-size:13px;color:var(--g700);cursor:pointer';lbl.textContent=lnk.label+' ('+lnk.href+')';lbl.onclick=()=>{cb.checked=!cb.checked;cb.onchange()}
+    row.appendChild(cb);row.appendChild(lbl);fpBody.appendChild(row)
+  })
+  fpCard.appendChild(fpBody);c.appendChild(fpCard)
   const slCard=document.createElement('div');slCard.className='sc';slCard.innerHTML='<div class="sc-h"><h3>Social Links</h3></div>'
   const slBody=document.createElement('div');slBody.className='sc-b sp'
   const slList=document.createElement('div');slList.className='sp4'
@@ -1639,7 +1675,7 @@ function renderInsights(){
         const sf=document.createElement('div');const sl=document.createElement('label');sl.className='fl';sl.textContent='URL Slug';const si=document.createElement('input');si.className='fi';si.value=item.slug||'';si.oninput=()=>{item.slug=slugify(si.value);si.value=item.slug};sf.appendChild(sl);sf.appendChild(si)
         g1.appendChild(tf);g1.appendChild(sf);body.appendChild(g1)
         const g2=document.createElement('div');g2.className='g2'
-        const catf=document.createElement('div');const catl=document.createElement('label');catl.className='fl';catl.textContent='Category';const cati=document.createElement('input');cati.className='fi';cati.value=item.category||'Essay';cati.placeholder='Essay';cati.oninput=()=>{item.category=cati.value;cb.textContent=cati.value};catf.appendChild(catl);catf.appendChild(cati)
+        const catf=document.createElement('div');const catl=document.createElement('label');catl.className='fl';catl.textContent='Category';const catSel=document.createElement('select');catSel.className='fsel';const insightCats=['Essay','Case Study','Interview','Opinion',...CATS];[...new Set(insightCats)].forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n;if(n===(item.category||'Essay'))o.selected=true;catSel.appendChild(o)});catSel.onchange=()=>{item.category=catSel.value;cb.textContent=catSel.value};catf.appendChild(catl);catf.appendChild(catSel)
         const datf=document.createElement('div');const datl=document.createElement('label');datl.className='fl';datl.textContent='Date';const dati=document.createElement('input');dati.className='fi';dati.type='date';dati.value=item.date||'';dati.oninput=()=>{item.date=dati.value;dt.textContent=dati.value};datf.appendChild(datl);datf.appendChild(dati)
         g2.appendChild(catf);g2.appendChild(datf);body.appendChild(g2)
         const excf=document.createElement('div');const excl=document.createElement('label');excl.className='fl';excl.textContent='Excerpt';const exca=document.createElement('textarea');exca.className='fta';exca.rows=2;exca.value=item.excerpt||'';exca.oninput=()=>item.excerpt=exca.value;excf.appendChild(excl);excf.appendChild(exca);body.appendChild(excf)
@@ -1692,7 +1728,7 @@ function renderInsightEditor(){
   const sf=document.createElement('div');const sl=document.createElement('label');sl.className='fl';sl.textContent='URL Slug';const si=document.createElement('input');si.className='fi';si.value=item.slug||'';si.oninput=()=>{item.slug=slugify(si.value);si.value=item.slug};sf.appendChild(sl);sf.appendChild(si)
   g1.appendChild(tf);g1.appendChild(sf);ib.appendChild(g1)
   const g2=document.createElement('div');g2.className='g2'
-  const catf=document.createElement('div');const catl=document.createElement('label');catl.className='fl';catl.textContent='Category';const cati=document.createElement('input');cati.className='fi';cati.value=item.category||'Essay';cati.oninput=()=>item.category=cati.value;catf.appendChild(catl);catf.appendChild(cati)
+  const catf=document.createElement('div');const catl=document.createElement('label');catl.className='fl';catl.textContent='Category';const catSeli=document.createElement('select');catSeli.className='fsel';const insightCatsI=['Essay','Case Study','Interview','Opinion',...CATS];[...new Set(insightCatsI)].forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n;if(n===(item.category||'Essay'))o.selected=true;catSeli.appendChild(o)});catSeli.onchange=()=>item.category=catSeli.value;catf.appendChild(catl);catf.appendChild(catSeli)
   const datf=document.createElement('div');const datl=document.createElement('label');datl.className='fl';datl.textContent='Date';const dati=document.createElement('input');dati.className='fi';dati.type='date';dati.value=item.date||'';dati.oninput=()=>item.date=dati.value;datf.appendChild(datl);datf.appendChild(dati)
   g2.appendChild(catf);g2.appendChild(datf);ib.appendChild(g2)
   const excf=document.createElement('div');const excl=document.createElement('label');excl.className='fl';excl.textContent='Excerpt';const exca=document.createElement('textarea');exca.className='fta';exca.rows=2;exca.value=item.excerpt||'';exca.oninput=()=>item.excerpt=exca.value;excf.appendChild(excl);excf.appendChild(exca);ib.appendChild(excf)

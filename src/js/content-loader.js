@@ -170,6 +170,48 @@
           }
         })
       }
+      // Apply dynamic nav links (middle section)
+      const links = Array.isArray(nf.navLinks) ? nf.navLinks : []
+      if (links.length) {
+        // The CTA link (contact) stays in place; middle links go in the hidden-md flex row
+        const midNav = document.querySelector('nav .hidden.md\\:flex')
+        if (midNav) {
+          const currentPage = window.location.pathname
+          midNav.innerHTML = ''
+          // All links except /contact.html go in the middle
+          links.filter(l => l.href !== '/contact.html').forEach(l => {
+            const a = document.createElement('a')
+            a.href = l.href
+            a.textContent = l.label
+            a.className = 'nav-link'
+            if (currentPage === l.href || currentPage.startsWith(l.href.replace('.html',''))) a.classList.add('active')
+            midNav.appendChild(a)
+          })
+        }
+        // Update CTA link if contact href changed
+        const ctaLink = links.find(l => l.href === '/contact.html')
+        if (ctaLink) {
+          document.querySelectorAll('[data-nav="contact"]').forEach(el => {
+            el.href = ctaLink.href
+            el.textContent = ctaLink.label
+          })
+        }
+      }
+      // Footer nav links
+      if (Array.isArray(nf.footerLinks) && nf.footerLinks.length) {
+        const footerPagesEl = document.querySelector('[data-footer-pages]')
+        if (footerPagesEl) {
+          const allLinks = Array.isArray(nf.navLinks) ? nf.navLinks : []
+          footerPagesEl.innerHTML = ''
+          allLinks.filter(l => nf.footerLinks.includes(l.href)).forEach(l => {
+            const a = document.createElement('a')
+            a.href = l.href
+            a.textContent = l.label
+            a.className = 'label-caps text-[11px] tracking-[0.2em] text-background/80 hover:text-background transition-colors'
+            footerPagesEl.appendChild(a)
+          })
+        }
+      }
     }
   } catch {}
 

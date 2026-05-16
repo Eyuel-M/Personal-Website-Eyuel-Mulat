@@ -123,80 +123,8 @@
             </div>
             <p class="text-sm text-on-surface-variant mb-8">Select all that apply.</p>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-0">
-
-              <label class="service-check">
-                <input type="checkbox" name="services[]" value="brand-strategy" class="peer sr-only"/>
-                <span class="service-box"><span class="material-symbols-outlined" style="font-size:11px;line-height:1">check</span></span>
-                <span class="service-text">Brand Strategy</span>
-              </label>
-
-              <label class="service-check">
-                <input type="checkbox" name="services[]" value="visual-identity" class="peer sr-only"/>
-                <span class="service-box"><span class="material-symbols-outlined" style="font-size:11px;line-height:1">check</span></span>
-                <span class="service-text">Visual Identity</span>
-              </label>
-
-              <label class="service-check">
-                <input type="checkbox" name="services[]" value="brand-guidelines" class="peer sr-only"/>
-                <span class="service-box"><span class="material-symbols-outlined" style="font-size:11px;line-height:1">check</span></span>
-                <span class="service-text">Brand Guidelines</span>
-              </label>
-
-              <label class="service-check">
-                <input type="checkbox" name="services[]" value="logo-design" class="peer sr-only"/>
-                <span class="service-box"><span class="material-symbols-outlined" style="font-size:11px;line-height:1">check</span></span>
-                <span class="service-text">Logo Design</span>
-              </label>
-
-              <label class="service-check">
-                <input type="checkbox" name="services[]" value="website-design" class="peer sr-only"/>
-                <span class="service-box"><span class="material-symbols-outlined" style="font-size:11px;line-height:1">check</span></span>
-                <span class="service-text">Website Design</span>
-              </label>
-
-              <label class="service-check">
-                <input type="checkbox" name="services[]" value="ui-ux" class="peer sr-only"/>
-                <span class="service-box"><span class="material-symbols-outlined" style="font-size:11px;line-height:1">check</span></span>
-                <span class="service-text">UI / UX Design</span>
-              </label>
-
-              <label class="service-check">
-                <input type="checkbox" name="services[]" value="system-design" class="peer sr-only"/>
-                <span class="service-box"><span class="material-symbols-outlined" style="font-size:11px;line-height:1">check</span></span>
-                <span class="service-text">Design System</span>
-              </label>
-
-              <label class="service-check">
-                <input type="checkbox" name="services[]" value="creative-direction" class="peer sr-only"/>
-                <span class="service-box"><span class="material-symbols-outlined" style="font-size:11px;line-height:1">check</span></span>
-                <span class="service-text">Creative Direction</span>
-              </label>
-
-              <label class="service-check">
-                <input type="checkbox" name="services[]" value="print-collateral" class="peer sr-only"/>
-                <span class="service-box"><span class="material-symbols-outlined" style="font-size:11px;line-height:1">check</span></span>
-                <span class="service-text">Print &amp; Collateral</span>
-              </label>
-
-              <label class="service-check">
-                <input type="checkbox" name="services[]" value="art-direction" class="peer sr-only"/>
-                <span class="service-box"><span class="material-symbols-outlined" style="font-size:11px;line-height:1">check</span></span>
-                <span class="service-text">Art Direction</span>
-              </label>
-
-              <label class="service-check">
-                <input type="checkbox" name="services[]" value="social-media" class="peer sr-only"/>
-                <span class="service-box"><span class="material-symbols-outlined" style="font-size:11px;line-height:1">check</span></span>
-                <span class="service-text">Social Media Design</span>
-              </label>
-
-              <label class="service-check">
-                <input type="checkbox" name="services[]" value="motion" class="peer sr-only"/>
-                <span class="service-box"><span class="material-symbols-outlined" style="font-size:11px;line-height:1">check</span></span>
-                <span class="service-text">Motion &amp; Animation</span>
-              </label>
-
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-0" id="services-grid">
+              <!-- Populated dynamically from /api/contact-services -->
             </div>
           </div>
 
@@ -497,5 +425,21 @@
 
   <script type="module" src="/src/js/main.js"></script>
   <script type="module" src="/src/js/content-loader.js"></script>
+  <script>
+    ;(async function(){
+      const grid=document.getElementById('services-grid')
+      if(!grid)return
+      let svcs
+      try{const r=await fetch('/api/contact-services');svcs=r.ok?await r.json():null}catch{}
+      if(!Array.isArray(svcs)||!svcs.length)svcs=['Brand Strategy','Visual Identity','Creative Direction','Typography','Digital Systems','Editorial Design']
+      grid.innerHTML=''
+      svcs.forEach(svc=>{
+        const slug=svc.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')
+        const lbl=document.createElement('label');lbl.className='service-check'
+        lbl.innerHTML=`<input type="checkbox" name="services[]" value="${slug}" class="peer sr-only"/><span class="service-box"><span class="material-symbols-outlined" style="font-size:11px;line-height:1">check</span></span><span class="service-text">${svc}</span>`
+        grid.appendChild(lbl)
+      })
+    })()
+  </script>
 </body>
 </html>
