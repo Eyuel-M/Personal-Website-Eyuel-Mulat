@@ -94,6 +94,10 @@
             <p class="text-base text-on-surface-variant leading-relaxed max-w-md">
               Typographic grids aren't about constraint — they're about creating a framework flexible enough to hold any content while maintaining visual authority. How spatial systems become creative tools.
             </p>
+            <div class="btn-link self-start mt-6">
+              Read Article
+              <span class="material-symbols-outlined text-accent" style="font-size:14px;line-height:1">north_east</span>
+            </div>
           </div>
           <div class="col-span-12 md:col-span-4 overflow-hidden bg-surface-container-low aspect-[4/3]">
             <img
@@ -119,6 +123,10 @@
             <p class="text-base text-on-surface-variant leading-relaxed max-w-md">
               The hardest design decisions aren't what to add — they're what to remove. Architectural restraint as a discipline means trusting negative space, trusting the reader, and trusting the work itself.
             </p>
+            <div class="btn-link self-start mt-6">
+              Read Article
+              <span class="material-symbols-outlined text-accent" style="font-size:14px;line-height:1">north_east</span>
+            </div>
           </div>
           <div class="col-span-12 md:col-span-4 overflow-hidden bg-surface-container-low aspect-[4/3]">
             <img
@@ -134,11 +142,11 @@
 
     <!-- ── CTA ────────────────────────────────────────────────────────────── -->
     <section class="py-40 px-10 md:px-[80px] border-t border-black/10 text-center bg-background dot-grid">
-      <p class="label-caps text-on-surface-variant tracking-[0.4em] mb-10 reveal">Have a project in mind?</p>
-      <h2 class="font-display text-[48px] md:text-[72px] uppercase leading-[0.9] mb-16 max-w-3xl mx-auto reveal reveal-delay-1">
+      <p class="label-caps text-on-surface-variant tracking-[0.4em] mb-10 reveal" data-cta-label>Have a project in mind?</p>
+      <h2 class="font-display text-[48px] md:text-[72px] uppercase leading-[0.9] mb-16 max-w-3xl mx-auto reveal reveal-delay-1" data-cta-heading>
         Let's make the<br><span class="text-accent">next great brand.</span>
       </h2>
-      <a href="/contact.html" class="btn-link text-lg reveal reveal-delay-2">
+      <a href="/contact.html" class="btn-link text-lg reveal reveal-delay-2" data-cta-btn>
         Start a Project
         <span class="material-symbols-outlined text-accent" style="font-size:18px;line-height:1">north_east</span>
       </a>
@@ -255,7 +263,8 @@
               <div class="col-span-12 md:col-span-6">
                 <span class="label-caps text-[10px] text-accent tracking-[0.3em] block mb-6">${a.category||''}</span>
                 <h2 class="font-display text-[36px] md:text-[48px] uppercase leading-tight mb-5 group-hover:text-accent transition-colors duration-300">${titleHtml}</h2>
-                <p class="text-base text-on-surface-variant leading-relaxed max-w-md">${a.excerpt||''}</p>
+                <p class="text-base text-on-surface-variant leading-relaxed max-w-md mb-6">${a.excerpt||''}</p>
+                <div class="btn-link self-start">Read Article <span class="material-symbols-outlined text-accent" style="font-size:14px;line-height:1">north_east</span></div>
               </div>
               <div class="col-span-12 md:col-span-4 overflow-hidden bg-surface-container-low aspect-[4/3]">
                 ${a.image ? `<img src="${a.image.replace(/"/g,'&quot;')}" alt="${(a.title||'').replace(/"/g,'&quot;')}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"/>` : ''}

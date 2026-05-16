@@ -227,11 +227,11 @@
 
     <!-- ── CTA ────────────────────────────────────────────────────────────── -->
     <section class="py-40 px-10 md:px-[80px] border-t border-black/10 text-center bg-background dot-grid">
-      <p class="label-caps text-on-surface-variant tracking-[0.4em] mb-10 reveal">Ready to build something lasting?</p>
-      <h2 class="font-display text-[48px] md:text-[80px] uppercase leading-[0.9] mb-16 max-w-4xl mx-auto reveal reveal-delay-1" data-editable="cta-h2">
+      <p class="label-caps text-on-surface-variant tracking-[0.4em] mb-10 reveal" data-cta-label>Ready to build something lasting?</p>
+      <h2 class="font-display text-[48px] md:text-[80px] uppercase leading-[0.9] mb-16 max-w-4xl mx-auto reveal reveal-delay-1" data-cta-heading>
         Define your<br><span class="text-accent">visual authority.</span>
       </h2>
-      <a href="/contact.html" class="btn-link text-lg reveal reveal-delay-2">
+      <a href="/contact.html" class="btn-link text-lg reveal reveal-delay-2" data-cta-btn>
         Start a Project
         <span class="material-symbols-outlined text-accent" style="font-size:18px;line-height:1">north_east</span>
       </a>
@@ -396,7 +396,7 @@
         </a>
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <h2 class="font-display text-[56px] md:text-[80px] uppercase leading-none mb-4 group-hover:text-accent transition-colors duration-300">${t(p0.title)}</h2>
+            <a href="/work/${q(p0.slug)}.html"><h2 class="font-display text-[56px] md:text-[80px] uppercase leading-none mb-4 group-hover:text-accent transition-colors duration-300">${t(p0.title)}</h2></a>
             <p class="text-base text-on-surface-variant max-w-xl leading-relaxed">${t(p0.description)}</p>
           </div>
           <a href="/work/${q(p0.slug)}.html" class="btn-link flex-shrink-0">
@@ -422,7 +422,7 @@
           <a href="/work/${q(p.slug)}.html" class="block overflow-hidden bg-surface-container-low aspect-[4/3] mb-8">
             ${p.thumbnail ? `<img src="${q(p.thumbnail)}" alt="${q(p.title)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"/>` : ''}
           </a>
-          <h2 class="font-display text-[44px] uppercase leading-none mb-5 group-hover:text-accent transition-colors duration-300">${t(p.title)}</h2>
+          <a href="/work/${q(p.slug)}.html"><h2 class="font-display text-[44px] uppercase leading-none mb-5 group-hover:text-accent transition-colors duration-300">${t(p.title)}</h2></a>
           <p class="text-base text-on-surface-variant max-w-sm mb-8 leading-relaxed">${t(p.description)}</p>
           <a href="/work/${q(p.slug)}.html" class="btn-link">
             View Project

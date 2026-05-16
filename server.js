@@ -622,6 +622,19 @@ function headHTML(title, description = '') {
   <link rel="stylesheet" href="/src/css/main.css"/>`
 }
 
+function ctaHTML() {
+  return `  <section class="py-40 px-10 md:px-[80px] border-t border-black/10 text-center bg-background dot-grid">
+    <p class="label-caps text-on-surface-variant tracking-[0.4em] mb-10" data-cta-label>Have a project in mind?</p>
+    <h2 class="font-display text-[48px] md:text-[72px] uppercase leading-[0.9] mb-16 max-w-3xl mx-auto" data-cta-heading>
+      Let's make the<br><span class="text-accent">next great brand.</span>
+    </h2>
+    <a href="/contact.html" class="btn-link text-lg" data-cta-btn>
+      Start a Project
+      <span class="material-symbols-outlined text-accent" style="font-size:18px;line-height:1">north_east</span>
+    </a>
+  </section>`
+}
+
 function buildProjectPage({ slug, title, category, year, client, scope, description, role, overviewH2, overviewText, img1, deliverables, thumbnail }, nextItem) {
   const dv = (deliverables && deliverables.length) ? deliverables : [{title:'',desc:''},{title:'',desc:''},{title:'',desc:''}]
   while (dv.length < 3) dv.push({title:'',desc:''})
@@ -726,6 +739,7 @@ ${navHTML()}
     <!-- Custom blocks added via admin -->
     <div id="admin-blocks" class="px-10 md:px-[80px]"></div>
   </main>
+${ctaHTML()}
 ${nextSection}
 ${footerHTML()}
   <script type="module" src="/src/js/main.js"></script>
@@ -792,6 +806,7 @@ ${navHTML()}
     <!-- Custom blocks added via admin -->
     <div id="admin-blocks" class="px-10 md:px-[80px]"></div>
   </main>
+${ctaHTML()}
 ${nextSection}
 ${footerHTML()}
   <script type="module" src="/src/js/main.js"></script>

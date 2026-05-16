@@ -1238,6 +1238,10 @@ function renderFooter(){
   if(!Array.isArray(S.data.socialLinks))S.data.socialLinks=[{label:'Instagram',url:''},{label:'LinkedIn',url:''},{label:'Behance',url:''}]
   if(!Array.isArray(S.data.footerLinks))S.data.footerLinks=['/about.html','/work.html','/insights.html','/contact.html']
   if(S.data.footerLogo===undefined)S.data.footerLogo=''
+  if(S.data.ctaLabel===undefined)S.data.ctaLabel='Have a project in mind?'
+  if(S.data.ctaHeading===undefined)S.data.ctaHeading="Let's make the<br><span class=\"text-accent\">next great brand.</span>"
+  if(S.data.ctaBtn===undefined)S.data.ctaBtn='Start a Project'
+  if(S.data.ctaHref===undefined)S.data.ctaHref='/contact.html'
   c.appendChild(mkSC('Footer Logo',mkIU({label:'Brand Logo Image',hint:'Upload a wide PNG or SVG with a transparent background — recommended size 1600 × 160 px (10:1 ratio). Use a light/white version since the footer background is dark. Replaces the large text logo at the bottom of the footer.',value:S.data.footerLogo||'',onChange:v=>{S.data.footerLogo=v},aspect:'10/1'})))
   c.appendChild(mkSC('Contact Info',mkInput('Email','email',S.data),mkInput('Phone','phone',S.data),mkInput('Address','address',S.data)))
   // Footer pages — pull available links from nav
@@ -1271,6 +1275,14 @@ function renderFooter(){
   }
   rsl();slBody.appendChild(slList);slCard.appendChild(slBody);c.appendChild(slCard)
   c.appendChild(mkSC('Copyright',mkInput('Copyright Text','copyright',S.data)))
+  c.appendChild(mkSC('Call to Action',
+    mkInput('Label Text','ctaLabel',S.data,'Small text above the heading'),
+    mkTextarea('Heading','ctaHeading',S.data,3,'Supports HTML — use &lt;br&gt; for line breaks, &lt;span class="text-accent"&gt;…&lt;/span&gt; for orange accent color.'),
+    mkG2(
+      mkInput('Button Text','ctaBtn',S.data),
+      mkInput('Button Link','ctaHref',S.data,'e.g. /contact.html','url')
+    )
+  ))
 }
 
 // ── Enquiries ─────────────────────────────────────────────────────────────────

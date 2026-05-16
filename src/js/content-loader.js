@@ -286,6 +286,18 @@
         el.appendChild(row)
       })
     }
+    if (ff.ctaLabel) {
+      document.querySelectorAll('[data-cta-label]').forEach(el => el.textContent = ff.ctaLabel)
+    }
+    if (ff.ctaHeading) {
+      document.querySelectorAll('[data-cta-heading]').forEach(el => el.innerHTML = ff.ctaHeading)
+    }
+    if (ff.ctaBtn || ff.ctaHref) {
+      document.querySelectorAll('[data-cta-btn]').forEach(el => {
+        if (ff.ctaHref) el.href = ff.ctaHref
+        if (ff.ctaBtn) el.innerHTML = `${ff.ctaBtn} <span class="material-symbols-outlined text-accent" style="font-size:18px;line-height:1">north_east</span>`
+      })
+    }
   }
 
   const cachedFooter = getCached('footer')
