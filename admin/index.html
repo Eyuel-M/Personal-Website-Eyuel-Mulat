@@ -308,6 +308,7 @@ async function initApp(){
   document.getElementById('login').style.display='none'
   document.getElementById('app').classList.add('show')
   buildSidebar()
+  updateEnquiryBadge()
   try{await switchSection('site')}catch(e){
     if(e.message==='Unauthorized')return
     console.error(e)
@@ -321,8 +322,22 @@ function buildSidebar(){
   SECTIONS.forEach(s=>{
     const b=document.createElement('button');b.className='ni'+(S.section===s.id?' on':'');b.dataset.id=s.id
     b.innerHTML=`<span class="ic">${s.icon}</span><span>${s.label}</span>`
+    if(s.id==='enquiries'){
+      const badge=document.createElement('span');badge.id='enq-badge'
+      badge.style.cssText='display:none;margin-left:auto;min-width:18px;height:18px;background:#dc2626;color:#fff;font-size:10px;font-weight:700;border-radius:99px;align-items:center;justify-content:center;padding:0 5px;flex-shrink:0;line-height:1'
+      b.appendChild(badge)
+    }
     b.onclick=()=>switchSection(s.id);nav.appendChild(b)
   })
+}
+async function updateEnquiryBadge(){
+  const badge=document.getElementById('enq-badge');if(!badge)return
+  try{
+    const data=await api('GET','/api/enquiries')
+    const n=data.filter(e=>!e.read).length
+    if(n>0){badge.textContent=n>99?'99+':String(n);badge.style.display='flex'}
+    else badge.style.display='none'
+  }catch{badge.style.display='none'}
 }
 function updateSidebarActive(){
   document.querySelectorAll('.ni').forEach(b=>b.classList.toggle('on',b.dataset.id===S.section))
@@ -1034,6 +1049,17 @@ function renderFooter(){
 }
 
 // ── Enquiries ─────────────────────────────────────────────────────────────────
+async function downloadBrief(filename,displayName){
+  try{
+    const res=await fetch(`/api/enquiry/brief/${encodeURIComponent(filename)}`,{headers:{'x-token':S.token}})
+    if(!res.ok){alert('File not found or could not be downloaded.');return}
+    const blob=await res.blob()
+    const url=URL.createObjectURL(blob)
+    const a=document.createElement('a');a.href=url;a.download=displayName||filename;a.click()
+    setTimeout(()=>URL.revokeObjectURL(url),5000)
+  }catch{alert('Download failed.')}
+}
+
 function renderEnquiries(){
   const c=document.getElementById('editor-inner');c.innerHTML=''
   const intro=document.createElement('p');intro.className='pg-intro';intro.textContent='Client enquiries submitted via the contact form — newest first.';c.appendChild(intro)
@@ -1048,6 +1074,7 @@ function renderEnquiries(){
     try{
       const data=await api('GET','/api/enquiries')
       list.innerHTML=''
+      updateEnquiryBadge()
       if(!data.length){list.innerHTML='<p style="font-size:13px;color:var(--g400);padding:24px 0">No enquiries yet.</p>';return}
       data.forEach(enq=>{
         const card=document.createElement('div')
@@ -1077,7 +1104,17 @@ function renderEnquiries(){
           return d
         }
         const emailLink=enq.email?`<a href="mailto:${enq.email}" style="color:var(--navy);text-decoration:underline">${enq.email}</a>`:''
-        ;[df('Email',emailLink),df('Phone',enq.phone||(enq.phone_alt?`${enq.phone_alt} (alt)`:'')),df('Timeline',enq.timeline),df('Brief file',enq.brief)].forEach(el=>{if(el)grid.appendChild(el)})
+        ;[df('Email',emailLink),df('Phone',enq.phone||(enq.phone_alt?`${enq.phone_alt} (alt)`:'')),df('Timeline',enq.timeline)].forEach(el=>{if(el)grid.appendChild(el)})
+        // Brief file download button
+        if(enq.brief){
+          const bf=document.createElement('div')
+          bf.innerHTML=`<div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--g400);margin-bottom:6px">Brief</div>`
+          const dlBtn=document.createElement('button');dlBtn.className='bn'
+          dlBtn.style.cssText='display:inline-flex;align-items:center;gap:6px;font-size:12px'
+          dlBtn.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>${enq.briefOriginalName||enq.brief}`
+          dlBtn.onclick=()=>downloadBrief(enq.brief,enq.briefOriginalName||enq.brief)
+          bf.appendChild(dlBtn);grid.appendChild(bf)
+        }
         if(enq.services&&enq.services.length){
           const sf=document.createElement('div');sf.style.cssText='grid-column:1/-1'
           sf.innerHTML=`<div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--g400);margin-bottom:8px">Services</div>`
@@ -1095,7 +1132,11 @@ function renderEnquiries(){
         head.onclick=async()=>{
           const open=body.style.display!=='none'
           body.style.display=open?'none':''
-          if(!open&&!enq.read){enq.read=true;card.style.borderLeft='';card.querySelectorAll('span').forEach(s=>{if(s.textContent==='New')s.remove()});await api('PATCH',`/api/enquiry/${enq.id}/read`,{}).catch(()=>{})}
+          if(!open&&!enq.read){
+            enq.read=true;card.style.borderLeft='';card.querySelectorAll('span').forEach(s=>{if(s.textContent==='New')s.remove()})
+            await api('PATCH',`/api/enquiry/${enq.id}/read`,{}).catch(()=>{})
+            updateEnquiryBadge()
+          }
         }
         card.appendChild(head);card.appendChild(body);list.appendChild(card)
       })

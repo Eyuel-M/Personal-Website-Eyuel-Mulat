@@ -393,16 +393,31 @@
             btn.style.opacity  = '0.5'
             errorEl.style.display = 'none'
 
+            // Upload brief file first if one was selected
+            let briefFilename     = ''
+            let briefOriginalName = ''
+            const briefFile = fd.get('brief')
+            if (briefFile && briefFile.size > 0) {
+              try {
+                const bfd = new FormData()
+                bfd.append('brief', briefFile)
+                const br = await fetch('/api/enquiry/brief', { method: 'POST', body: bfd })
+                const bj = await br.json()
+                if (bj.filename) { briefFilename = bj.filename; briefOriginalName = bj.originalName || briefFile.name }
+              } catch { /* brief upload failed silently; enquiry still submits */ }
+            }
+
             const data = {
-              name:      fd.get('full_name') || '',
-              company:   fd.get('company')   || '',
-              email:     emailVal,
-              phone:     fd.get('phone')     || '',
-              phone_alt: fd.get('phone_alt') || '',
-              services:  checkedServices,
-              timeline:  fd.get('timeline')  || '',
-              message:   fd.get('message')   || '',
-              brief:     (fd.get('brief') && fd.get('brief').name) ? fd.get('brief').name : '',
+              name:             fd.get('full_name') || '',
+              company:          fd.get('company')   || '',
+              email:            emailVal,
+              phone:            fd.get('phone')     || '',
+              phone_alt:        fd.get('phone_alt') || '',
+              services:         checkedServices,
+              timeline:         fd.get('timeline')  || '',
+              message:          fd.get('message')   || '',
+              brief:            briefFilename,
+              briefOriginalName: briefOriginalName,
             }
 
             try {

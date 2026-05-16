@@ -13,8 +13,10 @@ const ADMIN_TOKEN = 'em-' + Buffer.from(ADMIN_PASS + ':eyuelmulat').toString('ba
 
 const CONTENT_DIR = path.join(__dirname, 'content')
 const UPLOADS_DIR = path.join(__dirname, 'public', 'uploads')
+const BRIEFS_DIR  = path.join(__dirname, 'content', 'briefs')
 fs.mkdirSync(CONTENT_DIR, { recursive: true })
 fs.mkdirSync(UPLOADS_DIR, { recursive: true })
+fs.mkdirSync(BRIEFS_DIR,  { recursive: true })
 
 // ── Seed content files if they don't exist ───────────────────────────────────
 function seedIfMissing(filename, data) {
@@ -157,6 +159,24 @@ export function createApiApp() {
     fileFilter: (req, file, cb) => {
       const ok = /\.(jpe?g|png|gif|webp|svg|mp4|webm|mov|avi|mkv)$/i.test(file.originalname)
       cb(ok ? null : new Error('Unsupported file type'), ok)
+    },
+  })
+
+  const briefStorage = multer.diskStorage({
+    destination: BRIEFS_DIR,
+    filename: (req, file, cb) => {
+      const ext  = path.extname(file.originalname).toLowerCase()
+      const name = path.basename(file.originalname, ext)
+        .replace(/[^a-z0-9]/gi, '-').toLowerCase().slice(0, 50)
+      cb(null, `${name}-${Date.now()}${ext}`)
+    },
+  })
+  const briefUpload = multer({
+    storage: briefStorage,
+    limits: { fileSize: 6 * 1024 * 1024 },
+    fileFilter: (req, file, cb) => {
+      const ok = /\.(pdf|docx?)$/i.test(file.originalname)
+      cb(ok ? null : new Error('Only PDF/DOC/DOCX allowed'), ok)
     },
   })
 
@@ -370,6 +390,18 @@ app.post('/api/insight', auth, (req, res) => {
     const list = fs.existsSync(f) ? JSON.parse(fs.readFileSync(f)) : []
     fs.writeFileSync(f, JSON.stringify(list.filter(x => String(x.id) !== String(req.params.id)), null, 2))
     res.json({ ok: true })
+  })
+  // Upload a brief/attachment from the public contact form (no auth — submitted before login)
+  app.post('/api/enquiry/brief', briefUpload.single('brief'), (req, res) => {
+    if (!req.file) return res.status(400).json({ error: 'No file received' })
+    res.json({ filename: req.file.filename, originalName: req.file.originalname })
+  })
+  // Download a brief — auth required so only admin can fetch files
+  app.get('/api/enquiry/brief/:filename', auth, (req, res) => {
+    const safe = path.basename(req.params.filename)
+    const filePath = path.join(BRIEFS_DIR, safe)
+    if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'Not found' })
+    res.download(filePath, safe)
   })
 
   // ── Delete / Update project ───────────────────────────────────────────────
