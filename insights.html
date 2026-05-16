@@ -140,6 +140,9 @@
 
     </section>
 
+    <!-- Pagination -->
+    <div id="insights-pagination" class="px-10 md:px-[80px] py-16 flex gap-3 justify-center hidden"></div>
+
     <!-- ── CTA ────────────────────────────────────────────────────────────── -->
     <section class="py-40 px-10 md:px-[80px] border-t border-black/10 text-center bg-background dot-grid">
       <p class="label-caps text-on-surface-variant tracking-[0.4em] mb-10 reveal" data-cta-label>Have a project in mind?</p>
@@ -195,6 +198,16 @@
 
   <script type="module" src="/src/js/main.js"></script>
   <script type="module" src="/src/js/content-loader.js"></script>
+  <style>
+    .insights-page-btn {
+      background: none; border: none; cursor: pointer; padding: 6px 0;
+      color: rgba(0,0,0,0.35); font-family: inherit; transition: color 0.15s;
+      border-bottom: 2px solid transparent; padding-bottom: 4px;
+    }
+    .insights-page-btn:hover { color: rgba(0,0,0,0.7); }
+    .insights-page-btn.active { color: #FF4F00; border-bottom-color: #FF4F00; }
+    .insights-page-btn .label-caps { pointer-events: none; }
+  </style>
   <script>
     ;(async function() {
       function fmtDate(iso) {
@@ -205,6 +218,80 @@
         } catch { return '' }
       }
 
+      function renderFeatured(f) {
+        const featuredSection = document.getElementById('insights-featured')
+        if (!featuredSection) return
+        const fDate = fmtDate(f.date)
+        const words = (f.title||'').split(' ')
+        const mid = Math.ceil(words.length / 2)
+        const titleHtml = words.length > 2 ? words.slice(0,mid).join(' ') + '<br>' + words.slice(mid).join(' ') : (f.title||'')
+        featuredSection.style.display = ''
+        featuredSection.innerHTML = `<a href="/insights/${f.slug}.html" class="group block border-b border-black/10 pb-24 reveal is-visible">
+          <div class="grid grid-cols-12 gap-8 md:gap-16 items-center">
+            <div class="col-span-12 md:col-span-6 overflow-hidden bg-surface-container-low aspect-[16/9]">
+              ${f.image ? `<img src="${f.image.replace(/"/g,'&quot;')}" alt="${(f.title||'').replace(/"/g,'&quot;')}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"/>` : ''}
+            </div>
+            <div class="col-span-12 md:col-span-6 flex flex-col gap-8">
+              <div class="flex items-center gap-6">
+                <span class="label-caps text-[10px] text-accent tracking-[0.3em]">${f.category||''}</span>
+                ${fDate ? `<span class="label-caps text-[10px] text-on-surface-variant/50">${fDate}</span>` : ''}
+              </div>
+              <div>
+                <h2 class="font-display text-[48px] md:text-[64px] uppercase leading-none mb-6 group-hover:text-accent transition-colors duration-300">${titleHtml}</h2>
+                <p class="text-base text-on-surface-variant leading-relaxed max-w-md">${f.excerpt||''}</p>
+              </div>
+              <div class="btn-link self-start">Read Article <span class="material-symbols-outlined text-accent" style="font-size:14px;line-height:1">north_east</span></div>
+            </div>
+          </div>
+        </a>`
+      }
+
+      function renderList(listItems, page) {
+        const listSection = document.getElementById('insights-list')
+        if (!listSection) return
+        const slice = page === 1 ? listItems.slice(0, 2) : listItems.slice(2 + (page - 2) * 3, 2 + (page - 2) * 3 + 3)
+        listSection.innerHTML = ''
+        slice.forEach(a => {
+          const aDate = fmtDate(a.date)
+          const words = (a.title||'').split(' ')
+          const mid = Math.ceil(words.length / 2)
+          const titleHtml = words.length > 2 ? words.slice(0,mid).join(' ') + '<br>' + words.slice(mid).join(' ') : (a.title||'')
+          const el = document.createElement('a')
+          el.href = `/insights/${a.slug}.html`
+          el.className = 'group block border-b border-black/10 py-16 reveal is-visible'
+          el.innerHTML = `<div class="grid grid-cols-12 gap-8 items-start">
+            <div class="col-span-12 md:col-span-2">
+              ${aDate ? `<span class="label-caps text-[10px] text-on-surface-variant/50">${aDate}</span>` : ''}
+            </div>
+            <div class="col-span-12 md:col-span-6">
+              <span class="label-caps text-[10px] text-accent tracking-[0.3em] block mb-6">${a.category||''}</span>
+              <h2 class="font-display text-[36px] md:text-[48px] uppercase leading-tight mb-5 group-hover:text-accent transition-colors duration-300">${titleHtml}</h2>
+              <p class="text-base text-on-surface-variant leading-relaxed max-w-md mb-6">${a.excerpt||''}</p>
+              <div class="btn-link self-start">Read Article <span class="material-symbols-outlined text-accent" style="font-size:14px;line-height:1">north_east</span></div>
+            </div>
+            <div class="col-span-12 md:col-span-4 overflow-hidden bg-surface-container-low aspect-[4/3]">
+              ${a.image ? `<img src="${a.image.replace(/"/g,'&quot;')}" alt="${(a.title||'').replace(/"/g,'&quot;')}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"/>` : ''}
+            </div>
+          </div>`
+          listSection.appendChild(el)
+        })
+      }
+
+      function renderPagination(totalPages, currentPage, onPageClick) {
+        const paginationDiv = document.getElementById('insights-pagination')
+        if (!paginationDiv) return
+        if (totalPages <= 1) { paginationDiv.classList.add('hidden'); return }
+        paginationDiv.classList.remove('hidden')
+        paginationDiv.innerHTML = ''
+        for (let p = 1; p <= totalPages; p++) {
+          const btn = document.createElement('button')
+          btn.className = 'insights-page-btn' + (p === currentPage ? ' active' : '')
+          btn.innerHTML = `<span class="label-caps text-[10px] tracking-[0.3em]">${p}</span>`
+          btn.addEventListener('click', () => onPageClick(p))
+          paginationDiv.appendChild(btn)
+        }
+      }
+
       try {
         const r = await fetch('/api/content/insights-data')
         if (!r.ok) return
@@ -212,67 +299,24 @@
         const items = (data.items || []).filter(a => !a.status || a.status === 'published')
         if (!items.length) return
 
-        // Update hero count
         const countEl = document.getElementById('insights-hero-count')
         if (countEl) countEl.textContent = items.length + ' Article' + (items.length !== 1 ? 's' : '')
 
-        // Render featured (first item)
-        const featuredSection = document.getElementById('insights-featured')
-        if (featuredSection) {
-          const f = items[0]
-          const fDate = fmtDate(f.date)
-          const words = (f.title||'').split(' ')
-          const mid = Math.ceil(words.length / 2)
-          const titleHtml = words.length > 2 ? words.slice(0,mid).join(' ') + '<br>' + words.slice(mid).join(' ') : (f.title||'')
-          featuredSection.innerHTML = `<a href="/insights/${f.slug}.html" class="group block border-b border-black/10 pb-24 reveal is-visible">
-            <div class="grid grid-cols-12 gap-8 md:gap-16 items-center">
-              <div class="col-span-12 md:col-span-6 overflow-hidden bg-surface-container-low aspect-[16/9]">
-                ${f.image ? `<img src="${f.image.replace(/"/g,'&quot;')}" alt="${(f.title||'').replace(/"/g,'&quot;')}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"/>` : ''}
-              </div>
-              <div class="col-span-12 md:col-span-6 flex flex-col gap-8">
-                <div class="flex items-center gap-6">
-                  <span class="label-caps text-[10px] text-accent tracking-[0.3em]">${f.category||''}</span>
-                  ${fDate ? `<span class="label-caps text-[10px] text-on-surface-variant/50">${fDate}</span>` : ''}
-                </div>
-                <div>
-                  <h2 class="font-display text-[48px] md:text-[64px] uppercase leading-none mb-6 group-hover:text-accent transition-colors duration-300">${titleHtml}</h2>
-                  <p class="text-base text-on-surface-variant leading-relaxed max-w-md">${f.excerpt||''}</p>
-                </div>
-                <div class="btn-link self-start">Read Article <span class="material-symbols-outlined text-accent" style="font-size:14px;line-height:1">north_east</span></div>
-              </div>
-            </div>
-          </a>`
+        const listItems = items.slice(1)
+        const totalPages = listItems.length <= 2 ? 1 : 1 + Math.ceil((listItems.length - 2) / 3)
+
+        function goToPage(page) {
+          const featuredSection = document.getElementById('insights-featured')
+          if (featuredSection) {
+            if (page === 1) { renderFeatured(items[0]) }
+            else { featuredSection.style.display = 'none' }
+          }
+          renderList(listItems, page)
+          renderPagination(totalPages, page, goToPage)
+          window.scrollTo({ top: 0, behavior: 'smooth' })
         }
 
-        // Render remaining articles as list
-        const listSection = document.getElementById('insights-list')
-        if (listSection) {
-          listSection.innerHTML = ''
-          items.slice(1).forEach(a => {
-            const aDate = fmtDate(a.date)
-            const words = (a.title||'').split(' ')
-            const mid = Math.ceil(words.length / 2)
-            const titleHtml = words.length > 2 ? words.slice(0,mid).join(' ') + '<br>' + words.slice(mid).join(' ') : (a.title||'')
-            const el = document.createElement('a')
-            el.href = `/insights/${a.slug}.html`
-            el.className = 'group block border-b border-black/10 py-16 reveal is-visible'
-            el.innerHTML = `<div class="grid grid-cols-12 gap-8 items-start">
-              <div class="col-span-12 md:col-span-2">
-                ${aDate ? `<span class="label-caps text-[10px] text-on-surface-variant/50">${aDate}</span>` : ''}
-              </div>
-              <div class="col-span-12 md:col-span-6">
-                <span class="label-caps text-[10px] text-accent tracking-[0.3em] block mb-6">${a.category||''}</span>
-                <h2 class="font-display text-[36px] md:text-[48px] uppercase leading-tight mb-5 group-hover:text-accent transition-colors duration-300">${titleHtml}</h2>
-                <p class="text-base text-on-surface-variant leading-relaxed max-w-md mb-6">${a.excerpt||''}</p>
-                <div class="btn-link self-start">Read Article <span class="material-symbols-outlined text-accent" style="font-size:14px;line-height:1">north_east</span></div>
-              </div>
-              <div class="col-span-12 md:col-span-4 overflow-hidden bg-surface-container-low aspect-[4/3]">
-                ${a.image ? `<img src="${a.image.replace(/"/g,'&quot;')}" alt="${(a.title||'').replace(/"/g,'&quot;')}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"/>` : ''}
-              </div>
-            </div>`
-            listSection.appendChild(el)
-          })
-        }
+        goToPage(1)
       } catch(e) { console.error('insights load error', e) }
     })()
   </script>
