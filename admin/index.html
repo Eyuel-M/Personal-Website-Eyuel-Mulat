@@ -218,6 +218,7 @@ const SECTIONS=[
   {id:'contact',label:'Contact',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>'},
   {id:'clients',label:'Clients',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>'},
   {id:'footer',label:'Footer',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="15" x2="21" y2="15"/></svg>'},
+  {id:'enquiries',label:'Enquiries',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'},
 ]
 const TOKEN_KEY='em_token'
 const UID=()=>Math.random().toString(36).slice(2,8)
@@ -394,6 +395,7 @@ async function saveSection(){
         await api('PUT',`/api/content/${a.slug}`,{fields:mkArticleFields(a),blocks:(a.blocks||[]).map(blockForLoader),archivedBlocks:a.archivedBlocks||[]})
       }
     }
+    else if(id==='enquiries'){/* read-only section, nothing to save */}
     else if(id==='hero'){await api('PUT','/api/content/home',{fields:S.data})}
     else{await api('PUT',`/api/content/${id}`,{fields:S.data})}
     showSaving(true)
@@ -437,7 +439,7 @@ function render(){
     if(S.editView==='insight'&&S.editIdx!==null)return renderInsightEditor()
     return renderInsights()
   }
-  const map={site:renderSite,navigation:renderNav,hero:renderHero,slideshow:renderSlideshow,about:renderAbout,capabilities:renderCapabilities,categories:renderCategories,contact:renderContact,clients:renderClients,footer:renderFooter}
+  const map={site:renderSite,navigation:renderNav,hero:renderHero,slideshow:renderSlideshow,about:renderAbout,capabilities:renderCapabilities,categories:renderCategories,contact:renderContact,clients:renderClients,footer:renderFooter,enquiries:renderEnquiries}
   if(map[S.section])map[S.section]()
   else c.innerHTML='<p class="pg-intro">Section coming soon.</p>'
 }
@@ -1029,6 +1031,77 @@ function renderFooter(){
   }
   rsl();slBody.appendChild(slList);slCard.appendChild(slBody);c.appendChild(slCard)
   c.appendChild(mkSC('Copyright',mkInput('Copyright Text','copyright',S.data)))
+}
+
+// ── Enquiries ─────────────────────────────────────────────────────────────────
+function renderEnquiries(){
+  const c=document.getElementById('editor-inner');c.innerHTML=''
+  const intro=document.createElement('p');intro.className='pg-intro';intro.textContent='Client enquiries submitted via the contact form — newest first.';c.appendChild(intro)
+  const list=document.createElement('div');c.appendChild(list)
+  function fmtDate(iso){
+    if(!iso)return''
+    const d=new Date(iso)
+    return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+' · '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})
+  }
+  async function load(){
+    list.innerHTML='<p style="font-size:13px;color:var(--g400);padding:24px 0">Loading…</p>'
+    try{
+      const data=await api('GET','/api/enquiries')
+      list.innerHTML=''
+      if(!data.length){list.innerHTML='<p style="font-size:13px;color:var(--g400);padding:24px 0">No enquiries yet.</p>';return}
+      data.forEach(enq=>{
+        const card=document.createElement('div')
+        card.className='pc'
+        card.style.marginBottom='12px'
+        if(!enq.read)card.style.borderLeft='3px solid var(--navy)'
+        const head=document.createElement('div');head.className='pc-h'
+        const hl=document.createElement('div');hl.className='pc-hl'
+        const nm=document.createElement('span');nm.className='pt';nm.textContent=enq.name||'(no name)'
+        const co=document.createElement('span');co.className='cat-b';co.textContent=enq.company||'—'
+        const dt=document.createElement('span');dt.className='py';dt.textContent=fmtDate(enq.submittedAt)
+        hl.appendChild(co);hl.appendChild(nm);hl.appendChild(dt)
+        if(!enq.read){const nb=document.createElement('span');nb.style.cssText='font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--navy);background:var(--navy10);padding:2px 8px;border-radius:99px';nb.textContent='New';hl.appendChild(nb)}
+        const acts=document.createElement('div');acts.className='pc-acts'
+        const db=document.createElement('button');db.className='bd';db.textContent='Delete';db.style.color='var(--red400)'
+        db.onclick=async e=>{e.stopPropagation();if(!confirm('Delete this enquiry?'))return;await api('DELETE',`/api/enquiry/${enq.id}`);load()}
+        acts.appendChild(db)
+        head.appendChild(hl);head.appendChild(acts)
+        head.style.cursor='pointer'
+        const body=document.createElement('div');body.className='pc-b';body.style.display='none'
+        // Details grid
+        const grid=document.createElement('div');grid.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px'
+        function df(label,val){
+          if(!val)return null
+          const d=document.createElement('div')
+          d.innerHTML=`<div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--g400);margin-bottom:4px">${label}</div><div style="font-size:13px;color:var(--g800)">${val}</div>`
+          return d
+        }
+        const emailLink=enq.email?`<a href="mailto:${enq.email}" style="color:var(--navy);text-decoration:underline">${enq.email}</a>`:''
+        ;[df('Email',emailLink),df('Phone',enq.phone||(enq.phone_alt?`${enq.phone_alt} (alt)`:'')),df('Timeline',enq.timeline),df('Brief file',enq.brief)].forEach(el=>{if(el)grid.appendChild(el)})
+        if(enq.services&&enq.services.length){
+          const sf=document.createElement('div');sf.style.cssText='grid-column:1/-1'
+          sf.innerHTML=`<div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--g400);margin-bottom:8px">Services</div>`
+          const tags=document.createElement('div');tags.style.cssText='display:flex;flex-wrap:wrap;gap:6px'
+          enq.services.forEach(s=>{const t=document.createElement('span');t.style.cssText='font-size:11px;padding:3px 10px;border:1px solid var(--g200);border-radius:99px;color:var(--g700)';t.textContent=s;tags.appendChild(t)})
+          sf.appendChild(tags);grid.appendChild(sf)
+        }
+        body.appendChild(grid)
+        if(enq.message){
+          const mf=document.createElement('div');mf.style.cssText='border-top:1px solid var(--g100);padding-top:16px'
+          mf.innerHTML=`<div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--g400);margin-bottom:8px">Message</div><div style="font-size:13px;color:var(--g700);line-height:1.7;white-space:pre-wrap">${enq.message}</div>`
+          body.appendChild(mf)
+        }
+        // Toggle expand + mark read
+        head.onclick=async()=>{
+          const open=body.style.display!=='none'
+          body.style.display=open?'none':''
+          if(!open&&!enq.read){enq.read=true;card.style.borderLeft='';card.querySelectorAll('span').forEach(s=>{if(s.textContent==='New')s.remove()});await api('PATCH',`/api/enquiry/${enq.id}/read`,{}).catch(()=>{})}
+        }
+        card.appendChild(head);card.appendChild(body);list.appendChild(card)
+      })
+    }catch(e){list.innerHTML='<p style="font-size:13px;color:var(--red400);padding:24px 0">Failed to load enquiries.</p>'}
+  }
+  load()
 }
 
 // ── Portfolio ─────────────────────────────────────────────────────────────────

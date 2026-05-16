@@ -293,14 +293,57 @@
           </div>
 
           <!-- Submit -->
-          <div class="pt-4">
-            <button type="submit" class="btn-link text-base">
+          <div class="pt-4" id="form-submit-row">
+            <button type="submit" class="btn-link text-base" id="form-submit-btn">
               Send Enquiry
               <span class="material-symbols-outlined text-accent" style="font-size:16px;line-height:1">north_east</span>
             </button>
+            <p id="form-success" style="display:none" class="text-base text-on-surface-variant mt-6">Your enquiry has been sent — I'll be in touch shortly.</p>
+            <p id="form-error" style="display:none" class="text-base text-accent mt-6">Something went wrong. Please try again.</p>
           </div>
 
         </form>
+
+        <script>
+        document.querySelector('form').addEventListener('submit', async function(e) {
+          e.preventDefault()
+          const btn = document.getElementById('form-submit-btn')
+          const successEl = document.getElementById('form-success')
+          const errorEl = document.getElementById('form-error')
+          btn.disabled = true
+          btn.style.opacity = '0.5'
+          errorEl.style.display = 'none'
+          const fd = new FormData(this)
+          const data = {
+            name:      fd.get('full_name') || '',
+            company:   fd.get('company') || '',
+            email:     fd.get('email') || '',
+            phone:     fd.get('phone') || '',
+            phone_alt: fd.get('phone_alt') || '',
+            services:  fd.getAll('services[]'),
+            timeline:  fd.get('timeline') || '',
+            message:   fd.get('message') || '',
+            brief:     (fd.get('brief') && fd.get('brief').name) ? fd.get('brief').name : '',
+          }
+          try {
+            const res = await fetch('/api/enquiry', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data)
+            })
+            if (res.ok) {
+              this.style.display = 'none'
+              successEl.style.display = ''
+            } else {
+              throw new Error('failed')
+            }
+          } catch {
+            errorEl.style.display = ''
+            btn.disabled = false
+            btn.style.opacity = ''
+          }
+        })
+        </script>
 
       </div>
     </section>

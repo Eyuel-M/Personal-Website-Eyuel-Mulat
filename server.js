@@ -345,6 +345,33 @@ app.post('/api/insight', auth, (req, res) => {
     res.json({ ok: true })
   })
 
+  // ── Enquiries ──────────────────────────────────────────────────────────────
+  app.post('/api/enquiry', (req, res) => {
+    const f = path.join(CONTENT_DIR, 'enquiries.json')
+    const list = fs.existsSync(f) ? JSON.parse(fs.readFileSync(f)) : []
+    list.unshift({ ...req.body, id: Date.now(), submittedAt: new Date().toISOString(), read: false })
+    fs.writeFileSync(f, JSON.stringify(list, null, 2))
+    res.json({ ok: true })
+  })
+  app.get('/api/enquiries', auth, (req, res) => {
+    const f = path.join(CONTENT_DIR, 'enquiries.json')
+    res.json(fs.existsSync(f) ? JSON.parse(fs.readFileSync(f)) : [])
+  })
+  app.patch('/api/enquiry/:id/read', auth, (req, res) => {
+    const f = path.join(CONTENT_DIR, 'enquiries.json')
+    const list = fs.existsSync(f) ? JSON.parse(fs.readFileSync(f)) : []
+    const e = list.find(x => String(x.id) === String(req.params.id))
+    if (e) e.read = true
+    fs.writeFileSync(f, JSON.stringify(list, null, 2))
+    res.json({ ok: true })
+  })
+  app.delete('/api/enquiry/:id', auth, (req, res) => {
+    const f = path.join(CONTENT_DIR, 'enquiries.json')
+    const list = fs.existsSync(f) ? JSON.parse(fs.readFileSync(f)) : []
+    fs.writeFileSync(f, JSON.stringify(list.filter(x => String(x.id) !== String(req.params.id)), null, 2))
+    res.json({ ok: true })
+  })
+
   // ── Delete / Update project ───────────────────────────────────────────────
   app.put('/api/project/:slug', auth, (req, res) => {
     const { slug } = req.params
