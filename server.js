@@ -9,6 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const PORT = process.env.PORT || 3001
 
 const ADMIN_PASS  = process.env.ADMIN_PASS  || 'admin2024'
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@eyuelmulat.com'
 const ADMIN_TOKEN = 'em-' + Buffer.from(ADMIN_PASS + ':eyuelmulat').toString('base64')
 
 const CONTENT_DIR = path.join(__dirname, 'content')
@@ -189,12 +190,12 @@ export function createApiApp() {
 
   // Login
   app.post('/api/login', (req, res) => {
-  if (req.body.password === ADMIN_PASS) {
-    res.json({ token: ADMIN_TOKEN })
-  } else {
-    res.status(401).json({ error: 'Wrong password' })
-  }
-})
+    if (req.body.email === ADMIN_EMAIL && req.body.password === ADMIN_PASS) {
+      res.json({ token: ADMIN_TOKEN })
+    } else {
+      res.status(401).json({ error: 'Invalid email or password' })
+    }
+  })
 
 // Get content for a page
 app.get('/api/content/:page', (req, res) => {
