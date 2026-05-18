@@ -113,47 +113,6 @@ if (fileInput && fileZone && fileLabel) {
   })
 }
 
-// ─── Work: paginate at 5 per page with numbered buttons ──────────────────────
-;(function () {
-  const PER_PAGE = 5
-  const items  = [...document.querySelectorAll('[data-work-item]')]
-  const pagDiv = document.getElementById('work-pagination')
-  if (!items.length || !pagDiv) return
-
-  function goTo(page) {
-    items.forEach((el, i) => {
-      const on = i >= (page - 1) * PER_PAGE && i < page * PER_PAGE
-      if (on) {
-        el.classList.remove('hidden', 'is-visible')
-        void el.offsetWidth
-        setTimeout(() => el.classList.add('is-visible'), (i % PER_PAGE) * 80)
-      } else {
-        el.classList.add('hidden')
-        el.classList.remove('is-visible')
-      }
-    })
-    pagDiv.querySelectorAll('.work-page-btn').forEach(b => {
-      b.classList.toggle('is-active', Number(b.dataset.page) === page)
-    })
-    if (page > 1) items[0].closest('section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
-
-  const totalPages = Math.ceil(items.length / PER_PAGE)
-  if (totalPages > 1) {
-    for (let p = 1; p <= totalPages; p++) {
-      const b = document.createElement('button')
-      b.className = 'work-page-btn'
-      b.dataset.page = p
-      b.textContent = String(p).padStart(2, '0')
-      b.addEventListener('click', () => goTo(p))
-      pagDiv.appendChild(b)
-    }
-    pagDiv.classList.remove('hidden')
-  }
-
-  goTo(1)
-})()
-
 // ─── Dot grid: cursor glow wave effect ───────────────────────────────────────
 document.querySelectorAll('.dot-grid').forEach((section) => {
   section.addEventListener('mousemove', (e) => {

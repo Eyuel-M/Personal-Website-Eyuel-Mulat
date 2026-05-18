@@ -314,13 +314,75 @@
     .work-filter-btn:hover { color: rgba(0,0,0,0.7); }
     .work-filter-btn.active { color: #FF4F00; border-bottom-color: #FF4F00; }
     .work-filter-btn .label-caps { pointer-events: none; }
+    .work-page-btn {
+      background: none; border: none; cursor: pointer; padding: 6px 0;
+      color: rgba(0,0,0,0.35); font-family: inherit; transition: color 0.15s;
+      border-bottom: 2px solid transparent; padding-bottom: 4px;
+      font-size: 13px; min-width: 28px; text-align: center;
+    }
+    .work-page-btn:hover { color: rgba(0,0,0,0.7); }
+    .work-page-btn.active { color: #FF4F00; border-bottom-color: #FF4F00; }
     [data-work-item] { transition: opacity 0.25s, height 0.25s; }
     [data-work-item].hidden-item { display: none; }
   </style>
   <script>
+    const WORK_PER_PAGE = 3
+
+    function initWorkPagination() {
+      const allItems = [...document.querySelectorAll('[data-work-item]')]
+      const pagDiv = document.getElementById('work-pagination')
+      if (!pagDiv) return
+
+      if (allItems.length <= 3) {
+        pagDiv.classList.add('hidden')
+        allItems.forEach(el => el.classList.remove('hidden-item'))
+        return
+      }
+
+      const totalPages = Math.ceil(allItems.length / WORK_PER_PAGE)
+      pagDiv.innerHTML = ''
+      for (let p = 1; p <= totalPages; p++) {
+        const b = document.createElement('button')
+        b.className = 'work-page-btn'
+        b.dataset.page = p
+        b.textContent = String(p)
+        b.addEventListener('click', () => goToWorkPage(p))
+        pagDiv.appendChild(b)
+      }
+      pagDiv.classList.remove('hidden')
+      goToWorkPage(1)
+    }
+
+    function goToWorkPage(page) {
+      const allItems = [...document.querySelectorAll('[data-work-item]')]
+      allItems.forEach((el, i) => {
+        const show = i >= (page - 1) * WORK_PER_PAGE && i < page * WORK_PER_PAGE
+        el.classList.toggle('hidden-item', !show)
+      })
+      const pagDiv = document.getElementById('work-pagination')
+      if (pagDiv) {
+        pagDiv.querySelectorAll('.work-page-btn').forEach(b => {
+          b.classList.toggle('active', Number(b.dataset.page) === page)
+        })
+      }
+    }
+
+    function filterWork(cat, btn) {
+      document.querySelectorAll('.work-filter-btn').forEach(b => b.classList.remove('active'))
+      if (btn) btn.classList.add('active')
+      const pagDiv = document.getElementById('work-pagination')
+      if (cat === 'all') {
+        initWorkPagination()
+      } else {
+        if (pagDiv) pagDiv.classList.add('hidden')
+        document.querySelectorAll('[data-work-item]').forEach(item => {
+          item.classList.toggle('hidden-item', (item.dataset.category || '') !== cat)
+        })
+      }
+    }
+
     // ── Work page: load portfolio + categories together ───────────────────────
     ;(async function() {
-      // Fetch both in parallel so category slugs are available when rendering items
       const [portRes, catsRes] = await Promise.all([
         fetch('/api/content/portfolio').catch(() => null),
         fetch('/api/categories').catch(() => null),
@@ -329,7 +391,6 @@
       const cats = (catsRes && catsRes.ok) ? await catsRes.json() : []
       const data = (portRes && portRes.ok)  ? await portRes.json()  : {}
 
-      // Build name→slug lookup so item categories match filter slugs exactly
       const catLookup = {}
       cats.forEach(c => { catLookup[c.name.toLowerCase()] = c.slug })
       function slugify(s) { return (s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') }
@@ -350,9 +411,11 @@
 
       // ── Render portfolio items ──────────────────────────────────────────────
       const items = (data.items || []).filter(p => !p.status || p.status === 'published')
-      if (!items.length) return
+      if (!items.length) {
+        initWorkPagination() // paginate static placeholder cards
+        return
+      }
 
-      // Update hero count + year range
       const countEl = document.getElementById('work-hero-count')
       const yearEl  = document.getElementById('work-hero-year')
       if (countEl) countEl.textContent = items.length + ' Project' + (items.length !== 1 ? 's' : '')
@@ -363,11 +426,11 @@
 
       const container = document.getElementById('work-projects')
       if (!container) return
-      container.innerHTML = '' // replace static placeholder cards
+      container.innerHTML = ''
 
       items.forEach((p, i) => {
         const isEven  = i % 2 === 1
-        const cs      = getCatSlug(p.category)   // slug that matches filter buttons
+        const cs      = getCatSlug(p.category)
         const tags    = (p.tags || []).join(' · ')
         const words   = (p.title || '').split(' ')
         const mid     = Math.ceil(words.length / 2)
@@ -398,23 +461,13 @@
         a.href = `/work/${p.slug}.html`
         a.className = 'block border-b border-black/10 py-16 md:py-24 group reveal is-visible'
         a.dataset.workItem = ''
-        a.dataset.category = cs   // exact slug from categories API
+        a.dataset.category = cs
         a.innerHTML = `<div class="grid grid-cols-12 gap-8 md:gap-12 items-center">${isEven ? textBlock + imgBlock : imgBlock + textBlock}</div>`
         container.appendChild(a)
       })
-    })()
 
-    function filterWork(cat, btn) {
-      document.querySelectorAll('.work-filter-btn').forEach(b => b.classList.remove('active'))
-      if (btn) btn.classList.add('active')
-      document.querySelectorAll('[data-work-item]').forEach(item => {
-        if (cat === 'all') {
-          item.classList.remove('hidden-item')
-        } else {
-          item.classList.toggle('hidden-item', (item.dataset.category||'') !== cat)
-        }
-      })
-    }
+      initWorkPagination()
+    })()
   </script>
 </body>
 </html>
