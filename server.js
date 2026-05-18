@@ -5,6 +5,8 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import nodemailer from 'nodemailer'
+import { ImapFlow } from 'imapflow'
+import { simpleParser } from 'mailparser'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const PORT = process.env.PORT || 3001
@@ -21,9 +23,59 @@ fs.mkdirSync(BRIEFS_DIR,  { recursive: true })
 
 function getAccount () {
   const f = path.join(CONTENT_DIR, 'account.json')
-  const d = { email: DEFAULT_EMAIL, password: DEFAULT_PASS, recoveryEmail: '', smtpUser: '', smtpPass: '' }
+  const d = { email: DEFAULT_EMAIL, password: DEFAULT_PASS, recoveryEmail: '', smtpUser: '', smtpPass: '', imapHost: '', imapPort: '993', imapUser: '', imapPass: '' }
   if (!fs.existsSync(f)) return d
   try { return { ...d, ...JSON.parse(fs.readFileSync(f, 'utf8')) } } catch { return d }
+}
+
+// ── Messages (IMAP inbox + local sent/drafts) ─────────────────────────────────
+const SENT_FILE   = () => path.join(CONTENT_DIR, 'messages-sent.json')
+const DRAFTS_FILE = () => path.join(CONTENT_DIR, 'messages-drafts.json')
+const READ_FILE   = () => path.join(CONTENT_DIR, 'messages-read.json')
+
+function readSent()   { const f=SENT_FILE();   return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f)) : [] }
+function readDrafts() { const f=DRAFTS_FILE(); return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f)) : [] }
+function readUids()   { const f=READ_FILE();   return new Set(fs.existsSync(f) ? JSON.parse(fs.readFileSync(f)) : []) }
+function markUidRead(uid) {
+  const f = READ_FILE(); const s = readUids(); s.add(String(uid))
+  fs.writeFileSync(f, JSON.stringify([...s]))
+}
+
+let _inboxCache = null
+async function fetchInbox(acct) {
+  if (!acct.imapHost || !acct.imapUser || !acct.imapPass) return []
+  if (_inboxCache && (Date.now() - _inboxCache.at) < 90000) return _inboxCache.msgs
+  const client = new ImapFlow({ host: acct.imapHost, port: parseInt(acct.imapPort)||993, secure: true, auth: { user: acct.imapUser, pass: acct.imapPass }, logger: false, tls: { rejectUnauthorized: false } })
+  await client.connect()
+  const messages = []
+  const lock = await client.getMailboxLock('INBOX')
+  try {
+    const total = client.mailbox.exists
+    if (total > 0) {
+      const start = Math.max(1, total - 74) // fetch up to 75 newest
+      for await (const msg of client.fetch(`${start}:*`, { uid: true, envelope: true, source: true })) {
+        try {
+          const parsed = await simpleParser(msg.source)
+          messages.push({
+            uid: String(msg.uid),
+            from: msg.envelope.from?.[0] || null,
+            to:   msg.envelope.to   || [],
+            cc:   msg.envelope.cc   || [],
+            subject: msg.envelope.subject || '(no subject)',
+            date: msg.envelope.date,
+            text: parsed.text || '',
+            html: parsed.html || null,
+          })
+        } catch { /* skip unparseable */ }
+      }
+    }
+  } finally { lock.release() }
+  await client.logout()
+  messages.reverse()
+  const readSet = readUids()
+  messages.forEach(m => { m.read = readSet.has(m.uid) })
+  _inboxCache = { msgs: messages, at: Date.now() }
+  return messages
 }
 function makeToken (pw) {
   return 'em-' + Buffer.from(pw + ':eyuelmulat').toString('base64')
@@ -223,7 +275,12 @@ export function createApiApp() {
       recoveryEmail: req.body.recoveryEmail ?? acct.recoveryEmail,
       smtpUser:      req.body.smtpUser      ?? acct.smtpUser,
       smtpPass:      req.body.smtpPass      ?? acct.smtpPass,
+      imapHost:      req.body.imapHost      ?? acct.imapHost,
+      imapPort:      req.body.imapPort      ?? acct.imapPort,
+      imapUser:      req.body.imapUser      ?? acct.imapUser,
+      imapPass:      req.body.imapPass      ?? acct.imapPass,
     }
+    _inboxCache = null // invalidate on credential change
     fs.writeFileSync(path.join(CONTENT_DIR, 'account.json'), JSON.stringify(updated, null, 2))
     res.json({ ok: true })
   })
@@ -498,36 +555,6 @@ app.post('/api/insight', auth, (req, res) => {
     fs.writeFileSync(f, JSON.stringify(list.filter(x => String(x.id) !== String(req.params.id)), null, 2))
     res.json({ ok: true })
   })
-  app.post('/api/enquiry/:id/reply', auth, async (req, res) => {
-    const { subject, body } = req.body || {}
-    if (!body) return res.status(400).json({ error: 'Reply body is required.' })
-    const f = path.join(CONTENT_DIR, 'enquiries.json')
-    const list = fs.existsSync(f) ? JSON.parse(fs.readFileSync(f)) : []
-    const enq = list.find(x => String(x.id) === String(req.params.id))
-    if (!enq) return res.status(404).json({ error: 'Enquiry not found.' })
-    if (!enq.email) return res.status(400).json({ error: 'This enquiry has no reply-to email address.' })
-    const acct = readAccount()
-    if (!acct.smtpUser || !acct.smtpPass) return res.status(400).json({ error: 'Email sending is not configured. Set up Gmail SMTP in Account Settings first.' })
-    try {
-      const t = nodemailer.createTransport({ service: 'gmail', auth: { user: acct.smtpUser, pass: acct.smtpPass } })
-      await t.sendMail({
-        from: `"Eyuel Mulat" <${acct.smtpUser}>`,
-        to: enq.email,
-        replyTo: acct.smtpUser,
-        subject: subject || `Re: Enquiry from ${enq.name || 'your website'}`,
-        html: `<div style="font-family:sans-serif;max-width:560px;padding:32px;color:#111">
-          <p style="white-space:pre-wrap;line-height:1.7;margin:0 0 32px">${body.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>
-          <hr style="border:none;border-top:1px solid #eee;margin:0 0 20px"/>
-          <p style="font-size:12px;color:#999">Eyuel Mulat · <a href="mailto:hello@eyuelmulat.com" style="color:#999">hello@eyuelmulat.com</a></p>
-        </div>`,
-      })
-      if (!enq.replies) enq.replies = []
-      enq.replies.push({ sentAt: new Date().toISOString(), subject: subject || '', body })
-      enq.read = true
-      fs.writeFileSync(f, JSON.stringify(list, null, 2))
-      res.json({ ok: true })
-    } catch(e) { res.status(500).json({ error: e.message || 'Failed to send reply.' }) }
-  })
   // Upload a brief/attachment from the public contact form (no auth — submitted before login)
   app.post('/api/enquiry/brief', briefUpload.single('brief'), (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'No file received' })
@@ -539,6 +566,76 @@ app.post('/api/insight', auth, (req, res) => {
     const filePath = path.join(BRIEFS_DIR, safe)
     if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'Not found' })
     res.download(filePath, safe)
+  })
+
+  // ── Messages ──────────────────────────────────────────────────────────────
+  app.get('/api/messages/inbox', auth, async (req, res) => {
+    try {
+      if (req.query.refresh === '1') _inboxCache = null
+      const msgs = await fetchInbox(readAccount())
+      res.json(msgs)
+    } catch(e) { res.status(500).json({ error: e.message || 'IMAP fetch failed.' }) }
+  })
+  app.get('/api/messages/unread-count', auth, async (req, res) => {
+    try {
+      const msgs = await fetchInbox(readAccount())
+      res.json({ count: msgs.filter(m => !m.read).length })
+    } catch { res.json({ count: 0 }) }
+  })
+  app.patch('/api/messages/inbox/:uid/read', auth, (req, res) => {
+    markUidRead(req.params.uid)
+    if (_inboxCache) { const m = _inboxCache.msgs.find(x => x.uid === req.params.uid); if (m) m.read = true }
+    res.json({ ok: true })
+  })
+  app.get('/api/messages/sent', auth, (req, res) => { res.json(readSent()) })
+  app.delete('/api/messages/sent/:id', auth, (req, res) => {
+    const list = readSent().filter(x => String(x.id) !== String(req.params.id))
+    fs.writeFileSync(SENT_FILE(), JSON.stringify(list, null, 2))
+    res.json({ ok: true })
+  })
+  app.get('/api/messages/drafts', auth, (req, res) => { res.json(readDrafts()) })
+  app.post('/api/messages/draft', auth, (req, res) => {
+    const list = readDrafts()
+    const draft = { ...req.body, id: Date.now(), savedAt: new Date().toISOString() }
+    list.unshift(draft)
+    fs.writeFileSync(DRAFTS_FILE(), JSON.stringify(list, null, 2))
+    res.json({ ok: true, id: draft.id })
+  })
+  app.put('/api/messages/draft/:id', auth, (req, res) => {
+    const list = readDrafts()
+    const idx = list.findIndex(x => String(x.id) === String(req.params.id))
+    if (idx < 0) return res.status(404).json({ error: 'Draft not found.' })
+    list[idx] = { ...list[idx], ...req.body, id: list[idx].id, savedAt: new Date().toISOString() }
+    fs.writeFileSync(DRAFTS_FILE(), JSON.stringify(list, null, 2))
+    res.json({ ok: true })
+  })
+  app.delete('/api/messages/draft/:id', auth, (req, res) => {
+    fs.writeFileSync(DRAFTS_FILE(), JSON.stringify(readDrafts().filter(x => String(x.id) !== String(req.params.id)), null, 2))
+    res.json({ ok: true })
+  })
+  app.post('/api/messages/send', auth, async (req, res) => {
+    const { to = [], cc = [], subject = '', body = '', draftId } = req.body || {}
+    if (!to.length) return res.status(400).json({ error: 'At least one recipient is required.' })
+    if (!body.trim()) return res.status(400).json({ error: 'Message body is required.' })
+    const acct = readAccount()
+    if (!acct.smtpUser || !acct.smtpPass) return res.status(400).json({ error: 'SMTP not configured. Set up Gmail credentials in Account Settings.' })
+    try {
+      const t = nodemailer.createTransport({ service: 'gmail', auth: { user: acct.smtpUser, pass: acct.smtpPass } })
+      await t.sendMail({
+        from: `"Eyuel Mulat" <${acct.smtpUser}>`,
+        to: to.join(', '),
+        cc: cc.length ? cc.join(', ') : undefined,
+        subject: subject || '(no subject)',
+        html: `<div style="font-family:sans-serif;max-width:600px;padding:32px;color:#111;line-height:1.7"><div style="white-space:pre-wrap">${body.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div><hr style="margin:32px 0;border:none;border-top:1px solid #eee"/><p style="font-size:12px;color:#999;margin:0">Eyuel Mulat · hello@eyuelmulat.com</p></div>`,
+      })
+      const sent = readSent()
+      sent.unshift({ id: Date.now(), to, cc, subject, body, sentAt: new Date().toISOString() })
+      fs.writeFileSync(SENT_FILE(), JSON.stringify(sent, null, 2))
+      if (draftId) {
+        fs.writeFileSync(DRAFTS_FILE(), JSON.stringify(readDrafts().filter(x => String(x.id) !== String(draftId)), null, 2))
+      }
+      res.json({ ok: true })
+    } catch(e) { res.status(500).json({ error: e.message || 'Send failed.' }) }
   })
 
   // ── Delete / Update project ───────────────────────────────────────────────
