@@ -498,6 +498,36 @@ app.post('/api/insight', auth, (req, res) => {
     fs.writeFileSync(f, JSON.stringify(list.filter(x => String(x.id) !== String(req.params.id)), null, 2))
     res.json({ ok: true })
   })
+  app.post('/api/enquiry/:id/reply', auth, async (req, res) => {
+    const { subject, body } = req.body || {}
+    if (!body) return res.status(400).json({ error: 'Reply body is required.' })
+    const f = path.join(CONTENT_DIR, 'enquiries.json')
+    const list = fs.existsSync(f) ? JSON.parse(fs.readFileSync(f)) : []
+    const enq = list.find(x => String(x.id) === String(req.params.id))
+    if (!enq) return res.status(404).json({ error: 'Enquiry not found.' })
+    if (!enq.email) return res.status(400).json({ error: 'This enquiry has no reply-to email address.' })
+    const acct = readAccount()
+    if (!acct.smtpUser || !acct.smtpPass) return res.status(400).json({ error: 'Email sending is not configured. Set up Gmail SMTP in Account Settings first.' })
+    try {
+      const t = nodemailer.createTransport({ service: 'gmail', auth: { user: acct.smtpUser, pass: acct.smtpPass } })
+      await t.sendMail({
+        from: `"Eyuel Mulat" <${acct.smtpUser}>`,
+        to: enq.email,
+        replyTo: acct.smtpUser,
+        subject: subject || `Re: Enquiry from ${enq.name || 'your website'}`,
+        html: `<div style="font-family:sans-serif;max-width:560px;padding:32px;color:#111">
+          <p style="white-space:pre-wrap;line-height:1.7;margin:0 0 32px">${body.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>
+          <hr style="border:none;border-top:1px solid #eee;margin:0 0 20px"/>
+          <p style="font-size:12px;color:#999">Eyuel Mulat · <a href="mailto:hello@eyuelmulat.com" style="color:#999">hello@eyuelmulat.com</a></p>
+        </div>`,
+      })
+      if (!enq.replies) enq.replies = []
+      enq.replies.push({ sentAt: new Date().toISOString(), subject: subject || '', body })
+      enq.read = true
+      fs.writeFileSync(f, JSON.stringify(list, null, 2))
+      res.json({ ok: true })
+    } catch(e) { res.status(500).json({ error: e.message || 'Failed to send reply.' }) }
+  })
   // Upload a brief/attachment from the public contact form (no auth — submitted before login)
   app.post('/api/enquiry/brief', briefUpload.single('brief'), (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'No file received' })

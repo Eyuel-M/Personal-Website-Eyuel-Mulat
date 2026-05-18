@@ -1375,21 +1375,23 @@ async function downloadBrief(filename,displayName){
 
 function renderEnquiries(){
   const c=document.getElementById('editor-inner');c.innerHTML=''
-  const intro=document.createElement('p');intro.className='pg-intro';intro.textContent='Client enquiries submitted via the contact form — newest first.';c.appendChild(intro)
+  const intro=document.createElement('p');intro.className='pg-intro';intro.textContent='Messages from the contact form and replies you\'ve sent — newest first.';c.appendChild(intro)
   const list=document.createElement('div');c.appendChild(list)
   function fmtDate(iso){
     if(!iso)return''
     const d=new Date(iso)
     return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+' · '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})
   }
+  function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
   async function load(){
     list.innerHTML='<p style="font-size:13px;color:var(--g400);padding:24px 0">Loading…</p>'
     try{
       const data=await api('GET','/api/enquiries')
       list.innerHTML=''
       updateEnquiryBadge()
-      if(!data.length){list.innerHTML='<p style="font-size:13px;color:var(--g400);padding:24px 0">No enquiries yet.</p>';return}
+      if(!data.length){list.innerHTML='<p style="font-size:13px;color:var(--g400);padding:24px 0">No messages yet.</p>';return}
       data.forEach(enq=>{
+        const replies=enq.replies||[]
         const card=document.createElement('div')
         card.className='pc'
         card.style.marginBottom='12px'
@@ -1401,14 +1403,16 @@ function renderEnquiries(){
         const dt=document.createElement('span');dt.className='py';dt.textContent=fmtDate(enq.submittedAt)
         hl.appendChild(co);hl.appendChild(nm);hl.appendChild(dt)
         if(!enq.read){const nb=document.createElement('span');nb.style.cssText='font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--navy);background:var(--navy10);padding:2px 8px;border-radius:99px';nb.textContent='New';hl.appendChild(nb)}
+        if(replies.length){const rb=document.createElement('span');rb.style.cssText='font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--g400);background:var(--g100);padding:2px 8px;border-radius:99px';rb.textContent=replies.length+' repl'+(replies.length===1?'y':'ies');hl.appendChild(rb)}
         const acts=document.createElement('div');acts.className='pc-acts'
         const db=document.createElement('button');db.className='bd';db.textContent='Delete';db.style.color='var(--red400)'
-        db.onclick=async e=>{e.stopPropagation();if(!confirm('Delete this enquiry?'))return;await api('DELETE',`/api/enquiry/${enq.id}`);load()}
+        db.onclick=async e=>{e.stopPropagation();if(!confirm('Delete this message?'))return;await api('DELETE',`/api/enquiry/${enq.id}`);load()}
         acts.appendChild(db)
         head.appendChild(hl);head.appendChild(acts)
         head.style.cursor='pointer'
         const body=document.createElement('div');body.className='pc-b';body.style.display='none'
-        // Details grid
+
+        // ── Contact details grid ────────────────────────────────────────────
         const grid=document.createElement('div');grid.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px'
         function df(label,val){
           if(!val)return null
@@ -1416,15 +1420,14 @@ function renderEnquiries(){
           d.innerHTML=`<div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--g400);margin-bottom:4px">${label}</div><div style="font-size:13px;color:var(--g800)">${val}</div>`
           return d
         }
-        const emailLink=enq.email?`<a href="mailto:${enq.email}" style="color:var(--navy);text-decoration:underline">${enq.email}</a>`:''
-        ;[df('Email',emailLink),df('Phone',enq.phone||(enq.phone_alt?`${enq.phone_alt} (alt)`:'')),df('Timeline',enq.timeline)].forEach(el=>{if(el)grid.appendChild(el)})
-        // Brief file download button
+        const emailLink=enq.email?`<a href="mailto:${enq.email}" style="color:var(--navy);text-decoration:underline">${esc(enq.email)}</a>`:''
+        ;[df('Email',emailLink),df('Phone',enq.phone||(enq.phone_alt?`${esc(enq.phone_alt)} (alt)`:'')),df('Timeline',esc(enq.timeline))].forEach(el=>{if(el)grid.appendChild(el)})
         if(enq.brief){
           const bf=document.createElement('div')
           bf.innerHTML=`<div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--g400);margin-bottom:6px">Brief</div>`
           const dlBtn=document.createElement('button');dlBtn.className='bn'
           dlBtn.style.cssText='display:inline-flex;align-items:center;gap:6px;font-size:12px'
-          dlBtn.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>${enq.briefOriginalName||enq.brief}`
+          dlBtn.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>${esc(enq.briefOriginalName||enq.brief)}`
           dlBtn.onclick=()=>downloadBrief(enq.brief,enq.briefOriginalName||enq.brief)
           bf.appendChild(dlBtn);grid.appendChild(bf)
         }
@@ -1436,11 +1439,63 @@ function renderEnquiries(){
           sf.appendChild(tags);grid.appendChild(sf)
         }
         body.appendChild(grid)
+
+        // ── Conversation thread ─────────────────────────────────────────────
+        const thread=document.createElement('div');thread.style.cssText='border-top:1px solid var(--g100);padding-top:16px;display:flex;flex-direction:column;gap:12px'
+        // Incoming message bubble
         if(enq.message){
-          const mf=document.createElement('div');mf.style.cssText='border-top:1px solid var(--g100);padding-top:16px'
-          mf.innerHTML=`<div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--g400);margin-bottom:8px">Message</div><div style="font-size:13px;color:var(--g700);line-height:1.7;white-space:pre-wrap">${enq.message}</div>`
-          body.appendChild(mf)
+          const mb=document.createElement('div');mb.style.cssText='display:flex;flex-direction:column;gap:4px;align-items:flex-start'
+          mb.innerHTML=`<div style="font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--g400)">${esc(enq.name||'Client')} · ${fmtDate(enq.submittedAt)}</div>
+            <div style="background:var(--g50,#f7f7f7);border:1px solid var(--g100);border-radius:2px 12px 12px 12px;padding:12px 16px;font-size:13px;color:var(--g800);line-height:1.7;white-space:pre-wrap;max-width:90%">${esc(enq.message)}</div>`
+          thread.appendChild(mb)
         }
+        // Sent reply bubbles
+        replies.forEach(r=>{
+          const rb=document.createElement('div');rb.style.cssText='display:flex;flex-direction:column;gap:4px;align-items:flex-end'
+          rb.innerHTML=`<div style="font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--g400)">You · ${fmtDate(r.sentAt)}</div>
+            <div style="background:var(--navy);color:#fff;border-radius:12px 2px 12px 12px;padding:12px 16px;font-size:13px;line-height:1.7;white-space:pre-wrap;max-width:90%">${esc(r.body)}</div>`
+          thread.appendChild(rb)
+        })
+        body.appendChild(thread)
+
+        // ── Reply compose ───────────────────────────────────────────────────
+        if(enq.email){
+          const compose=document.createElement('div');compose.style.cssText='margin-top:16px;border-top:1px solid var(--g100);padding-top:16px'
+          const subjectRow=document.createElement('div');subjectRow.style.cssText='margin-bottom:8px'
+          const subjectIn=document.createElement('input');subjectIn.type='text'
+          subjectIn.placeholder=`Re: Enquiry from ${enq.name||'your website'}`
+          subjectIn.style.cssText='width:100%;font-size:13px;padding:8px 10px;border:1px solid var(--g200);border-radius:4px;background:var(--bg,#fff);color:var(--g800);box-sizing:border-box'
+          subjectRow.appendChild(subjectIn)
+          const bodyIn=document.createElement('textarea');bodyIn.rows=4
+          bodyIn.placeholder='Write your reply…'
+          bodyIn.style.cssText='width:100%;font-size:13px;padding:10px;border:1px solid var(--g200);border-radius:4px;resize:vertical;background:var(--bg,#fff);color:var(--g800);box-sizing:border-box;margin-bottom:8px;font-family:inherit'
+          const sendRow=document.createElement('div');sendRow.style.cssText='display:flex;align-items:center;gap:10px'
+          const sendBtn=document.createElement('button');sendBtn.className='bp';sendBtn.textContent='Send Reply'
+          const statusMsg=document.createElement('span');statusMsg.style.cssText='font-size:12px;color:var(--g400)'
+          sendRow.appendChild(sendBtn);sendRow.appendChild(statusMsg)
+          compose.appendChild(subjectRow);compose.appendChild(bodyIn);compose.appendChild(sendRow)
+          sendBtn.onclick=async()=>{
+            const bodyTxt=bodyIn.value.trim()
+            if(!bodyTxt)return
+            sendBtn.disabled=true;sendBtn.textContent='Sending…';statusMsg.textContent=''
+            try{
+              await api('POST',`/api/enquiry/${enq.id}/reply`,{subject:subjectIn.value.trim()||undefined,body:bodyTxt})
+              // Append sent bubble to thread immediately
+              const rb=document.createElement('div');rb.style.cssText='display:flex;flex-direction:column;gap:4px;align-items:flex-end'
+              rb.innerHTML=`<div style="font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--g400)">You · just now</div>
+                <div style="background:var(--navy);color:#fff;border-radius:12px 2px 12px 12px;padding:12px 16px;font-size:13px;line-height:1.7;white-space:pre-wrap;max-width:90%">${esc(bodyTxt)}</div>`
+              thread.appendChild(rb)
+              bodyIn.value='';subjectIn.value=''
+              statusMsg.style.color='var(--green700,#15803d)';statusMsg.textContent='Sent!'
+              // Update reply count badge
+              replies.push({sentAt:new Date().toISOString(),body:bodyTxt})
+              card.querySelectorAll('span').forEach(s=>{if(s.textContent.includes('repl')){s.textContent=replies.length+' repl'+(replies.length===1?'y':'ies')}})
+            }catch(e){statusMsg.style.color='var(--red400)';statusMsg.textContent=e.message||'Failed to send.'}
+            sendBtn.disabled=false;sendBtn.textContent='Send Reply'
+          }
+          body.appendChild(compose)
+        }
+
         // Toggle expand + mark read
         head.onclick=async()=>{
           const open=body.style.display!=='none'
@@ -1453,7 +1508,7 @@ function renderEnquiries(){
         }
         card.appendChild(head);card.appendChild(body);list.appendChild(card)
       })
-    }catch(e){list.innerHTML='<p style="font-size:13px;color:var(--red400);padding:24px 0">Failed to load enquiries.</p>'}
+    }catch(e){list.innerHTML='<p style="font-size:13px;color:var(--red400);padding:24px 0">Failed to load messages.</p>'}
   }
   load()
 }
