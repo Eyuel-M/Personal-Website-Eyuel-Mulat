@@ -572,13 +572,13 @@ app.post('/api/insight', auth, (req, res) => {
   app.get('/api/messages/inbox', auth, async (req, res) => {
     try {
       if (req.query.refresh === '1') _inboxCache = null
-      const msgs = await fetchInbox(readAccount())
+      const msgs = await fetchInbox(getAccount())
       res.json(msgs)
     } catch(e) { res.status(500).json({ error: e.message || 'IMAP fetch failed.' }) }
   })
   app.get('/api/messages/unread-count', auth, async (req, res) => {
     try {
-      const msgs = await fetchInbox(readAccount())
+      const msgs = await fetchInbox(getAccount())
       res.json({ count: msgs.filter(m => !m.read).length })
     } catch { res.json({ count: 0 }) }
   })
@@ -617,7 +617,7 @@ app.post('/api/insight', auth, (req, res) => {
     const { to = [], cc = [], subject = '', body = '', draftId } = req.body || {}
     if (!to.length) return res.status(400).json({ error: 'At least one recipient is required.' })
     if (!body.trim()) return res.status(400).json({ error: 'Message body is required.' })
-    const acct = readAccount()
+    const acct = getAccount()
     if (!acct.smtpUser || !acct.smtpPass) return res.status(400).json({ error: 'SMTP not configured. Set up Gmail credentials in Account Settings.' })
     try {
       const t = nodemailer.createTransport({ service: 'gmail', auth: { user: acct.smtpUser, pass: acct.smtpPass } })
