@@ -1,4 +1,5 @@
 import { resolve } from 'path'
+import fs from 'fs'
 import { defineConfig } from 'vite'
 import { createApiApp } from './server.js'
 
@@ -7,15 +8,27 @@ export default defineConfig({
     {
       name: 'api-and-admin',
       configureServer(server) {
-        // Rewrite /admin → /admin/index.html so Vite serves the right file
+        // Rewrite /admin and clean URLs → .html before Vite serves files
         server.middlewares.use((req, _res, next) => {
-          if (req.url === '/admin' || req.url === '/admin/') {
+          const urlPath = req.url.split('?')[0].split('#')[0]
+          if (urlPath === '/admin' || urlPath === '/admin/') {
             req.url = '/admin/index.html'
+          } else if (!urlPath.includes('.') && urlPath !== '/' && !urlPath.startsWith('/api')) {
+            const candidate = resolve(__dirname, '.' + urlPath + '.html')
+            if (fs.existsSync(candidate)) req.url = urlPath + '.html'
           }
           next()
         })
-        // Mount Express API routes directly on Vite's server
+        // Mount Express API routes
         server.middlewares.use(createApiApp())
+        // Post-hook: runs after Vite's own middleware — catch unknown routes as 404
+        return () => {
+          server.middlewares.use((_req, res) => {
+            res.statusCode = 404
+            res.setHeader('Content-Type', 'text/html')
+            res.end(fs.readFileSync(resolve(__dirname, '404.html'), 'utf-8'))
+          })
+        }
       },
     },
   ],

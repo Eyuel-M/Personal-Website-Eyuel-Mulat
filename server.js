@@ -948,6 +948,15 @@ const isMain = process.argv[1] === fileURLToPath(import.meta.url)
 if (isMain) {
   const app = createApiApp()
   app.use('/admin', express.static(path.join(__dirname, 'admin')))
+  // Rewrite clean URLs → .html before static serving
+  app.use((req, res, next) => {
+    const p = req.path
+    if (!path.extname(p) && p !== '/' && !p.startsWith('/api')) {
+      const candidate = path.join(__dirname, p + '.html')
+      if (fs.existsSync(candidate)) { req.url = p + '.html'; return next() }
+    }
+    next()
+  })
   app.use(express.static(path.join(__dirname)))
   app.use((req, res) => res.status(404).sendFile(path.join(__dirname, '404.html')))
   app.listen(PORT, () => {

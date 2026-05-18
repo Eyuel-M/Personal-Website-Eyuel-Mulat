@@ -1,3 +1,8 @@
+// ─── Clean URLs — strip .html from address bar ───────────────────────────────
+if (location.pathname.endsWith('.html')) {
+  history.replaceState(null, '', location.pathname.slice(0, -5) + location.search + location.hash)
+}
+
 // ─── Scroll reveal ────────────────────────────────────────────────────────────
 const revealObserver = new IntersectionObserver(
   (entries) => {
