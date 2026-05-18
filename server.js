@@ -949,6 +949,7 @@ if (isMain) {
   const app = createApiApp()
   app.use('/admin', express.static(path.join(__dirname, 'admin')))
   app.use(express.static(path.join(__dirname)))
+  app.use((req, res) => res.status(404).sendFile(path.join(__dirname, '404.html')))
   app.listen(PORT, () => {
     console.log(`\n  ◆ Site + Admin  →  http://localhost:${PORT}`)
     console.log(`    Password      →  ${DEFAULT_PASS}\n`)
