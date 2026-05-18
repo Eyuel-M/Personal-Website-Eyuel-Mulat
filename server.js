@@ -623,7 +623,7 @@ app.post('/api/insight', auth, (req, res) => {
       const t = nodemailer.createTransport({ service: 'gmail', auth: { user: acct.smtpUser, pass: acct.smtpPass } })
       await t.sendMail({
         from: `"Eyuel Mulat" <${acct.smtpUser}>`,
-        replyTo: 'hello@eyuelmulat.com',
+        replyTo: acct.smtpUser,
         to: to.join(', '),
         cc: cc.length ? cc.join(', ') : undefined,
         subject: subject || '(no subject)',
