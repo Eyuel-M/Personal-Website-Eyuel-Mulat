@@ -8,27 +8,42 @@ export default defineConfig({
     {
       name: 'api-and-admin',
       configureServer(server) {
-        // Rewrite /admin and clean URLs → .html before Vite serves files
-        server.middlewares.use((req, _res, next) => {
+        // Must run BEFORE Vite's spaFallbackMiddleware which serves index.html for 404s
+        server.middlewares.use((req, res, next) => {
           const urlPath = req.url.split('?')[0].split('#')[0]
+
+          // Skip Vite internals, API routes, and file assets
+          if (
+            urlPath.startsWith('/api') ||
+            urlPath.startsWith('/@') ||
+            urlPath.startsWith('/node_modules') ||
+            urlPath.includes('.')
+          ) return next()
+
+          // /admin rewrite
           if (urlPath === '/admin' || urlPath === '/admin/') {
             req.url = '/admin/index.html'
-          } else if (!urlPath.includes('.') && urlPath !== '/' && !urlPath.startsWith('/api')) {
-            const candidate = resolve(__dirname, '.' + urlPath + '.html')
-            if (fs.existsSync(candidate)) req.url = urlPath + '.html'
+            return next()
           }
-          next()
+
+          // Root is always valid
+          if (urlPath === '/') return next()
+
+          // Clean URL: check if matching .html exists
+          const candidate = resolve(__dirname, '.' + urlPath + '.html')
+          if (fs.existsSync(candidate)) {
+            req.url = urlPath + '.html'
+            return next()
+          }
+
+          // No matching page found — serve 404 now before Vite's fallback kicks in
+          res.statusCode = 404
+          res.setHeader('Content-Type', 'text/html; charset=utf-8')
+          res.end(fs.readFileSync(resolve(__dirname, '404.html'), 'utf-8'))
         })
+
         // Mount Express API routes
         server.middlewares.use(createApiApp())
-        // Post-hook: runs after Vite's own middleware — catch unknown routes as 404
-        return () => {
-          server.middlewares.use((_req, res) => {
-            res.statusCode = 404
-            res.setHeader('Content-Type', 'text/html')
-            res.end(fs.readFileSync(resolve(__dirname, '404.html'), 'utf-8'))
-          })
-        }
       },
     },
   ],
