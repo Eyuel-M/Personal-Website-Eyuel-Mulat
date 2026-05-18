@@ -664,6 +664,24 @@ function mkField(label,hint){
   d.innerHTML=`<label class="fl">${label}</label>${hint?`<p class="fh">${hint}</p>`:''}`
   return d
 }
+function eyeIcon(visible){
+  return visible
+    ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
+    : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'
+}
+function addEyeToggle(container){
+  const inp=container.querySelector('.fi')
+  if(!inp)return
+  inp.type='password';inp.style.paddingRight='36px'
+  const wrap=inp.parentElement
+  if(wrap.style.position!=='relative'){wrap.style.position='relative';wrap.style.display='flex';wrap.style.alignItems='center'}
+  const eye=document.createElement('button');eye.type='button'
+  eye.style.cssText='position:absolute;right:10px;background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;color:var(--g400);flex-shrink:0'
+  eye.setAttribute('aria-label','Toggle password visibility')
+  eye.innerHTML=eyeIcon(false)
+  eye.onclick=()=>{const show=inp.type==='password';inp.type=show?'text':'password';eye.innerHTML=eyeIcon(show)}
+  wrap.appendChild(eye)
+}
 function mkInput(label,key,obj,hint='',type='text'){
   const d=mkField(label,hint)
   const i=document.createElement('input');i.className='fi';i.type=type;i.value=obj[key]||''
@@ -1314,9 +1332,16 @@ function renderAccount(){
   function pwField(lbl,ph,cb){
     const wrap=document.createElement('div');wrap.style.marginBottom='16px'
     wrap.innerHTML=`<label class="fl">${lbl}</label>`
+    const row=document.createElement('div');row.style.cssText='position:relative;display:flex;align-items:center'
     const inp=document.createElement('input');inp.className='fi';inp.type='password';inp.placeholder=ph
+    inp.style.cssText='padding-right:36px;width:100%;box-sizing:border-box'
     inp.oninput=()=>{pwMsg.textContent='';cb(inp.value)}
-    wrap.appendChild(inp);return {wrap,inp}
+    const eye=document.createElement('button');eye.type='button'
+    eye.style.cssText='position:absolute;right:10px;background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;color:var(--g400);flex-shrink:0'
+    eye.setAttribute('aria-label','Toggle password visibility')
+    eye.innerHTML=eyeIcon(false)
+    eye.onclick=()=>{const show=inp.type==='password';inp.type=show?'text':'password';eye.innerHTML=eyeIcon(show)}
+    row.appendChild(inp);row.appendChild(eye);wrap.appendChild(row);return {wrap,inp}
   }
   const {wrap:w1}=pwField('Current Password','Enter current password',v=>curPw=v)
   const {wrap:w2}=pwField('New Password','At least 6 characters',v=>newPw=v)
@@ -1352,7 +1377,7 @@ function renderAccount(){
   helpNote.innerHTML='Used to send reset codes to your recovery address. Requires a <a href="https://myaccount.google.com/apppasswords" target="_blank" style="color:var(--navy)">Gmail App Password</a> — not your regular Gmail password.'
   const smtpUser=mkInput('Gmail Address (sender)','smtpUser',d,'','email')
   const smtpPassDiv=mkInput('Gmail App Password','smtpPass',d,'16-character app password from Google Account security settings.')
-  smtpPassDiv.querySelector('.fi').type='password'
+  addEyeToggle(smtpPassDiv)
   const testBtn=document.createElement('button');testBtn.className='bs';testBtn.style.marginTop='4px';testBtn.textContent='Send test email to recovery address'
   const testMsg=document.createElement('p');testMsg.style.cssText='font-size:12px;min-height:18px;margin-top:8px'
   testBtn.onclick=async()=>{
@@ -1375,7 +1400,7 @@ function renderAccount(){
   const imapPort=mkInput('IMAP Port','imapPort',d,'993 (SSL) or 143 (STARTTLS)')
   const imapUser=mkInput('IMAP Username','imapUser',d,'Usually your full email address','email')
   const imapPassDiv=mkInput('IMAP Password','imapPass',d,'Your email password or App Password')
-  imapPassDiv.querySelector('.fi').type='password'
+  addEyeToggle(imapPassDiv)
   c.appendChild(mkSC('Messages Inbox (IMAP)',imapNote,imapHost,imapPort,imapUser,imapPassDiv))
 }
 
