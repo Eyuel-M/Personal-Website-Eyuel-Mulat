@@ -21,6 +21,21 @@
       justify-content: center;
     }
 
+    /* ── Film grain overlay ── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: -50%;
+      width: 200%;
+      height: 200%;
+      z-index: 100;
+      pointer-events: none;
+      opacity: 0.09;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23g)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 200px 200px;
+    }
+
     /* ── Giant 404 backdrop ── */
     .backdrop {
       position: fixed;
@@ -34,7 +49,7 @@
 
     .digit {
       font-family: 'Anton', 'Impact', 'Arial Black', sans-serif;
-      font-size: clamp(280px, 42vw, 680px);
+      font-size: clamp(320px, 46vw, 740px);
       line-height: 0.82;
       color: #FF4F00;
       letter-spacing: -0.02em;
@@ -42,30 +57,30 @@
     }
 
     .digit-left {
-      left: -12vw;
-      filter: blur(18px) brightness(0.7);
-      opacity: 0.9;
+      left: -4vw;
+      filter: blur(14px) brightness(0.65);
+      opacity: 0.85;
     }
 
     .digit-center {
-      filter: blur(0px);
+      filter: blur(0);
       opacity: 1;
       text-shadow:
-        0 0 120px rgba(255, 79, 0, 0.35),
-        0 0 40px  rgba(255, 79, 0, 0.2);
+        0 0 140px rgba(255, 79, 0, 0.45),
+        0 0 60px  rgba(255, 79, 0, 0.25);
     }
 
     .digit-right {
-      right: -12vw;
-      filter: blur(18px) brightness(0.7);
-      opacity: 0.9;
+      right: -4vw;
+      filter: blur(14px) brightness(0.65);
+      opacity: 0.85;
     }
 
-    /* vignette overlay */
+    /* vignette */
     .vignette {
       position: fixed;
       inset: 0;
-      background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.75) 100%);
+      background: radial-gradient(ellipse at center, transparent 20%, rgba(0,0,0,0.6) 70%, rgba(0,0,0,0.85) 100%);
       pointer-events: none;
     }
 
@@ -77,36 +92,33 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0;
     }
 
     .eyebrow {
-      font-family: 'Hanken Grotesk', sans-serif;
       font-size: 10px;
       font-weight: 600;
       letter-spacing: 0.4em;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.4);
-      margin-bottom: 12px;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 10px;
     }
 
     .label {
       font-family: 'Anton', 'Impact', sans-serif;
-      font-size: clamp(13px, 1.6vw, 18px);
-      letter-spacing: 0.3em;
+      font-size: clamp(14px, 1.6vw, 19px);
+      letter-spacing: 0.35em;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.55);
+      color: rgba(255,255,255,0.7);
       margin-bottom: 6px;
     }
 
     .tagline {
-      font-family: 'Hanken Grotesk', sans-serif;
-      font-size: clamp(10px, 1.1vw, 13px);
+      font-size: clamp(10px, 1vw, 12px);
       font-weight: 400;
-      letter-spacing: 0.18em;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.3);
-      margin-bottom: 40px;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 44px;
     }
 
     /* nav links */
@@ -114,67 +126,61 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 8px 6px;
-      margin-bottom: 32px;
+      gap: 8px;
+      margin-bottom: 36px;
     }
 
     .nav a {
-      font-family: 'Hanken Grotesk', sans-serif;
       font-size: 10px;
       font-weight: 600;
       letter-spacing: 0.28em;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.55);
+      color: rgba(255,255,255,0.8);
       text-decoration: none;
-      padding: 7px 16px;
-      border: 1px solid rgba(255,255,255,0.12);
+      padding: 8px 18px;
+      border: 1px solid rgba(255,255,255,0.25);
       border-radius: 2px;
       transition: color 0.2s, border-color 0.2s, background 0.2s;
       white-space: nowrap;
+      background: rgba(255,255,255,0.03);
+      backdrop-filter: blur(4px);
     }
 
     .nav a:hover {
       color: #FF4F00;
       border-color: #FF4F00;
-      background: rgba(255,79,0,0.06);
+      background: rgba(255,79,0,0.08);
     }
 
     .nav a.home {
       color: #fff;
-      border-color: rgba(255,255,255,0.35);
-    }
-
-    .nav a.home:hover {
-      color: #FF4F00;
-      border-color: #FF4F00;
+      border-color: rgba(255,255,255,0.55);
+      background: rgba(255,255,255,0.06);
     }
 
     .bottom-label {
-      font-family: 'Hanken Grotesk', sans-serif;
       font-size: 9px;
       font-weight: 600;
-      letter-spacing: 0.3em;
+      letter-spacing: 0.28em;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.2);
-      line-height: 1.8;
-      text-align: center;
+      color: rgba(255,255,255,0.3);
+      line-height: 1.9;
     }
 
-    /* top corner label */
+    /* top label */
     .corner-label {
       position: fixed;
-      top: 32px;
+      top: 28px;
       left: 50%;
       transform: translateX(-50%);
-      font-family: 'Hanken Grotesk', sans-serif;
       font-size: 9px;
       font-weight: 600;
-      letter-spacing: 0.35em;
+      letter-spacing: 0.38em;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.25);
+      color: rgba(255,255,255,0.3);
       z-index: 20;
       text-align: center;
-      line-height: 1.8;
+      line-height: 1.9;
     }
   </style>
 </head>
@@ -182,17 +188,14 @@
 
   <div class="corner-label">404<br>Error Page</div>
 
-  <!-- Giant blurred backdrop digits -->
   <div class="backdrop">
     <span class="digit digit-left">4</span>
     <span class="digit digit-center">0</span>
     <span class="digit digit-right">4</span>
   </div>
 
-  <!-- Vignette -->
   <div class="vignette"></div>
 
-  <!-- Center content -->
   <div class="content">
     <p class="eyebrow">Eyuel Mulat</p>
     <p class="label">404</p>
@@ -200,10 +203,10 @@
 
     <nav class="nav">
       <a href="/" class="home">↖ Go Home</a>
-      <a href="/about.html">About</a>
-      <a href="/work.html">Work</a>
-      <a href="/insights.html">Insights</a>
-      <a href="/contact.html">Contact</a>
+      <a href="/about">About</a>
+      <a href="/work">Work</a>
+      <a href="/insights">Insights</a>
+      <a href="/contact">Contact</a>
     </nav>
 
     <p class="bottom-label">
