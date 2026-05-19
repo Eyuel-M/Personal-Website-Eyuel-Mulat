@@ -546,7 +546,7 @@ async function switchSection(id){
 async function loadSection(id){
   try{
     if(id==='account'){S.data=await api('GET','/api/account');return}
-    if(id==='slideshow'){S.data=await api('GET','/api/slides');return}
+    if(id==='slideshow'){const[sl,sp]=await Promise.all([api('GET','/api/slides'),api('GET','/api/slideshow-speed').catch(()=>({speed:40}))]);S.data=sl;S.slideshowSpeed=typeof sp.speed==='number'?sp.speed:40;return}
     if(id==='capabilities'){S.data=await api('GET','/api/capabilities');return}
     if(id==='categories'){S.data=await api('GET','/api/categories');return}
     if(id==='clients'){S.data=await api('GET','/api/clients');return}
@@ -586,7 +586,7 @@ async function saveSection(){
   btn.disabled=true;btn.textContent='Saving…'
   try{
     const id=S.section
-    if(id==='slideshow'){await api('PUT','/api/slides',S.data)}
+    if(id==='slideshow'){await Promise.all([api('PUT','/api/slides',S.data),api('PUT','/api/slideshow-speed',{speed:S.slideshowSpeed??40})])}
     else if(id==='capabilities'){await api('PUT','/api/capabilities',S.data)}
     else if(id==='categories'){await api('PUT','/api/categories',S.data)}
     else if(id==='clients'){await api('PUT','/api/clients',S.data)}
@@ -1032,9 +1032,33 @@ function renderHero(){
 function renderSlideshow(){
   const c=document.getElementById('editor-inner');c.innerHTML=''
   if(!Array.isArray(S.data))S.data=[]
+  if(typeof S.slideshowSpeed!=='number')S.slideshowSpeed=40
   const slides=S.data
+
+  // ── Speed control card (outside rsl so it doesn't get wiped on re-render) ──
+  const speedCard=document.createElement('div');speedCard.className='sc';speedCard.style.marginBottom='24px'
+  speedCard.innerHTML='<div class="sc-h"><h3>Playback Speed</h3></div>'
+  const speedBody=document.createElement('div');speedBody.className='sc-b sp'
+  const speedRow=document.createElement('div');speedRow.style.cssText='display:flex;justify-content:space-between;align-items:center;margin-bottom:10px'
+  const speedHint=document.createElement('span');speedHint.style.cssText='font-size:11px;color:var(--g400)'
+  speedHint.textContent='Controls how fast slides cycle on the homepage.'
+  const speedVal=document.createElement('span');speedVal.style.cssText='font-size:12px;font-weight:600;color:var(--g600)'
+  speedVal.textContent=S.slideshowSpeed+'%'
+  speedRow.appendChild(speedHint);speedRow.appendChild(speedVal)
+  const speedSlider=document.createElement('input');speedSlider.type='range';speedSlider.min='0';speedSlider.max='100';speedSlider.step='1';speedSlider.value=S.slideshowSpeed
+  speedSlider.style.cssText='width:100%;cursor:pointer;accent-color:#0C0C0C'
+  speedSlider.oninput=()=>{S.slideshowSpeed=Number(speedSlider.value);speedVal.textContent=speedSlider.value+'%'}
+  const slowFastRow=document.createElement('div');slowFastRow.style.cssText='display:flex;justify-content:space-between;margin-top:4px'
+  slowFastRow.innerHTML='<span style="font-size:10px;color:var(--g300)">Slow</span><span style="font-size:10px;color:var(--g300)">Fast</span>'
+  speedBody.appendChild(speedRow);speedBody.appendChild(speedSlider);speedBody.appendChild(slowFastRow)
+  speedCard.appendChild(speedBody);c.appendChild(speedCard)
+
+  // ── Slides list ────────────────────────────────────────────────────────────
+  const slidesWrap=document.createElement('div')
+  c.appendChild(slidesWrap)
+
   function rsl(){
-    c.innerHTML='<p class="pg-intro">The fast-cycling image montage shown below the hero section on the homepage. Add or remove images here — they will cycle automatically on the site. Drag to reorder.</p>'
+    slidesWrap.innerHTML='<p class="pg-intro">The fast-cycling image montage shown below the hero section on the homepage. Add or remove images here — they will cycle automatically on the site.</p>'
     slides.forEach((sl,i)=>{
       const card=document.createElement('div');card.className='sc';card.style.marginBottom='16px'
       card.innerHTML=`<div class="sc-h" style="display:flex;justify-content:space-between;align-items:center"><h3>Slide ${i+1}</h3><button class="bd" data-i="${i}">Remove</button></div>`
@@ -1044,10 +1068,10 @@ function renderSlideshow(){
       const tf=document.createElement('div')
       const tl=document.createElement('label');tl.className='fl';tl.textContent='Title (optional)'
       const ti=document.createElement('input');ti.className='fi';ti.value=sl.title||'';ti.oninput=()=>sl.title=ti.value
-      tf.appendChild(tl);tf.appendChild(ti);body.appendChild(tf);card.appendChild(body);c.appendChild(card)
+      tf.appendChild(tl);tf.appendChild(ti);body.appendChild(tf);card.appendChild(body);slidesWrap.appendChild(card)
     })
     const add=document.createElement('button');add.className='bdash';add.textContent='+ Add Slide'
-    add.onclick=()=>{slides.push({media:'',title:''});rsl()};c.appendChild(add)
+    add.onclick=()=>{slides.push({media:'',title:''});rsl()};slidesWrap.appendChild(add)
   }
   rsl()
 }

@@ -434,35 +434,51 @@
     })()
   </script>
   <script>
-  // ── Slideshow: load from API, replace static images ─────────────────────────
+  // ── Slideshow: JS-driven crossfade — seamless loop including last→first ──────
   ;(async function(){
-    const r = await fetch('/api/slides').catch(()=>null)
-    if (!r || !r.ok) return
-    const slides = (await r.json()).filter(s => s.media || s.image)
+    const [slidesRes, speedRes] = await Promise.all([
+      fetch('/api/slides').catch(()=>null),
+      fetch('/api/slideshow-speed').catch(()=>null),
+    ])
+    if (!slidesRes || !slidesRes.ok) return
+    const slides = (await slidesRes.json()).filter(s => s.media || s.image)
     if (!slides.length) return
+
+    const speedData = (speedRes && speedRes.ok) ? await speedRes.json() : { speed: 40 }
+    const speed = typeof speedData.speed === 'number' ? speedData.speed : 40
+    // Logarithmic mapping: speed 0→2000ms, speed 40→~600ms, speed 100→100ms
+    const intervalMs = Math.round(2000 * Math.pow(0.05, speed / 100))
+    const fadeDuration = Math.min(Math.round(intervalMs * 0.35), 500)
+
     const container = document.querySelector('.hero-slideshow')
     if (!container) return
-    const N = slides.length
-    const period = (1.8 * N / 3).toFixed(2)  // keep per-slide visibility constant
-    const stagger = (period / N).toFixed(2)
-    const style = document.createElement('style')
-    style.textContent = slides.map((_,i) =>
-      `.hsd-${i}{animation:slide-flash ${period}s ${(i*stagger).toFixed(2)}s infinite}`
-    ).join('\n')
-    document.head.appendChild(style)
     container.innerHTML = ''
-    slides.forEach((s,i) => {
+
+    const slideEls = slides.map(s => {
       const src = s.media || s.image
+      let el
       if (/\.(mp4|webm|mov)$/i.test(src)) {
-        const v = document.createElement('video')
-        v.src=src; v.autoplay=true; v.muted=true; v.loop=true; v.playsInline=true
-        v.className=`hero-slide hsd-${i} w-full h-full object-cover`; container.appendChild(v)
+        el = document.createElement('video')
+        el.src = src; el.autoplay = true; el.muted = true; el.loop = true; el.playsInline = true
       } else {
-        const img = document.createElement('img')
-        img.src=src; img.alt=s.title||''
-        img.className=`hero-slide hsd-${i} w-full h-full object-cover`; container.appendChild(img)
+        el = document.createElement('img')
+        el.src = src; el.alt = s.title || ''
       }
+      el.className = 'hero-slide w-full h-full object-cover'
+      el.style.transition = `opacity ${fadeDuration}ms ease`
+      container.appendChild(el)
+      return el
     })
+
+    // Show first slide immediately (no fade-in delay on page load)
+    slideEls[0].style.opacity = '1'
+    let current = 0
+
+    setInterval(() => {
+      slideEls[current].style.opacity = '0'
+      current = (current + 1) % slideEls.length
+      slideEls[current].style.opacity = '1'
+    }, intervalMs)
   })()
   </script>
 </body>

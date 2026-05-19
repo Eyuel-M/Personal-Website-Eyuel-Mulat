@@ -518,6 +518,16 @@ app.post('/api/insight', auth, (req, res) => {
     res.json({ ok: true })
   })
 
+  // ── Slideshow Speed ────────────────────────────────────────────────────────
+  app.get('/api/slideshow-speed', (req, res) => {
+    const f = path.join(CONTENT_DIR, 'slideshow-speed.json')
+    res.json(fs.existsSync(f) ? JSON.parse(fs.readFileSync(f)) : { speed: 40 })
+  })
+  app.put('/api/slideshow-speed', auth, (req, res) => {
+    fs.writeFileSync(path.join(CONTENT_DIR, 'slideshow-speed.json'), JSON.stringify(req.body, null, 2))
+    res.json({ ok: true })
+  })
+
   // ── Contact Services ──────────────────────────────────────────────────────
   const defaultSvcs = ['Brand Strategy','Visual Identity','Creative Direction','Typography','Digital Systems','Editorial Design','Campaign & Art Direction','Print & Packaging']
   app.get('/api/contact-services', (req, res) => {

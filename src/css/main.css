@@ -118,15 +118,19 @@
   position: absolute;
   inset: 0;
   opacity: 0;
+  transition: opacity 0.35s ease;
 }
+
+/* CSS fallback for static 3-slide markup (before API loads).
+   33% = stagger/period so the next slide starts exactly as this one begins fading — seamless loop. */
 .hero-slide-1 { animation: slide-flash 1.8s 0s   infinite; }
 .hero-slide-2 { animation: slide-flash 1.8s 0.6s infinite; }
 .hero-slide-3 { animation: slide-flash 1.8s 1.2s infinite; }
 
 @keyframes slide-flash {
   0%   { opacity: 1; }
-  30%  { opacity: 1; }
-  40%  { opacity: 0; }
+  33%  { opacity: 1; }
+  43%  { opacity: 0; }
   100% { opacity: 0; }
 }
 
