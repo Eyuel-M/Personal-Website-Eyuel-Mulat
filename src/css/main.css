@@ -75,25 +75,25 @@
 @media (pointer: fine) {
   html, body, *, *::before, *::after { cursor: none !important; }
 
+  /* mix-blend-mode: difference makes the white cursor invert against any background:
+     white on black bg → appears white; white on white bg → appears black; etc. */
   #cursor-ring {
     position: fixed;
     top: 0; left: 0;
     width: 32px; height: 32px;
-    border: 1.5px solid rgba(15, 15, 15, 0.65);
+    border: 1.5px solid white;
     border-radius: 50%;
     pointer-events: none;
     z-index: 9999;
     will-change: transform;
+    mix-blend-mode: difference;
     transform: translate(calc(-200px - 50%), calc(-200px - 50%));
     transition:
       width  220ms cubic-bezier(0.34, 1.56, 0.64, 1),
-      height 220ms cubic-bezier(0.34, 1.56, 0.64, 1),
-      border-color 220ms ease,
-      opacity 300ms ease;
+      height 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   #cursor-ring.is-hover {
     width: 50px; height: 50px;
-    border-color: rgba(255, 79, 0, 0.65);
   }
   #cursor-ring.is-pressed {
     width: 20px; height: 20px;
@@ -103,11 +103,12 @@
     position: fixed;
     top: 0; left: 0;
     width: 5px; height: 5px;
-    background: #0F0F0F;
+    background: white;
     border-radius: 50%;
     pointer-events: none;
     z-index: 10000;
     will-change: transform;
+    mix-blend-mode: difference;
     transform: translate(calc(-200px - 50%), calc(-200px - 50%));
   }
 }
