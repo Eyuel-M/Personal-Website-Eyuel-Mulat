@@ -62,7 +62,8 @@
 
       // Render custom blocks into #admin-blocks
       const blockZone = document.getElementById('admin-blocks')
-      if (blockZone && blocks.length) {
+      if (blockZone) {
+        blockZone.innerHTML = ''  // clear before each render to prevent double-append (cache + fetch)
         blocks.forEach(block => {
           const el = document.createElement('div')
           el.style.cssText = [

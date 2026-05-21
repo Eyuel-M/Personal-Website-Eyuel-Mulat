@@ -36,6 +36,13 @@ export default defineConfig({
             return next()
           }
 
+          // /work/slug and /insights/slug without a static file — rewrite to .html
+          // and let the dynamic page handler in createApiApp() generate them on demand.
+          if (/^\/work\/[a-z0-9][a-z0-9-]*$/i.test(urlPath) || /^\/insights\/[a-z0-9][a-z0-9-]*$/i.test(urlPath)) {
+            req.url = urlPath + '.html'
+            return next()
+          }
+
           // No matching page found — serve 404 now before Vite's fallback kicks in
           res.statusCode = 404
           res.setHeader('Content-Type', 'text/html; charset=utf-8')

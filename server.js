@@ -171,12 +171,15 @@ export function createApiApp() {
   // Dynamic project/insight page serving — generates HTML on demand for any
   // slug that doesn't have a hand-crafted static file. Never written to disk
   // so template changes take effect immediately on every request.
+  // Handles both /work/slug.html and /work/slug (clean URL after .html is stripped).
   app.use((req, res, next) => {
     let m
-    if ((m = req.url.match(/^\/work\/([a-z0-9][a-z0-9-]*)\.html(\?.*)?$/i))) {
+    if ((m = req.url.match(/^\/work\/([a-z0-9][a-z0-9-]*)(?:\.html)?(\?.*)?$/i))) {
       const slug = m[1]
+      const qs   = m[2] || ''
+      req.url = `/work/${slug}.html${qs}`             // normalise so static server can find hand-crafted files
       const filePath = path.join(__dirname, 'work', `${slug}.html`)
-      if (fs.existsSync(filePath)) return next() // hand-crafted static file → let Vite serve it
+      if (fs.existsSync(filePath)) return next()      // hand-crafted static file → let static server serve it
       try {
         const pf = path.join(CONTENT_DIR, 'portfolio.json')
         if (!fs.existsSync(pf)) return next()
@@ -190,10 +193,12 @@ export function createApiApp() {
         return res.send(buildProjectPage(item, nextItem))
       } catch { return next() }
     }
-    if ((m = req.url.match(/^\/insights\/([a-z0-9][a-z0-9-]*)\.html(\?.*)?$/i))) {
+    if ((m = req.url.match(/^\/insights\/([a-z0-9][a-z0-9-]*)(?:\.html)?(\?.*)?$/i))) {
       const slug = m[1]
+      const qs   = m[2] || ''
+      req.url = `/insights/${slug}.html${qs}`         // normalise so static server can find hand-crafted files
       const filePath = path.join(__dirname, 'insights', `${slug}.html`)
-      if (fs.existsSync(filePath)) return next() // hand-crafted static file → let Vite serve it
+      if (fs.existsSync(filePath)) return next()      // hand-crafted static file → let static server serve it
       try {
         const af = path.join(CONTENT_DIR, 'insights-data.json')
         if (!fs.existsSync(af)) return next()
