@@ -629,8 +629,8 @@ function blockForLoader(b){
   const m={top:b.marginTop||0,right:b.marginRight||0,bottom:b.marginBottom||0,left:b.marginLeft||0}
   if(b.type==='image')return{type:'image',value:b.url,margin:m}
   if(b.type==='text')return{type:'html',value:b.html,title:b.title||'',margin:m}
-  if(b.type==='grid2')return{type:'grid2',images:b.images,margin:m}
-  if(b.type==='grid2x2')return{type:'grid2x2',images:b.images,margin:m}
+  if(b.type==='grid2')return{type:'grid2',cells:b.cells||(b.images||[]).map(u=>({type:'image',url:u})),margin:m}
+  if(b.type==='grid2x2')return{type:'grid2x2',cells:b.cells||(b.images||[]).map(u=>({type:'image',url:u})),margin:m}
   return b
 }
 
@@ -890,10 +890,46 @@ function mkBlockInner(block,onChange){
   if(block.type==='grid2'||block.type==='grid2x2'){
     const w=document.createElement('div')
     const cnt=block.type==='grid2'?2:4
-    if(!block.images||block.images.length<cnt)block.images=Array(cnt).fill('').map((v,j)=>(block.images||[])[j]||'')
+    if(!block.cells){const imgs=block.images||[];block.cells=Array.from({length:cnt},(_,j)=>({type:'image',url:imgs[j]||''}));delete block.images}
+    while(block.cells.length<cnt)block.cells.push({type:'image',url:''})
     const grid=document.createElement('div');grid.className='g2';grid.style.marginBottom='16px'
     for(let j=0;j<cnt;j++){
-      grid.appendChild(mkIU({label:`Image ${j+1}`,value:block.images[j]||'',onChange:v=>{block.images[j]=v;onChange(block)},aspect:'1/1'}))
+      const cell=block.cells[j];if(!cell.type)cell.type='image'
+      const cellWrap=document.createElement('div');cellWrap.style.cssText='display:flex;flex-direction:column;gap:8px'
+      const lbl=document.createElement('p');lbl.style.cssText='font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g400);margin:0 0 2px';lbl.textContent=`Cell ${j+1}`
+      const tRow=document.createElement('div');tRow.style.cssText='display:flex;gap:4px;margin-bottom:6px'
+      const imgT=document.createElement('button');imgT.type='button';imgT.style.cssText='padding:3px 10px;font-size:11px;font-weight:600;border-radius:4px;border:1px solid var(--g200);cursor:pointer';imgT.textContent='Image'
+      const txtT=document.createElement('button');txtT.type='button';txtT.style.cssText='padding:3px 10px;font-size:11px;font-weight:600;border-radius:4px;border:1px solid var(--g200);cursor:pointer';txtT.textContent='Text'
+      tRow.appendChild(imgT);tRow.appendChild(txtT)
+      const imgP=mkIU({label:'',value:cell.url||'',onChange:v=>{cell.url=v;onChange(block)},aspect:'1/1'})
+      const txtP=document.createElement('div');txtP.style.cssText='display:flex;flex-direction:column;gap:6px'
+      const tif=document.createElement('div');tif.className='ff'
+      const til=document.createElement('label');til.className='fl';til.textContent='Title'
+      const tii=document.createElement('input');tii.className='fi';tii.placeholder='Optional heading';tii.value=cell.title||'';tii.oninput=()=>{cell.title=tii.value;onChange(block)}
+      tif.appendChild(til);tif.appendChild(tii);txtP.appendChild(tif)
+      const rtEd=document.createElement('div');rtEd.className='rt-ed';rtEd.contentEditable='true'
+      if(cell.html)rtEd.innerHTML=cell.html
+      rtEd.oninput=()=>{cell.html=rtEd.innerHTML;onChange(block)}
+      const rtBar=document.createElement('div');rtBar.className='rt-bar'
+      const mkRb=(html,cmd)=>{const b=document.createElement('button');b.type='button';b.className='rt-b';b.innerHTML=html;b.onmousedown=e=>{e.preventDefault();document.execCommand('styleWithCSS',false,'true');document.execCommand(cmd,false,null);rtEd.focus();cell.html=rtEd.innerHTML;onChange(block)};return b}
+      rtBar.appendChild(mkRb('<b>B</b>','bold'));rtBar.appendChild(mkRb('<i style="font-style:italic">I</i>','italic'));rtBar.appendChild(mkRb('<u style="text-decoration:underline">U</u>','underline'))
+      const rtLW=document.createElement('div');rtLW.style.cssText='display:flex;align-items:center;gap:4px;margin-left:4px'
+      const rtLBtn=document.createElement('button');rtLBtn.type='button';rtLBtn.className='rt-b';rtLBtn.title='Add link'
+      rtLBtn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>'
+      const rtLIn=document.createElement('input');rtLIn.type='url';rtLIn.placeholder='https://';rtLIn.style.cssText='display:none;width:110px;padding:3px 7px;font-size:11px;border:1px solid var(--g300);border-radius:4px;outline:none'
+      const rtLOk=document.createElement('button');rtLOk.type='button';rtLOk.style.cssText='display:none;padding:3px 9px;font-size:11px;background:var(--g900);color:#fff;border:none;border-radius:4px;cursor:pointer';rtLOk.textContent='Add'
+      const rtLX=document.createElement('button');rtLX.type='button';rtLX.style.cssText='display:none;padding:3px 6px;font-size:11px;background:none;border:none;cursor:pointer;color:var(--g400)';rtLX.textContent='✕'
+      let _rng=null
+      const _lHide=()=>{rtLIn.style.display=rtLOk.style.display=rtLX.style.display='none';rtLIn.value='';_rng=null}
+      const _lApply=()=>{const url=rtLIn.value.trim();if(!url||!_rng){_lHide();return};const a=document.createElement('a');a.href=url.startsWith('http')?url:'https://'+url;a.target='_blank';a.rel='noopener noreferrer';try{a.appendChild(_rng.extractContents());_rng.insertNode(a)}catch(e){};const s=window.getSelection();if(s)s.removeAllRanges();_lHide();cell.html=rtEd.innerHTML;onChange(block);rtEd.focus()}
+      rtLBtn.onmousedown=e=>{e.preventDefault();const s=window.getSelection();if(!s||s.isCollapsed||!s.rangeCount)return;_rng=s.getRangeAt(0).cloneRange();rtLIn.style.display=rtLOk.style.display=rtLX.style.display='';setTimeout(()=>rtLIn.focus(),10)}
+      rtLOk.onclick=_lApply;rtLIn.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();_lApply()}};rtLX.onclick=()=>{_lHide();rtEd.focus()}
+      rtLW.appendChild(rtLBtn);rtLW.appendChild(rtLIn);rtLW.appendChild(rtLOk);rtLW.appendChild(rtLX);rtBar.appendChild(rtLW)
+      const rtW=document.createElement('div');rtW.appendChild(rtBar);rtW.appendChild(rtEd);txtP.appendChild(rtW)
+      cellWrap.appendChild(lbl);cellWrap.appendChild(tRow);cellWrap.appendChild(imgP);cellWrap.appendChild(txtP)
+      const updT=()=>{const isImg=cell.type==='image';imgP.style.display=isImg?'':'none';txtP.style.display=isImg?'none':'';imgT.style.background=isImg?'var(--g900)':'transparent';imgT.style.color=isImg?'#fff':'var(--g500)';txtT.style.background=!isImg?'var(--g900)':'transparent';txtT.style.color=!isImg?'#fff':'var(--g500)'}
+      imgT.onclick=()=>{cell.type='image';updT();onChange(block)};txtT.onclick=()=>{cell.type='text';updT();onChange(block)};updT()
+      grid.appendChild(cellWrap)
     }
     w.appendChild(grid);w.appendChild(mkMS(block,onChange));return w
   }
@@ -933,7 +969,7 @@ function renderBlocksSection(container,item){
       const b=document.createElement('button');b.className='ab-btn';b.textContent='+ '+lbl
       b.onclick=()=>{
         const def={marginTop:10,marginBottom:10,marginLeft:0,marginRight:0}
-        const nb=type==='image'?{id:UID(),type:'image',url:'',...def}:type==='text'?{id:UID(),type:'text',html:'',...def}:type==='grid2'?{id:UID(),type:'grid2',images:['',''],...def}:{id:UID(),type:'grid2x2',images:['','','',''],...def}
+        const nb=type==='image'?{id:UID(),type:'image',url:'',...def}:type==='text'?{id:UID(),type:'text',html:'',...def}:type==='grid2'?{id:UID(),type:'grid2',cells:[{type:'image',url:''},{type:'image',url:''}],...def}:{id:UID(),type:'grid2x2',cells:[{type:'image',url:''},{type:'image',url:''},{type:'image',url:''},{type:'image',url:''}],...def}
         item.blocks.push(nb);renderBlocks()
       }
       abBtns.appendChild(b)

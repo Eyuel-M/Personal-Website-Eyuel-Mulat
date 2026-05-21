@@ -102,25 +102,33 @@
             div.querySelectorAll('a').forEach(a => { a.target = '_blank'; a.rel = 'noopener noreferrer' })
             el.appendChild(div)
 
-          } else if (block.type === 'grid2') {
+          } else if (block.type === 'grid2' || block.type === 'grid2x2') {
+            const maxCells = block.type === 'grid2' ? 2 : 4
             const grid = document.createElement('div')
             grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:16px'
-            ;(block.images || []).slice(0, 2).forEach(src => {
-              if (!src) return
-              const img = document.createElement('img')
-              img.src = src; img.className = 'w-full object-cover aspect-square'
-              grid.appendChild(img)
-            })
-            el.appendChild(grid)
-
-          } else if (block.type === 'grid2x2') {
-            const grid = document.createElement('div')
-            grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:16px'
-            ;(block.images || []).slice(0, 4).forEach(src => {
-              if (!src) return
-              const img = document.createElement('img')
-              img.src = src; img.className = 'w-full object-cover aspect-square'
-              grid.appendChild(img)
+            const cells = block.cells || (block.images || []).map(u => ({ type: 'image', url: u }))
+            cells.slice(0, maxCells).forEach(cell => {
+              const wrapper = document.createElement('div')
+              if (cell.type === 'text') {
+                if (cell.title) {
+                  const h = document.createElement('h3')
+                  h.className = 'font-display text-[24px] uppercase leading-tight mb-3'
+                  h.textContent = cell.title
+                  wrapper.appendChild(h)
+                }
+                const div = document.createElement('div')
+                div.className = 'text-base text-on-surface-variant leading-relaxed prose-article'
+                div.innerHTML = cell.html || ''
+                div.querySelectorAll('a').forEach(a => { a.target = '_blank'; a.rel = 'noopener noreferrer' })
+                wrapper.appendChild(div)
+              } else {
+                if (!cell.url) return
+                const img = document.createElement('img')
+                img.src = cell.url
+                img.className = 'w-full object-cover aspect-square'
+                wrapper.appendChild(img)
+              }
+              grid.appendChild(wrapper)
             })
             el.appendChild(grid)
 
