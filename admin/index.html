@@ -806,6 +806,39 @@ function mkRT(block,onChange){
   colI.onblur=()=>{const sel=window.getSelection();if(!sel||sel.isCollapsed)return;wrapSel('color',colI.value)}
   bar.appendChild(colI);bar.appendChild(rdiv())
   bar.appendChild(rb('Clear','removeFormat'))
+  // ── Link button ──────────────────────────────────────────────────────────
+  bar.appendChild(rdiv())
+  const lnkWrap=document.createElement('div');lnkWrap.style.cssText='display:flex;align-items:center;gap:4px'
+  const lnkBtn=document.createElement('button');lnkBtn.type='button';lnkBtn.className='rt-b';lnkBtn.title='Add link — select text first'
+  lnkBtn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>'
+  const lnkIn=document.createElement('input');lnkIn.type='url';lnkIn.placeholder='https://';lnkIn.style.cssText='display:none;width:150px;padding:3px 7px;font-size:11px;border:1px solid var(--g300);border-radius:4px;outline:none'
+  const lnkOk=document.createElement('button');lnkOk.type='button';lnkOk.style.cssText='display:none;padding:3px 9px;font-size:11px;background:var(--g900);color:#fff;border:none;border-radius:4px;cursor:pointer';lnkOk.textContent='Add'
+  const lnkX=document.createElement('button');lnkX.type='button';lnkX.style.cssText='display:none;padding:3px 6px;font-size:11px;background:none;border:none;cursor:pointer;color:var(--g400)';lnkX.textContent='✕'
+  let _lnkRange=null
+  function _lnkHide(){lnkIn.style.display=lnkOk.style.display=lnkX.style.display='none';lnkIn.value='';_lnkRange=null}
+  function _lnkApply(){
+    const url=lnkIn.value.trim()
+    if(!url||!_lnkRange){_lnkHide();return}
+    const a=document.createElement('a')
+    a.href=url.startsWith('http')?url:'https://'+url
+    a.target='_blank';a.rel='noopener noreferrer'
+    try{a.appendChild(_lnkRange.extractContents());_lnkRange.insertNode(a)}catch(e){}
+    const s=window.getSelection();if(s)s.removeAllRanges()
+    _lnkHide();sync();ed.focus()
+  }
+  lnkBtn.onmousedown=e=>{
+    e.preventDefault()
+    const s=window.getSelection()
+    if(!s||s.isCollapsed||!s.rangeCount)return
+    _lnkRange=s.getRangeAt(0).cloneRange()
+    lnkIn.style.display=lnkOk.style.display=lnkX.style.display=''
+    setTimeout(()=>lnkIn.focus(),10)
+  }
+  lnkOk.onclick=_lnkApply
+  lnkIn.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();_lnkApply()}}
+  lnkX.onclick=()=>{_lnkHide();ed.focus()}
+  lnkWrap.appendChild(lnkBtn);lnkWrap.appendChild(lnkIn);lnkWrap.appendChild(lnkOk);lnkWrap.appendChild(lnkX)
+  bar.appendChild(lnkWrap)
   const ed=document.createElement('div');ed.className='rt-ed';ed.contentEditable='true'
   if(block.html)ed.innerHTML=block.html
   function sync(){block.html=ed.innerHTML;onChange(block)}

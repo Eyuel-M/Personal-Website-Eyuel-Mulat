@@ -37,7 +37,10 @@
             el.style.display = ''
           }
         } else if (type === 'html') {
-          if (ov.value) el.innerHTML = ov.value
+          if (ov.value) {
+            el.innerHTML = ov.value
+            el.querySelectorAll('a').forEach(a => { a.target = '_blank'; a.rel = 'noopener noreferrer' })
+          }
         } else {
           if (ov.value !== undefined) el.textContent = ov.value
         }
@@ -96,6 +99,7 @@
             const div = document.createElement('div')
             div.className = 'text-base text-on-surface-variant leading-relaxed max-w-2xl'
             div.innerHTML = block.value || ''
+            div.querySelectorAll('a').forEach(a => { a.target = '_blank'; a.rel = 'noopener noreferrer' })
             el.appendChild(div)
 
           } else if (block.type === 'grid2') {

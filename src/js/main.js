@@ -149,7 +149,8 @@ document.querySelectorAll('.dot-grid').forEach((section) => {
           if (!link.label) return
           const a = document.createElement('a')
           a.href = link.url || '#'
-          if (link.url) { a.target = '_blank'; a.rel = 'noopener noreferrer' }
+          a.target = '_blank'
+          a.rel = 'noopener noreferrer'
           a.className = 'label-caps text-[11px] tracking-[0.2em] text-background/80 hover:text-background transition-colors'
           a.textContent = link.label
           container.appendChild(a)
@@ -165,7 +166,8 @@ document.querySelectorAll('.dot-grid').forEach((section) => {
         if (!link.label) return
         const a = document.createElement('a')
         a.href = link.url || '#'
-        if (link.url) { a.target = '_blank'; a.rel = 'noopener noreferrer' }
+        a.target = '_blank'
+        a.rel = 'noopener noreferrer'
         a.className = 'flex items-center justify-between border-b border-black/10 py-4 group'
         a.innerHTML = `<span class="text-base text-on-surface-variant group-hover:text-primary transition-colors">${link.label}</span><span class="material-symbols-outlined text-accent opacity-0 group-hover:opacity-100 transition-opacity" style="font-size:14px;line-height:1">north_east</span>`
         contactSocial.appendChild(a)
