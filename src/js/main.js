@@ -137,20 +137,39 @@ document.querySelectorAll('.dot-grid').forEach((section) => {
     const data = await res.json()
     const links = data?.fields?.socialLinks
     if (!Array.isArray(links) || !links.length) return
+
+    // ── Footer Follow column ──────────────────────────────────────────────────
     const footer = document.querySelector('footer')
-    if (!footer) return
-    const followSpan = Array.from(footer.querySelectorAll('span')).find(el => el.textContent.trim() === 'Follow')
-    if (!followSpan) return
-    const container = followSpan.parentElement
-    container.querySelectorAll('a').forEach(a => a.remove())
-    links.forEach(link => {
-      if (!link.label) return
-      const a = document.createElement('a')
-      a.href = link.url || '#'
-      if (link.url) { a.target = '_blank'; a.rel = 'noopener noreferrer' }
-      a.className = 'label-caps text-[11px] tracking-[0.2em] text-background/80 hover:text-background transition-colors'
-      a.textContent = link.label
-      container.appendChild(a)
-    })
+    if (footer) {
+      const followSpan = Array.from(footer.querySelectorAll('span')).find(el => el.textContent.trim() === 'Follow')
+      if (followSpan) {
+        const container = followSpan.parentElement
+        container.querySelectorAll('a').forEach(a => a.remove())
+        links.forEach(link => {
+          if (!link.label) return
+          const a = document.createElement('a')
+          a.href = link.url || '#'
+          if (link.url) { a.target = '_blank'; a.rel = 'noopener noreferrer' }
+          a.className = 'label-caps text-[11px] tracking-[0.2em] text-background/80 hover:text-background transition-colors'
+          a.textContent = link.label
+          container.appendChild(a)
+        })
+      }
+    }
+
+    // ── Contact page Follow list ──────────────────────────────────────────────
+    const contactSocial = document.querySelector('[data-contact-social]')
+    if (contactSocial) {
+      contactSocial.innerHTML = ''
+      links.forEach(link => {
+        if (!link.label) return
+        const a = document.createElement('a')
+        a.href = link.url || '#'
+        if (link.url) { a.target = '_blank'; a.rel = 'noopener noreferrer' }
+        a.className = 'flex items-center justify-between border-b border-black/10 py-4 group'
+        a.innerHTML = `<span class="text-base text-on-surface-variant group-hover:text-primary transition-colors">${link.label}</span><span class="material-symbols-outlined text-accent opacity-0 group-hover:opacity-100 transition-opacity" style="font-size:14px;line-height:1">north_east</span>`
+        contactSocial.appendChild(a)
+      })
+    }
   } catch(e) {}
 })()
