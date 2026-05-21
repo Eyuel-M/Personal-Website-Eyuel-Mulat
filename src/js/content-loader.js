@@ -252,6 +252,8 @@
           if (!link.label) return
           const a = document.createElement('a')
           a.href = link.url || '#'
+          a.target = '_blank'
+          a.rel = 'noopener noreferrer'
           a.textContent = link.label
           a.className = 'label-caps text-[11px] tracking-[0.2em] text-background/80 hover:text-background transition-colors'
           el.appendChild(a)

@@ -319,3 +319,16 @@
 }
 .upload-zone:hover      { border-color: #FF4F00; }
 .upload-zone.has-file   { border-color: #FF4F00; border-style: solid; background: rgba(255, 79, 0, 0.03); }
+
+/* ─── Insight / portfolio post: links in body copy ───────────────────────── */
+.prose-article a,
+[data-editable-type="html"] a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  color: inherit;
+  transition: color 0.15s;
+}
+.prose-article a:hover,
+[data-editable-type="html"] a:hover {
+  color: #FF4F00;
+}
