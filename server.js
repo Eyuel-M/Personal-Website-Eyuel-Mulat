@@ -173,6 +173,7 @@ export function createApiApp() {
   // so template changes take effect immediately on every request.
   // Handles both /work/slug.html and /work/slug (clean URL after .html is stripped).
   app.use((req, res, next) => {
+    const serve404 = () => res.status(404).sendFile(path.join(__dirname, '404.html'))
     let m
     if ((m = req.url.match(/^\/work\/([a-z0-9][a-z0-9-]*)(?:\.html)?(\?.*)?$/i))) {
       const slug = m[1]
@@ -182,16 +183,16 @@ export function createApiApp() {
       if (fs.existsSync(filePath)) return next()      // hand-crafted static file → let static server serve it
       try {
         const pf = path.join(CONTENT_DIR, 'portfolio.json')
-        if (!fs.existsSync(pf)) return next()
+        if (!fs.existsSync(pf)) return serve404()
         const portfolio = JSON.parse(fs.readFileSync(pf))
         const items = portfolio.items || []
         const idx = items.findIndex(p => p.slug === slug)
-        if (idx < 0) return next()
+        if (idx < 0) return serve404()
         const item = items[idx]
         const nextItem = items.length > 1 ? items[(idx + 1) % items.length] : null
         res.setHeader('Content-Type', 'text/html; charset=utf-8')
         return res.send(buildProjectPage(item, nextItem))
-      } catch { return next() }
+      } catch { return serve404() }
     }
     if ((m = req.url.match(/^\/insights\/([a-z0-9][a-z0-9-]*)(?:\.html)?(\?.*)?$/i))) {
       const slug = m[1]
@@ -201,16 +202,16 @@ export function createApiApp() {
       if (fs.existsSync(filePath)) return next()      // hand-crafted static file → let static server serve it
       try {
         const af = path.join(CONTENT_DIR, 'insights-data.json')
-        if (!fs.existsSync(af)) return next()
+        if (!fs.existsSync(af)) return serve404()
         const insightsData = JSON.parse(fs.readFileSync(af))
         const items = insightsData.items || []
         const idx = items.findIndex(a => a.slug === slug)
-        if (idx < 0) return next()
+        if (idx < 0) return serve404()
         const item = items[idx]
         const nextItem = items.length > 1 ? items[(idx + 1) % items.length] : null
         res.setHeader('Content-Type', 'text/html; charset=utf-8')
         return res.send(buildInsightPage(item, nextItem))
-      } catch { return next() }
+      } catch { return serve404() }
     }
     next()
   })

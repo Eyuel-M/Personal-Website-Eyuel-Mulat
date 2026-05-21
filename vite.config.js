@@ -12,13 +12,24 @@ export default defineConfig({
         server.middlewares.use((req, res, next) => {
           const urlPath = req.url.split('?')[0].split('#')[0]
 
-          // Skip Vite internals, API routes, and file assets
+          // Skip Vite internals and API routes unconditionally
           if (
             urlPath.startsWith('/api') ||
             urlPath.startsWith('/@') ||
-            urlPath.startsWith('/node_modules') ||
-            urlPath.includes('.')
+            urlPath.startsWith('/node_modules')
           ) return next()
+
+          // URLs with extensions: only pass through if the file actually exists on disk.
+          // Unknown dotted URLs (e.g. /about.typo) would otherwise fall through to
+          // Vite's SPA fallback and serve index.html instead of a 404.
+          if (urlPath.includes('.')) {
+            const filePath = resolve(__dirname, '.' + urlPath)
+            if (fs.existsSync(filePath)) return next()
+            res.statusCode = 404
+            res.setHeader('Content-Type', 'text/html; charset=utf-8')
+            res.end(fs.readFileSync(resolve(__dirname, '404.html'), 'utf-8'))
+            return
+          }
 
           // /admin rewrite
           if (urlPath === '/admin' || urlPath === '/admin/') {
