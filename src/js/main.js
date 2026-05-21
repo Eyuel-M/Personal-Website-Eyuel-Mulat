@@ -113,18 +113,73 @@ if (fileInput && fileZone && fileLabel) {
   })
 }
 
-// ─── Dot grid: cursor glow wave effect ───────────────────────────────────────
+// ─── Custom cursor (ring lags, dot is instant for precise clicking) ──────────
+if (window.matchMedia('(pointer: fine)').matches) {
+  const ring = document.createElement('div')
+  ring.id = 'cursor-ring'
+  const dot = document.createElement('div')
+  dot.id = 'cursor-dot'
+  document.body.appendChild(ring)
+  document.body.appendChild(dot)
+
+  let rx = -200, ry = -200
+  let mx = -200, my = -200
+  let ringRaf = null
+
+  function animateRing() {
+    ringRaf = null
+    rx += (mx - rx) * 0.11
+    ry += (my - ry) * 0.11
+    ring.style.transform = `translate(calc(${rx.toFixed(2)}px - 50%), calc(${ry.toFixed(2)}px - 50%))`
+    if (Math.abs(mx - rx) > 0.2 || Math.abs(my - ry) > 0.2) {
+      ringRaf = requestAnimationFrame(animateRing)
+    }
+  }
+
+  document.addEventListener('mousemove', (e) => {
+    mx = e.clientX; my = e.clientY
+    dot.style.transform = `translate(calc(${mx}px - 50%), calc(${my}px - 50%))`
+    if (!ringRaf) ringRaf = requestAnimationFrame(animateRing)
+  })
+
+  document.addEventListener('mousedown', () => ring.classList.add('is-pressed'))
+  document.addEventListener('mouseup',   () => ring.classList.remove('is-pressed'))
+
+  document.addEventListener('mouseover', (e) => {
+    const el = e.target.closest('a, button, [role="button"], label, select, input[type="range"]')
+    ring.classList.toggle('is-hover', !!el)
+  })
+}
+
+// ─── Dot grid: fluid glow with motion trail (JS lerp, no CSS transition) ─────
 document.querySelectorAll('.dot-grid').forEach((section) => {
+  let gx = 50, gy = 50
+  let tx = 50, ty = 50
+  let glowing = false
+  let rafId = null
+
+  function animateGlow() {
+    rafId = null
+    gx += (tx - gx) * 0.052
+    gy += (ty - gy) * 0.052
+    section.style.setProperty('--dot-x', gx.toFixed(3) + '%')
+    section.style.setProperty('--dot-y', gy.toFixed(3) + '%')
+    if (glowing || Math.abs(tx - gx) + Math.abs(ty - gy) > 0.05) {
+      rafId = requestAnimationFrame(animateGlow)
+    }
+  }
+
   section.addEventListener('mousemove', (e) => {
     const rect = section.getBoundingClientRect()
-    const x = ((e.clientX - rect.left) / rect.width  * 100).toFixed(2) + '%'
-    const y = ((e.clientY - rect.top)  / rect.height * 100).toFixed(2) + '%'
-    section.style.setProperty('--dot-x', x)
-    section.style.setProperty('--dot-y', y)
+    tx = (e.clientX - rect.left) / rect.width  * 100
+    ty = (e.clientY - rect.top)  / rect.height * 100
+    glowing = true
     section.style.setProperty('--dot-glow', '1')
+    if (!rafId) rafId = requestAnimationFrame(animateGlow)
   })
 
   section.addEventListener('mouseleave', () => {
+    glowing = false
     section.style.setProperty('--dot-glow', '0')
   })
 })

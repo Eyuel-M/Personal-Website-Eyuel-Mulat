@@ -54,21 +54,62 @@
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
 }
 
-/* ─── Dot grid with cursor glow wave ─────────────────────────────────────── */
+/* ─── Dot grid with fluid cursor glow (position animated by JS lerp) ─────── */
 .dot-grid {
   --dot-x: 50%;
   --dot-y: 50%;
   --dot-glow: 0;
-  transition: --dot-x 120ms ease-out, --dot-y 120ms ease-out, --dot-glow 300ms ease-out;
+  transition: --dot-glow 700ms ease-out;
   background-image:
     radial-gradient(
-      circle 300px at var(--dot-x) var(--dot-y),
-      rgba(255, 79, 0, calc(var(--dot-glow) * 0.15)) 0%,
-      rgba(255, 79, 0, calc(var(--dot-glow) * 0.06)) 45%,
+      circle 520px at var(--dot-x) var(--dot-y),
+      rgba(255, 79, 0, calc(var(--dot-glow) * 0.22)) 0%,
+      rgba(255, 79, 0, calc(var(--dot-glow) * 0.09)) 42%,
       transparent 70%
     ),
     radial-gradient(rgba(0, 0, 0, 0.12) 1.5px, transparent 0);
   background-size: 100% 100%, 36px 36px;
+}
+
+/* ─── Custom cursor (mouse / trackpad only) ───────────────────────────────── */
+@media (pointer: fine) {
+  html, body, *, *::before, *::after { cursor: none !important; }
+
+  #cursor-ring {
+    position: fixed;
+    top: 0; left: 0;
+    width: 32px; height: 32px;
+    border: 1.5px solid rgba(15, 15, 15, 0.65);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    will-change: transform;
+    transform: translate(calc(-200px - 50%), calc(-200px - 50%));
+    transition:
+      width  220ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      height 220ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      border-color 220ms ease,
+      opacity 300ms ease;
+  }
+  #cursor-ring.is-hover {
+    width: 50px; height: 50px;
+    border-color: rgba(255, 79, 0, 0.65);
+  }
+  #cursor-ring.is-pressed {
+    width: 20px; height: 20px;
+  }
+
+  #cursor-dot {
+    position: fixed;
+    top: 0; left: 0;
+    width: 5px; height: 5px;
+    background: #0F0F0F;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10000;
+    will-change: transform;
+    transform: translate(calc(-200px - 50%), calc(-200px - 50%));
+  }
 }
 
 /* ─── Scroll reveal ──────────────────────────────────────────────────────── */
