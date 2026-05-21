@@ -882,8 +882,8 @@ ${navHTML()}
     <!-- Custom blocks added via admin -->
     <div id="admin-blocks" class="px-10 md:px-[80px]"></div>
   </main>
-${ctaHTML()}
 ${nextSection}
+${ctaHTML()}
 ${footerHTML()}
   <script type="module" src="/src/js/main.js"></script>
   <script type="module" src="/src/js/content-loader.js"></script>
@@ -949,8 +949,8 @@ ${navHTML()}
     <!-- Custom blocks added via admin -->
     <div id="admin-blocks" class="px-10 md:px-[80px]"></div>
   </main>
-${ctaHTML()}
 ${nextSection}
+${ctaHTML()}
 ${footerHTML()}
   <script type="module" src="/src/js/main.js"></script>
   <script type="module" src="/src/js/content-loader.js"></script>
