@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Content Manager — Eyuel Mulat</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -329,6 +330,7 @@ const SECTIONS=[
   {id:'footer',label:'Footer',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="15" x2="21" y2="15"/></svg>'},
   {id:'enquiries',label:'Enquiries',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'},
   {id:'messages',label:'Messages',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>'},
+  {id:'analytics',label:'Analytics',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>'},
   {id:'account',label:'Account & Security',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>'},
 ]
 const TOKEN_KEY='em_token'
@@ -532,9 +534,11 @@ async function updateEnquiryBadge(){
     else badge.style.display='none'
   }catch{badge.style.display='none'}
 }
+const READ_ONLY_SECTIONS=new Set(['enquiries','messages','analytics'])
 function updateSidebarActive(){
   document.querySelectorAll('.ni').forEach(b=>b.classList.toggle('on',b.dataset.id===S.section))
   document.getElementById('tb-title').textContent=SECTIONS.find(s=>s.id===S.section)?.label||''
+  document.getElementById('save-btn').style.display=READ_ONLY_SECTIONS.has(S.section)?'none':''
 }
 
 async function switchSection(id){
@@ -545,6 +549,7 @@ async function switchSection(id){
 
 async function loadSection(id){
   try{
+    if(id==='analytics'){S.data={};return}
     if(id==='account'){S.data=await api('GET','/api/account');return}
     if(id==='slideshow'){const[sl,sp]=await Promise.all([api('GET','/api/slides'),api('GET','/api/slideshow-speed').catch(()=>({speed:40}))]);S.data=sl;S.slideshowSpeed=typeof sp.speed==='number'?sp.speed:40;return}
     if(id==='capabilities'){S.data=await api('GET','/api/capabilities');return}
@@ -606,6 +611,7 @@ async function saveSection(){
       }
     }
     else if(id==='enquiries'){/* read-only section, nothing to save */}
+    else if(id==='analytics'){/* read-only section */}
     else if(id==='account'){await api('PUT','/api/account',S.data)}
     else if(id==='hero'){await api('PUT','/api/content/home',{fields:S.data})}
     else{
@@ -653,7 +659,7 @@ function render(){
     if(S.editView==='insight'&&S.editIdx!==null)return renderInsightEditor()
     return renderInsights()
   }
-  const map={site:renderSite,navigation:renderNav,hero:renderHero,slideshow:renderSlideshow,about:renderAbout,capabilities:renderCapabilities,categories:renderCategories,contact:renderContact,clients:renderClients,footer:renderFooter,enquiries:renderEnquiries,messages:renderMessages,account:renderAccount}
+  const map={site:renderSite,navigation:renderNav,hero:renderHero,slideshow:renderSlideshow,about:renderAbout,capabilities:renderCapabilities,categories:renderCategories,contact:renderContact,clients:renderClients,footer:renderFooter,enquiries:renderEnquiries,messages:renderMessages,analytics:renderAnalytics,account:renderAccount}
   if(map[S.section])map[S.section]()
   else c.innerHTML='<p class="pg-intro">Section coming soon.</p>'
 }
@@ -2120,6 +2126,195 @@ function renderInsightEditor(){
   const pubBtnI=document.createElement('button');pubBtnI.className=item.status==='published'?'btn-unpub':'btn-pub';pubBtnI.textContent=item.status==='published'?'Set to Draft':'Publish'
   pubBtnI.onclick=async()=>{item.status=item.status==='published'?'draft':'published';pubLblI.innerHTML=`<span style="font-size:13px;font-weight:600;color:var(--g700)">Status: </span><span class="${item.status==='published'?'pub-b':'draft-b'}">${item.status==='published'?'Published':'Draft'}</span>`;pubBtnI.className=item.status==='published'?'btn-unpub':'btn-pub';pubBtnI.textContent=item.status==='published'?'Set to Draft':'Publish';await saveSection()}
   pubRowI.appendChild(pubLblI);pubRowI.appendChild(pubBtnI);c.appendChild(pubRowI)
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Analytics Dashboard
+// ══════════════════════════════════════════════════════════════════════════════
+let _aCharts={}
+function destroyCharts(){Object.values(_aCharts).forEach(c=>{try{c.destroy()}catch{}});_aCharts={}}
+
+function fmtDur(s){if(!s)return'—';const m=Math.floor(s/60),sec=s%60;return m>0?`${m}m ${sec}s`:`${sec}s`}
+function fmtPct(n){return(n>0?'+':'')+n+'%'}
+function scoreColor(v,thresholds){
+  if(!v||v===0)return'var(--g400)'
+  const[good,ok]=thresholds
+  return v<=good?'var(--green700)':v<=ok?'#D97706':'var(--red600)'
+}
+
+async function renderAnalytics(){
+  destroyCharts()
+  const c=document.getElementById('editor-inner')
+  c.innerHTML=''
+
+  // ── Range selector ─────────────────────────────────────────────────────────
+  let range=S._analyticsRange||'30d'
+  const header=document.createElement('div')
+  header.style.cssText='display:flex;align-items:center;justify-content:space-between;margin-bottom:24px'
+  const htitle=document.createElement('div')
+  htitle.innerHTML='<h2 style="font-size:16px;font-weight:600;color:var(--g900)">Analytics</h2><p style="font-size:12px;color:var(--g400);margin-top:2px">Visitor & performance data from your site</p>'
+  const rangeSel=document.createElement('select')
+  rangeSel.className='fsel';rangeSel.style.width='auto'
+  ;[['7d','Last 7 days'],['30d','Last 30 days'],['90d','Last 90 days']].forEach(([v,l])=>{
+    const o=document.createElement('option');o.value=v;o.textContent=l;if(v===range)o.selected=true;rangeSel.appendChild(o)
+  })
+  rangeSel.onchange=()=>{S._analyticsRange=rangeSel.value;renderAnalytics()}
+  header.appendChild(htitle);header.appendChild(rangeSel);c.appendChild(header)
+
+  // ── Loading state ──────────────────────────────────────────────────────────
+  const loadEl=document.createElement('div')
+  loadEl.style.cssText='text-align:center;padding:60px;color:var(--g400);font-size:13px'
+  loadEl.textContent='Loading analytics…'
+  c.appendChild(loadEl)
+
+  // ── Fetch all data ─────────────────────────────────────────────────────────
+  let ov={},ts=[],pages=[],sources=[],devData={devices:[],browsers:[]},evts=[],perf={},rt={}
+  try{
+    ;[ov,ts,pages,sources,devData,evts,perf,rt]=await Promise.all([
+      api('GET',`/api/analytics/overview?range=${range}`),
+      api('GET',`/api/analytics/timeseries?range=${range}`),
+      api('GET',`/api/analytics/pages?range=${range}`),
+      api('GET',`/api/analytics/sources?range=${range}`),
+      api('GET',`/api/analytics/devices?range=${range}`),
+      api('GET',`/api/analytics/events?range=${range}`),
+      api('GET',`/api/analytics/performance?range=${range}`),
+      api('GET','/api/analytics/realtime'),
+    ])
+  }catch(e){
+    loadEl.textContent='Could not load analytics. Make sure the database is connected.'
+    return
+  }
+  loadEl.remove()
+
+  // ── Overview cards ─────────────────────────────────────────────────────────
+  const cards=[
+    {label:'Visitors',value:ov.totalVisitors||0,sub:`${ov.newVisitors||0} new / ${ov.returningVisitors||0} returning`,chg:ov.changes?.visitors},
+    {label:'Page Views',value:ov.pageViews||0,sub:'across all pages',chg:ov.changes?.pageViews},
+    {label:'Avg. Duration',value:fmtDur(ov.avgDuration),sub:'per session'},
+    {label:'Bounce Rate',value:(ov.bounceRate||0)+'%',sub:'single-page sessions'},
+  ]
+  const grid=document.createElement('div')
+  grid.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px'
+  cards.forEach(card=>{
+    const el=document.createElement('div')
+    el.style.cssText='background:#fff;border:1px solid var(--g200);border-radius:12px;padding:20px 24px'
+    const chgHTML=card.chg!=null?`<span style="font-size:11px;font-weight:600;color:${card.chg>=0?'var(--green700)':'var(--red600)'};margin-left:8px">${fmtPct(card.chg)}</span>`:''
+    el.innerHTML=`<div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--g400);margin-bottom:8px">${card.label}</div><div style="font-size:28px;font-weight:700;color:var(--g900);line-height:1">${card.value}${chgHTML}</div><div style="font-size:11px;color:var(--g400);margin-top:6px">${card.sub}</div>`
+    grid.appendChild(el)
+  })
+  c.appendChild(grid)
+
+  // ── Realtime strip ─────────────────────────────────────────────────────────
+  const rtEl=document.createElement('div')
+  rtEl.style.cssText='background:#111827;border-radius:12px;padding:16px 24px;margin-bottom:24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap'
+  const rtDot=`<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#22C55E;margin-right:8px;animation:rtpulse 2s infinite"></span>`
+  const rtPages=((rt.activePages||[]).slice(0,3).map(p=>`<span style="background:rgba(255,255,255,.1);border-radius:4px;padding:2px 8px;font-size:11px;color:#9CA3AF">${p.page} <strong style="color:#fff">${p.count}</strong></span>`).join(' '))||''
+  rtEl.innerHTML=`<style>@keyframes rtpulse{0%,100%{opacity:1}50%{opacity:.4}}</style><div style="font-size:13px;color:#fff;font-weight:600">${rtDot}${rt.activeVisitors||0} active right now</div><div style="display:flex;gap:8px;flex-wrap:wrap">${rtPages}</div>`
+  c.appendChild(rtEl)
+
+  // ── Timeseries chart ───────────────────────────────────────────────────────
+  const tsCard=document.createElement('div')
+  tsCard.style.cssText='background:#fff;border:1px solid var(--g200);border-radius:12px;padding:20px 24px;margin-bottom:24px'
+  tsCard.innerHTML='<div style="font-size:12px;font-weight:600;color:var(--g700);margin-bottom:16px">Visitors & Page Views</div><div style="position:relative;height:200px"><canvas id="a-ts-chart"></canvas></div>'
+  c.appendChild(tsCard)
+
+  // ── Two-column: pages + sources ────────────────────────────────────────────
+  const row2=document.createElement('div')
+  row2.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px'
+
+  // Top pages
+  const pCard=document.createElement('div')
+  pCard.style.cssText='background:#fff;border:1px solid var(--g200);border-radius:12px;padding:20px 24px'
+  const maxPV=Math.max(1,...(pages||[]).map(p=>p.views))
+  const pRows=(pages||[]).slice(0,8).map(p=>`<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--g100)"><div style="flex:1;font-size:12px;color:var(--g800);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.path}</div><div style="width:80px;height:4px;background:var(--g100);border-radius:2px;flex-shrink:0"><div style="width:${Math.round(p.views/maxPV*100)}%;height:100%;background:var(--g900);border-radius:2px"></div></div><div style="font-size:11px;font-weight:600;color:var(--g600);width:28px;text-align:right;flex-shrink:0">${p.views}</div></div>`).join('')
+  pCard.innerHTML=`<div style="font-size:12px;font-weight:600;color:var(--g700);margin-bottom:12px">Top Pages</div>${pRows||'<p style="font-size:12px;color:var(--g400);padding:12px 0">No data yet</p>'}`
+
+  // Traffic sources
+  const sCard=document.createElement('div')
+  sCard.style.cssText='background:#fff;border:1px solid var(--g200);border-radius:12px;padding:20px 24px'
+  const maxSrc=Math.max(1,...(sources||[]).map(s=>s.count))
+  const sRows=(sources||[]).slice(0,8).map(s=>`<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--g100)"><div style="flex:1;font-size:12px;color:var(--g800)">${s.source}</div><div style="width:80px;height:4px;background:var(--g100);border-radius:2px;flex-shrink:0"><div style="width:${Math.round(s.count/maxSrc*100)}%;height:100%;background:var(--g900);border-radius:2px"></div></div><div style="font-size:11px;font-weight:600;color:var(--g600);width:28px;text-align:right;flex-shrink:0">${s.count}</div></div>`).join('')
+  sCard.innerHTML=`<div style="font-size:12px;font-weight:600;color:var(--g700);margin-bottom:12px">Traffic Sources</div>${sRows||'<p style="font-size:12px;color:var(--g400);padding:12px 0">No data yet</p>'}`
+
+  row2.appendChild(pCard);row2.appendChild(sCard);c.appendChild(row2)
+
+  // ── Devices + browsers ─────────────────────────────────────────────────────
+  const row3=document.createElement('div')
+  row3.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px'
+
+  const devCard=document.createElement('div')
+  devCard.style.cssText='background:#fff;border:1px solid var(--g200);border-radius:12px;padding:20px 24px'
+  devCard.innerHTML='<div style="font-size:12px;font-weight:600;color:var(--g700);margin-bottom:16px">Devices</div><div style="position:relative;height:160px"><canvas id="a-dev-chart"></canvas></div>'
+
+  const brCard=document.createElement('div')
+  brCard.style.cssText='background:#fff;border:1px solid var(--g200);border-radius:12px;padding:20px 24px'
+  const maxBr=Math.max(1,...(devData.browsers||[]).map(b=>b.count))
+  const brRows=(devData.browsers||[]).map(b=>`<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--g100)"><div style="flex:1;font-size:12px;color:var(--g800)">${b.browser}</div><div style="width:80px;height:4px;background:var(--g100);border-radius:2px;flex-shrink:0"><div style="width:${Math.round(b.count/maxBr*100)}%;height:100%;background:var(--g900);border-radius:2px"></div></div><div style="font-size:11px;font-weight:600;color:var(--g600);width:28px;text-align:right;flex-shrink:0">${b.count}</div></div>`).join('')
+  brCard.innerHTML=`<div style="font-size:12px;font-weight:600;color:var(--g700);margin-bottom:12px">Browsers</div>${brRows||'<p style="font-size:12px;color:var(--g400);padding:12px 0">No data yet</p>'}`
+
+  row3.appendChild(devCard);row3.appendChild(brCard);c.appendChild(row3)
+
+  // ── Events + Performance ────────────────────────────────────────────────────
+  const row4=document.createElement('div')
+  row4.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px'
+
+  const evCard=document.createElement('div')
+  evCard.style.cssText='background:#fff;border:1px solid var(--g200);border-radius:12px;padding:20px 24px'
+  const maxEv=Math.max(1,...(evts||[]).map(e=>e.count))
+  const evRows=(evts||[]).map(e=>`<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--g100)"><div style="flex:1;font-size:12px;color:var(--g800)">${e.name}</div><div style="width:80px;height:4px;background:var(--g100);border-radius:2px;flex-shrink:0"><div style="width:${Math.round(e.count/maxEv*100)}%;height:100%;background:var(--g900);border-radius:2px"></div></div><div style="font-size:11px;font-weight:600;color:var(--g600);width:28px;text-align:right;flex-shrink:0">${e.count}</div></div>`).join('')
+  evCard.innerHTML=`<div style="font-size:12px;font-weight:600;color:var(--g700);margin-bottom:12px">Events</div>${evRows||'<p style="font-size:12px;color:var(--g400);padding:12px 0">No events tracked yet</p>'}`
+
+  const pfCard=document.createElement('div')
+  pfCard.style.cssText='background:#fff;border:1px solid var(--g200);border-radius:12px;padding:20px 24px'
+  const perfItems=[
+    {label:'FCP (First Contentful Paint)',val:perf.fcp,unit:'ms',thresholds:[1800,3000]},
+    {label:'LCP (Largest Contentful Paint)',val:perf.lcp,unit:'ms',thresholds:[2500,4000]},
+    {label:'CLS (Cumulative Layout Shift)',val:perf.cls,unit:'',thresholds:[0.1,0.25]},
+    {label:'TTFB (Time to First Byte)',val:perf.ttfb,unit:'ms',thresholds:[800,1800]},
+    {label:'Load Time',val:perf.loadTime,unit:'ms',thresholds:[2000,4000]},
+  ]
+  const pfRows=perfItems.map(p=>{
+    const v=parseFloat(p.val)||0
+    const col=v>0?scoreColor(v,p.thresholds):'var(--g400)'
+    const display=v>0?(p.unit?v+p.unit:v):'—'
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--g100)"><span style="font-size:12px;color:var(--g700)">${p.label}</span><span style="font-size:13px;font-weight:700;color:${col}">${display}</span></div>`
+  }).join('')
+  pfCard.innerHTML=`<div style="font-size:12px;font-weight:600;color:var(--g700);margin-bottom:12px">Core Web Vitals (avg)</div>${pfRows}`
+
+  row4.appendChild(evCard);row4.appendChild(pfCard);c.appendChild(row4)
+
+  // ── Draw charts (after DOM is ready) ──────────────────────────────────────
+  requestAnimationFrame(()=>{
+    // Timeseries
+    const tsCtx=document.getElementById('a-ts-chart')
+    if(tsCtx&&ts.length){
+      _aCharts.ts=new Chart(tsCtx,{
+        type:'line',
+        data:{
+          labels:ts.map(d=>d.date.slice(5)),
+          datasets:[
+            {label:'Visitors',data:ts.map(d=>d.visitors),borderColor:'#111827',backgroundColor:'rgba(17,24,39,.06)',tension:.3,pointRadius:2,borderWidth:2,fill:true},
+            {label:'Page Views',data:ts.map(d=>d.pageViews),borderColor:'#6B7280',backgroundColor:'transparent',tension:.3,pointRadius:2,borderWidth:1.5,borderDash:[4,4]},
+          ]
+        },
+        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:11},usePointStyle:true,pointStyle:'circle'}}},scales:{x:{ticks:{font:{size:10}},grid:{display:false}},y:{ticks:{font:{size:10}},grid:{color:'rgba(0,0,0,.05)'},beginAtZero:true}}}
+      })
+    }else if(tsCtx){tsCtx.parentElement.innerHTML='<p style="text-align:center;color:var(--g400);font-size:12px;padding:60px 0">No data yet for this range</p>'}
+
+    // Devices donut
+    const devCtx=document.getElementById('a-dev-chart')
+    const devs=devData.devices||[]
+    if(devCtx&&devs.length){
+      _aCharts.dev=new Chart(devCtx,{
+        type:'doughnut',
+        data:{
+          labels:devs.map(d=>d.device),
+          datasets:[{data:devs.map(d=>d.count),backgroundColor:['#111827','#4B5563','#9CA3AF','#D1D5DB'],borderWidth:0,hoverOffset:4}]
+        },
+        options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{position:'right',labels:{font:{size:11},usePointStyle:true,pointStyle:'circle'}}}}
+      })
+    }else if(devCtx){devCtx.parentElement.innerHTML='<p style="text-align:center;color:var(--g400);font-size:12px;padding:40px 0">No data yet</p>'}
+  })
 }
 </script>
 </body>

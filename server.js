@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url'
 import nodemailer from 'nodemailer'
 import { ImapFlow } from 'imapflow'
 import { simpleParser } from 'mailparser'
+import { ingestHandler, analyticsRouter } from './analytics-server.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const PORT = process.env.PORT || 3001
@@ -699,6 +700,10 @@ app.post('/api/insight', auth, (req, res) => {
     res.json(fs.existsSync(f) ? JSON.parse(fs.readFileSync(f)) : [])
   })
 
+  // ── Analytics ──────────────────────────────────────────────────────────────
+  app.post('/api/analytics/ingest', ingestHandler)
+  app.use('/api/analytics', auth, analyticsRouter)
+
   // JSON error handler — catches unhandled async route errors in Express 5
   // eslint-disable-next-line no-unused-vars
   app.use((err, req, res, next) => {
@@ -888,6 +893,7 @@ ${ctaHTML()}
 ${footerHTML()}
   <script type="module" src="/src/js/main.js"></script>
   <script type="module" src="/src/js/content-loader.js"></script>
+  <script type="module" src="/src/js/analytics-sdk.js"></script>
 </body>
 </html>`
 }
@@ -955,6 +961,7 @@ ${ctaHTML()}
 ${footerHTML()}
   <script type="module" src="/src/js/main.js"></script>
   <script type="module" src="/src/js/content-loader.js"></script>
+  <script type="module" src="/src/js/analytics-sdk.js"></script>
 </body>
 </html>`
 }

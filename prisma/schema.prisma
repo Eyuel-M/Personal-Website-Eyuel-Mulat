@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id            String   @id @default(cuid())
+  visitorId     String
+  ipHash        String?
+  country       String?
+  device        String   @default("desktop") // mobile | tablet | desktop
+  browser       String?
+  os            String?
+  referrer      String?
+  utmSource     String?
+  utmMedium     String?
+  utmCampaign   String?
+  entryPage     String
+  exitPage      String?
+  startedAt     DateTime @default(now())
+  lastSeenAt    DateTime @default(now())
+  duration      Int?     // seconds
+  pageViewCount Int      @default(1)
+  isNew         Boolean  @default(true)
+
+  pageViews PageView[]
+  events    Event[]
+  metrics   PerformanceMetric[]
+
+  @@index([visitorId])
+  @@index([startedAt])
+  @@index([lastSeenAt])
+  @@map("sessions")
+}
+
+model PageView {
+  id        String   @id @default(cuid())
+  sessionId String
+  visitorId String
+  path      String
+  title     String?
+  referrer  String?
+  duration  Int?
+  timestamp DateTime @default(now())
+
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([path])
+  @@index([timestamp])
+  @@index([sessionId])
+  @@map("page_views")
+}
+
+model Event {
+  id         String   @id @default(cuid())
+  sessionId  String
+  visitorId  String
+  name       String
+  properties Json?
+  path       String
+  timestamp  DateTime @default(now())
+
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([name])
+  @@index([timestamp])
+  @@index([sessionId])
+  @@map("events")
+}
+
+model PerformanceMetric {
+  id        String   @id @default(cuid())
+  sessionId String
+  path      String
+  fcp       Float?   // First Contentful Paint (ms)
+  lcp       Float?   // Largest Contentful Paint (ms)
+  cls       Float?   // Cumulative Layout Shift score
+  fid       Float?   // First Input Delay (ms)
+  inp       Float?   // Interaction to Next Paint (ms)
+  ttfb      Float?   // Time to First Byte (ms)
+  loadTime  Float?   // Total load time (ms)
+  timestamp DateTime @default(now())
+
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([path])
+  @@index([timestamp])
+  @@index([sessionId])
+  @@map("performance_metrics")
+}
