@@ -2186,6 +2186,53 @@ async function renderAnalytics(){
   }
   loadEl.remove()
 
+  // ── Demo mode: inject mock data when DB has no real records ────────────────
+  const isDemo=!ov.totalVisitors&&!ov.pageViews&&!ts.length
+  if(isDemo){
+    const days=range==='7d'?7:range==='90d'?90:30
+    const seed=(d,i)=>Math.round(d*(0.7+Math.sin(i*0.7+1)*0.3+Math.random()*0.15))
+    const baseV=range==='7d'?42:range==='90d'?124:87
+    const basePV=range==='7d'?138:range==='90d'?401:284
+    ts=Array.from({length:days},(_,i)=>{
+      const dt=new Date(Date.now()-(days-1-i)*86400000)
+      const dow=dt.getDay(),wk=dow>0&&dow<6?1:0.55
+      return{date:dt.toISOString().slice(0,10),visitors:seed(baseV*wk,i),pageViews:seed(basePV*wk,i)}
+    })
+    const totV=ts.reduce((a,d)=>a+d.visitors,0)
+    const totPV=ts.reduce((a,d)=>a+d.pageViews,0)
+    ov={totalVisitors:totV,totalSessions:Math.round(totV*1.18),pageViews:totPV,newVisitors:Math.round(totV*0.61),returningVisitors:Math.round(totV*0.39),avgDuration:154,bounceRate:38,changes:{visitors:12,pageViews:8}}
+    pages=[
+      {path:'/',views:Math.round(totPV*0.28)},
+      {path:'/work.html',views:Math.round(totPV*0.21)},
+      {path:'/about.html',views:Math.round(totPV*0.14)},
+      {path:'/work/nexus-dashboard.html',views:Math.round(totPV*0.11)},
+      {path:'/contact.html',views:Math.round(totPV*0.09)},
+      {path:'/insights.html',views:Math.round(totPV*0.07)},
+      {path:'/work/vanguard-capital.html',views:Math.round(totPV*0.06)},
+      {path:'/insights/why-brand-systems-outlast-assets.html',views:Math.round(totPV*0.04)},
+    ]
+    sources=[
+      {source:'Direct',count:Math.round(totV*0.43)},
+      {source:'Google',count:Math.round(totV*0.27)},
+      {source:'LinkedIn',count:Math.round(totV*0.13)},
+      {source:'Instagram',count:Math.round(totV*0.08)},
+      {source:'Behance',count:Math.round(totV*0.05)},
+      {source:'Twitter/X',count:Math.round(totV*0.04)},
+    ]
+    devData={
+      devices:[{device:'Desktop',count:Math.round(totV*0.66)},{device:'Mobile',count:Math.round(totV*0.27)},{device:'Tablet',count:Math.round(totV*0.07)}],
+      browsers:[{browser:'Chrome',count:Math.round(totV*0.52)},{browser:'Safari',count:Math.round(totV*0.28)},{browser:'Firefox',count:Math.round(totV*0.11)},{browser:'Edge',count:Math.round(totV*0.07)},{browser:'Other',count:Math.round(totV*0.02)}],
+    }
+    evts=[
+      {name:'portfolio_click',count:Math.round(totV*0.19)},
+      {name:'cta_click',count:Math.round(totV*0.15)},
+      {name:'pageview_duration',count:Math.round(totPV*0.82)},
+      {name:'form_submit',count:Math.round(totV*0.04)},
+    ]
+    perf={fcp:1240,lcp:2100,cls:'0.042',ttfb:380,loadTime:2800}
+    rt={activeVisitors:3,activePages:[{page:'/',count:2},{page:'/work.html',count:1}]}
+  }
+
   // ── Overview cards ─────────────────────────────────────────────────────────
   const cards=[
     {label:'Visitors',value:ov.totalVisitors||0,sub:`${ov.newVisitors||0} new / ${ov.returningVisitors||0} returning`,chg:ov.changes?.visitors},
@@ -2204,12 +2251,21 @@ async function renderAnalytics(){
   })
   c.appendChild(grid)
 
+  // Demo banner
+  if(isDemo){
+    const banner=document.createElement('div')
+    banner.style.cssText='display:flex;align-items:center;gap:12px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;padding:12px 18px;margin-bottom:20px;font-size:12px;color:#92400E'
+    banner.innerHTML=`<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span><strong>Preview mode</strong> — this is sample data so you can explore the dashboard. Once you connect a PostgreSQL database via <code style="background:rgba(0,0,0,.07);padding:1px 5px;border-radius:3px;font-family:monospace">DATABASE_URL</code> and deploy to yegara.com, real visitor data will appear here automatically.</span>`
+    c.insertBefore(banner,grid.nextSibling)
+  }
+
   // ── Realtime strip ─────────────────────────────────────────────────────────
   const rtEl=document.createElement('div')
   rtEl.style.cssText='background:#111827;border-radius:12px;padding:16px 24px;margin-bottom:24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap'
   const rtDot=`<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#22C55E;margin-right:8px;animation:rtpulse 2s infinite"></span>`
   const rtPages=((rt.activePages||[]).slice(0,3).map(p=>`<span style="background:rgba(255,255,255,.1);border-radius:4px;padding:2px 8px;font-size:11px;color:#9CA3AF">${p.page} <strong style="color:#fff">${p.count}</strong></span>`).join(' '))||''
-  rtEl.innerHTML=`<style>@keyframes rtpulse{0%,100%{opacity:1}50%{opacity:.4}}</style><div style="font-size:13px;color:#fff;font-weight:600">${rtDot}${rt.activeVisitors||0} active right now</div><div style="display:flex;gap:8px;flex-wrap:wrap">${rtPages}</div>`
+  const rtDemoTag=isDemo?`<span style="margin-left:auto;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6B7280;background:rgba(255,255,255,.08);padding:2px 8px;border-radius:4px">Preview</span>`:''
+  rtEl.innerHTML=`<style>@keyframes rtpulse{0%,100%{opacity:1}50%{opacity:.4}}</style><div style="font-size:13px;color:#fff;font-weight:600">${rtDot}${rt.activeVisitors||0} active right now</div><div style="display:flex;gap:8px;flex-wrap:wrap">${rtPages}</div>${rtDemoTag}`
   c.appendChild(rtEl)
 
   // ── Timeseries chart ───────────────────────────────────────────────────────
