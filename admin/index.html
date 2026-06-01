@@ -330,6 +330,8 @@ const SECTIONS=[
   {id:'footer',label:'Footer',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="15" x2="21" y2="15"/></svg>'},
   {id:'enquiries',label:'Enquiries',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'},
   {id:'messages',label:'Messages',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>'},
+  {id:'testimonials',label:'Testimonials',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg>'},
+  {id:'terms',label:'Terms & Conditions',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>'},
   {id:'analytics',label:'Analytics',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>'},
   {id:'account',label:'Account & Security',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>'},
 ]
@@ -534,7 +536,7 @@ async function updateEnquiryBadge(){
     else badge.style.display='none'
   }catch{badge.style.display='none'}
 }
-const READ_ONLY_SECTIONS=new Set(['enquiries','messages','analytics'])
+const READ_ONLY_SECTIONS=new Set(['enquiries','messages','analytics','testimonials'])
 function updateSidebarActive(){
   document.querySelectorAll('.ni').forEach(b=>b.classList.toggle('on',b.dataset.id===S.section))
   document.getElementById('tb-title').textContent=SECTIONS.find(s=>s.id===S.section)?.label||''
@@ -550,6 +552,12 @@ async function switchSection(id){
 async function loadSection(id){
   try{
     if(id==='analytics'){S.data={};return}
+    if(id==='testimonials'){S.data=await api('GET','/api/admin/testimonials');return}
+    if(id==='terms'){
+      const d=await api('GET','/api/terms')
+      S.data={content:d.content||'',visible:d.visible!==false,updatedAt:d.updatedAt||null}
+      return
+    }
     if(id==='account'){S.data=await api('GET','/api/account');return}
     if(id==='slideshow'){const[sl,sp]=await Promise.all([api('GET','/api/slides'),api('GET','/api/slideshow-speed').catch(()=>({speed:40}))]);S.data=sl;S.slideshowSpeed=typeof sp.speed==='number'?sp.speed:40;return}
     if(id==='capabilities'){S.data=await api('GET','/api/capabilities');return}
@@ -612,6 +620,8 @@ async function saveSection(){
     }
     else if(id==='enquiries'){/* read-only section, nothing to save */}
     else if(id==='analytics'){/* read-only section */}
+    else if(id==='testimonials'){/* read-only section — actions via direct API calls */}
+    else if(id==='terms'){await api('PUT','/api/terms',S.data)}
     else if(id==='account'){await api('PUT','/api/account',S.data)}
     else if(id==='hero'){await api('PUT','/api/content/home',{fields:S.data})}
     else{
@@ -659,7 +669,7 @@ function render(){
     if(S.editView==='insight'&&S.editIdx!==null)return renderInsightEditor()
     return renderInsights()
   }
-  const map={site:renderSite,navigation:renderNav,hero:renderHero,slideshow:renderSlideshow,about:renderAbout,capabilities:renderCapabilities,categories:renderCategories,contact:renderContact,clients:renderClients,footer:renderFooter,enquiries:renderEnquiries,messages:renderMessages,analytics:renderAnalytics,account:renderAccount}
+  const map={site:renderSite,navigation:renderNav,hero:renderHero,slideshow:renderSlideshow,about:renderAbout,capabilities:renderCapabilities,categories:renderCategories,contact:renderContact,clients:renderClients,footer:renderFooter,enquiries:renderEnquiries,messages:renderMessages,testimonials:renderTestimonials,terms:renderTerms,analytics:renderAnalytics,account:renderAccount}
   if(map[S.section])map[S.section]()
   else c.innerHTML='<p class="pg-intro">Section coming soon.</p>'
 }
@@ -1374,6 +1384,8 @@ function renderFooter(){
   // Footer pages — pull available links from nav
   const navData=JSON.parse(localStorage.getItem('em_nav_cache')||'null')
   const allLinks=(navData&&navData.navLinks)||[{label:'About',href:'/about.html'},{label:'Work',href:'/work.html'},{label:'Insights',href:'/insights.html'},{label:'Contact',href:'/contact.html'}]
+  // Ensure Terms is always available as an option
+  if(!allLinks.find(l=>l.href==='/terms.html'))allLinks.push({label:'Terms & Conditions',href:'/terms.html'})
   const fpCard=document.createElement('div');fpCard.className='sc';fpCard.innerHTML='<div class="sc-h"><h3>Footer Pages</h3><p style="font-size:12px;color:var(--g400);margin:0">Choose which nav pages appear in the footer.</p></div>'
   const fpBody=document.createElement('div');fpBody.className='sc-b sp'
   allLinks.forEach(lnk=>{
@@ -2140,6 +2152,234 @@ function scoreColor(v,thresholds){
   if(!v||v===0)return'var(--g400)'
   const[good,ok]=thresholds
   return v<=good?'var(--green700)':v<=ok?'#D97706':'var(--red600)'
+}
+
+// ── Testimonials ──────────────────────────────────────────────────────────────
+function renderTestimonials(){
+  const c=document.getElementById('editor-inner')
+  c.innerHTML=''
+
+  // Header row with action buttons
+  const hdr=document.createElement('div')
+  hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px'
+  const htitle=document.createElement('div')
+  htitle.innerHTML='<p style="font-size:13px;color:var(--g500);margin:0">Manage client testimonials. Approved testimonials appear on the homepage.</p>'
+  const hbtns=document.createElement('div')
+  hbtns.style.cssText='display:flex;gap:8px'
+  const reqBtn=document.createElement('button');reqBtn.className='bp';reqBtn.textContent='Send Request'
+  const addBtn=document.createElement('button');addBtn.className='bs';addBtn.textContent='Add Manually'
+  hbtns.appendChild(reqBtn);hbtns.appendChild(addBtn)
+  hdr.appendChild(htitle);hdr.appendChild(hbtns);c.appendChild(hdr)
+
+  // Status filter tabs
+  const list=Array.isArray(S.data)?S.data:[]
+  const pendingCount=list.filter(t=>t.status==='pending').length
+  const tabs=['all','pending','approved','archived']
+  let activeTab='all'
+
+  const tabBar=document.createElement('div')
+  tabBar.style.cssText='display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--g200);padding-bottom:0'
+
+  function mkTab(id,lbl,badge){
+    const b=document.createElement('button');b.type='button'
+    b.style.cssText='background:none;border:none;border-bottom:2px solid transparent;padding:8px 14px;font-size:12px;font-weight:500;color:var(--g500);cursor:pointer;display:flex;align-items:center;gap:6px;transition:color .12s;margin-bottom:-1px'
+    b.textContent=lbl
+    if(badge>0){const sp=document.createElement('span');sp.style.cssText='min-width:18px;height:18px;background:#dc2626;color:#fff;font-size:10px;font-weight:700;border-radius:99px;display:inline-flex;align-items:center;justify-content:center;padding:0 4px';sp.textContent=badge;b.appendChild(sp)}
+    function setActive(on){b.style.borderBottomColor=on?'var(--navy)':'transparent';b.style.color=on?'var(--navy)':'var(--g500)'}
+    b.onclick=()=>{activeTab=id;tabBar.querySelectorAll('button').forEach(x=>{x.style.borderBottomColor='transparent';x.style.color='var(--g500)'});setActive(true);renderList()}
+    if(id===activeTab)setActive(true)
+    return b
+  }
+  tabBar.appendChild(mkTab('all','All'))
+  tabBar.appendChild(mkTab('pending','Pending',pendingCount))
+  tabBar.appendChild(mkTab('approved','Approved'))
+  tabBar.appendChild(mkTab('archived','Archived'))
+  c.appendChild(tabBar)
+
+  const listEl=document.createElement('div');c.appendChild(listEl)
+
+  function statusBadge(st){
+    const colors={approved:'background:var(--green50);color:var(--green700)',pending:'background:var(--amber50);color:var(--amber800)','pending-submission':'background:var(--g100);color:var(--g600)',rejected:'background:var(--red50);color:var(--red600)',archived:'background:var(--g100);color:var(--g500)'}
+    return `<span style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:4px;${colors[st]||colors.pending}">${st}</span>`
+  }
+
+  function renderList(){
+    listEl.innerHTML=''
+    const filtered=list.filter(t=>activeTab==='all'||t.status===activeTab||(activeTab==='pending'&&t.status==='pending'))
+    if(!filtered.length){
+      const e=document.createElement('p');e.style.cssText='color:var(--g400);font-size:13px;padding:32px 0;text-align:center';e.textContent='No testimonials in this view.';listEl.appendChild(e);return
+    }
+    filtered.forEach(t=>{
+      const card=document.createElement('div');card.className='sc';card.style.marginBottom='12px'
+      const stars='★'.repeat(Math.max(1,Math.min(5,t.rating||5)))+'☆'.repeat(5-Math.max(1,Math.min(5,t.rating||5)))
+      const starsHtml=`<span style="color:#FF4F00;font-size:14px;letter-spacing:1px">${stars}</span>`
+      const body=document.createElement('div');body.style.cssText='padding:16px 20px'
+      body.innerHTML=`
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            ${starsHtml}
+            ${statusBadge(t.status)}
+            ${t.project?`<span style="font-size:11px;color:var(--g400);background:var(--g100);padding:2px 8px;border-radius:4px">${t.project}</span>`:''}
+          </div>
+          <div style="display:flex;gap:4px;align-items:center;flex-shrink:0">
+            ${t.status!=='approved'?`<button class="ta-approve" data-id="${t.id}" style="font-size:11px;background:var(--green50);color:var(--green700);border:1px solid #86efac;border-radius:4px;padding:4px 10px;cursor:pointer;font-weight:600">Approve</button>`:''}
+            ${t.status!=='rejected'&&t.status!=='archived'&&t.status!=='approved'?`<button class="ta-reject" data-id="${t.id}" style="font-size:11px;background:var(--red50);color:var(--red600);border:1px solid #fca5a5;border-radius:4px;padding:4px 10px;cursor:pointer;font-weight:600">Reject</button>`:''}
+            ${t.status!=='archived'?`<button class="ta-archive" data-id="${t.id}" style="font-size:11px;background:none;border:1px solid var(--g200);color:var(--g500);border-radius:4px;padding:4px 10px;cursor:pointer">Archive</button>`:''}
+            <button class="ta-delete" data-id="${t.id}" style="font-size:11px;background:none;border:none;color:var(--red400);cursor:pointer;padding:4px 8px;border-radius:4px">Delete</button>
+          </div>
+        </div>
+        <blockquote style="font-size:13px;color:var(--g700);line-height:1.7;margin:0 0 10px;font-style:italic">"${(t.comment||'').slice(0,200).replace(/</g,'&lt;')}${(t.comment||'').length>200?'…':''}"</blockquote>
+        <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+          <span style="font-size:12px;font-weight:600;color:var(--g800)">${(t.name||'').replace(/</g,'&lt;')}</span>
+          ${t.role||t.company?`<span style="font-size:11px;color:var(--g400)">${[(t.role||'').replace(/</g,'&lt;'),(t.company||'').replace(/</g,'&lt;')].filter(Boolean).join(' · ')}</span>`:''}
+          ${t.submittedAt?`<span style="font-size:10px;color:var(--g300)">${new Date(t.submittedAt).toLocaleDateString()}</span>`:''}
+        </div>`
+      card.appendChild(body)
+
+      // Action handlers
+      card.querySelectorAll('.ta-approve').forEach(b=>b.onclick=async()=>{
+        await api('PATCH',`/api/admin/testimonials/${b.dataset.id}`,{status:'approved'})
+        S.data=await api('GET','/api/admin/testimonials')
+        renderList()
+      })
+      card.querySelectorAll('.ta-reject').forEach(b=>b.onclick=async()=>{
+        await api('PATCH',`/api/admin/testimonials/${b.dataset.id}`,{status:'rejected'})
+        S.data=await api('GET','/api/admin/testimonials')
+        renderList()
+      })
+      card.querySelectorAll('.ta-archive').forEach(b=>b.onclick=async()=>{
+        await api('PATCH',`/api/admin/testimonials/${b.dataset.id}`,{status:'archived'})
+        S.data=await api('GET','/api/admin/testimonials')
+        renderList()
+      })
+      card.querySelectorAll('.ta-delete').forEach(b=>b.onclick=async()=>{
+        if(!confirm('Delete this testimonial?'))return
+        await api('DELETE',`/api/admin/testimonials/${b.dataset.id}`)
+        S.data=await api('GET','/api/admin/testimonials')
+        renderList()
+      })
+
+      listEl.appendChild(card)
+    })
+  }
+  renderList()
+
+  // Send Request modal
+  function mkModal(title,fields,onSubmit){
+    const overlay=document.createElement('div')
+    overlay.style.cssText='position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center'
+    const modal=document.createElement('div')
+    modal.style.cssText='background:#fff;border-radius:12px;padding:32px;width:100%;max-width:440px;box-shadow:0 8px 48px rgba(0,0,0,.2)'
+    const h=document.createElement('h3');h.style.cssText='font-size:15px;font-weight:600;margin:0 0 20px';h.textContent=title;modal.appendChild(h)
+    const data={}
+    fields.forEach(f=>{
+      const row=document.createElement('div');row.style.marginBottom='16px'
+      const lbl=document.createElement('label');lbl.className='fl';lbl.textContent=f.label;row.appendChild(lbl)
+      if(f.type==='select'){
+        const sel=document.createElement('select');sel.className='fsel';sel.value=data[f.key]=f.default||''
+        ;(f.options||[]).forEach(o=>{const opt=document.createElement('option');opt.value=o;opt.textContent=o;sel.appendChild(opt)})
+        sel.onchange=()=>data[f.key]=sel.value;row.appendChild(sel)
+      } else {
+        const inp=document.createElement('input');inp.className='fi';inp.type=f.type||'text';inp.placeholder=f.placeholder||'';inp.value=data[f.key]=f.default||''
+        inp.oninput=()=>data[f.key]=inp.value;row.appendChild(inp)
+      }
+      modal.appendChild(row)
+    })
+    const err=document.createElement('p');err.style.cssText='color:var(--red600);font-size:12px;margin-bottom:12px;display:none';modal.appendChild(err)
+    const foot=document.createElement('div');foot.style.cssText='display:flex;gap:8px;justify-content:flex-end'
+    const cancel=document.createElement('button');cancel.className='bs';cancel.textContent='Cancel';cancel.onclick=()=>overlay.remove()
+    const submit=document.createElement('button');submit.className='bp';submit.textContent='Submit'
+    submit.onclick=async()=>{
+      err.style.display='none';submit.disabled=true;submit.textContent='Sending…'
+      try{await onSubmit(data);overlay.remove()}
+      catch(e){err.textContent=e.message||'Failed.';err.style.display='block';submit.disabled=false;submit.textContent='Submit'}
+    }
+    foot.appendChild(cancel);foot.appendChild(submit);modal.appendChild(foot)
+    overlay.appendChild(modal)
+    overlay.onclick=e=>{if(e.target===overlay)overlay.remove()}
+    document.body.appendChild(overlay)
+  }
+
+  reqBtn.onclick=()=>mkModal('Send Testimonial Request',[
+    {key:'name',label:'Client Name',placeholder:'Jane Smith'},
+    {key:'email',label:'Email',type:'email',placeholder:'client@example.com'},
+    {key:'project',label:'Project (optional)',placeholder:'Brand Identity'},
+  ],async(d)=>{
+    if(!d.name||!d.email)throw new Error('Name and email are required.')
+    await api('POST','/api/admin/testimonials/request',d)
+    S.data=await api('GET','/api/admin/testimonials')
+    renderList()
+  })
+
+  addBtn.onclick=()=>{
+    const overlay=document.createElement('div')
+    overlay.style.cssText='position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center'
+    const modal=document.createElement('div')
+    modal.style.cssText='background:#fff;border-radius:12px;padding:32px;width:100%;max-width:480px;box-shadow:0 8px 48px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto'
+    const h=document.createElement('h3');h.style.cssText='font-size:15px;font-weight:600;margin:0 0 20px';h.textContent='Add Testimonial Manually';modal.appendChild(h)
+    const nd={}
+    const fields2=[
+      {key:'name',label:'Name',placeholder:'Jane Smith'},
+      {key:'company',label:'Company',placeholder:'Acme Inc'},
+      {key:'role',label:'Role / Title',placeholder:'CEO'},
+      {key:'project',label:'Project',placeholder:'Brand Identity'},
+      {key:'comment',label:'Testimonial',placeholder:'Share your feedback…',type:'textarea'},
+    ]
+    fields2.forEach(f=>{
+      const row=document.createElement('div');row.style.marginBottom='14px'
+      const lbl=document.createElement('label');lbl.className='fl';lbl.textContent=f.label;row.appendChild(lbl)
+      if(f.type==='textarea'){const ta=document.createElement('textarea');ta.className='fta';ta.rows=4;ta.placeholder=f.placeholder||'';ta.oninput=()=>nd[f.key]=ta.value;row.appendChild(ta)}
+      else{const inp=document.createElement('input');inp.className='fi';inp.type='text';inp.placeholder=f.placeholder||'';inp.oninput=()=>nd[f.key]=inp.value;row.appendChild(inp)}
+      modal.appendChild(row)
+    })
+    // Rating
+    const rrow=document.createElement('div');rrow.style.marginBottom='16px'
+    const rlbl=document.createElement('label');rlbl.className='fl';rlbl.textContent='Rating';rrow.appendChild(rlbl)
+    const rsel=document.createElement('select');rsel.className='fsel';nd.rating=5
+    ;[5,4,3,2,1].forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent='★'.repeat(v)+'  ('+v+')';rsel.appendChild(o)})
+    rsel.onchange=()=>nd.rating=parseInt(rsel.value)
+    rrow.appendChild(rsel);modal.appendChild(rrow)
+    const err=document.createElement('p');err.style.cssText='color:var(--red600);font-size:12px;margin-bottom:12px;display:none';modal.appendChild(err)
+    const foot=document.createElement('div');foot.style.cssText='display:flex;gap:8px;justify-content:flex-end'
+    const cancel=document.createElement('button');cancel.className='bs';cancel.textContent='Cancel';cancel.onclick=()=>overlay.remove()
+    const submit=document.createElement('button');submit.className='bp';submit.textContent='Publish'
+    submit.onclick=async()=>{
+      err.style.display='none'
+      if(!nd.name||!nd.comment){err.textContent='Name and testimonial are required.';err.style.display='block';return}
+      submit.disabled=true;submit.textContent='Publishing…'
+      try{
+        await api('POST','/api/admin/testimonials',nd)
+        S.data=await api('GET','/api/admin/testimonials')
+        overlay.remove();activeTab='approved';renderList()
+      }catch(e){err.textContent=e.message||'Failed.';err.style.display='block';submit.disabled=false;submit.textContent='Publish'}
+    }
+    foot.appendChild(cancel);foot.appendChild(submit);modal.appendChild(foot)
+    overlay.appendChild(modal)
+    overlay.onclick=e=>{if(e.target===overlay)overlay.remove()}
+    document.body.appendChild(overlay)
+  }
+}
+
+// ── Terms & Conditions ────────────────────────────────────────────────────────
+function renderTerms(){
+  const c=document.getElementById('editor-inner')
+  c.innerHTML=''
+  const block={html:S.data.content||''}
+
+  const hdr=document.createElement('div')
+  hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px'
+  const hint=document.createElement('p');hint.style.cssText='font-size:13px;color:var(--g500);margin:0'
+  hint.textContent='Edit the Terms & Conditions page content. Changes are saved when you click Save Changes.'
+  const viewLink=document.createElement('a');viewLink.href='/terms.html';viewLink.target='_blank'
+  viewLink.style.cssText='font-size:12px;color:var(--navy);text-decoration:none;display:flex;align-items:center;gap:4px'
+  viewLink.innerHTML='View Terms Page <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>'
+  hdr.appendChild(hint);hdr.appendChild(viewLink);c.appendChild(hdr)
+
+  const sc=mkSC('Terms Content',mkRT(block,b=>{S.data.content=b.html;block.html=b.html}))
+  c.appendChild(sc)
+
+  // Wire up the existing save button
+  document.getElementById('save-btn').style.display=''
 }
 
 async function renderAnalytics(){

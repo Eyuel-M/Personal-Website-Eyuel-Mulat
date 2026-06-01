@@ -82,6 +82,8 @@ export default defineConfig({
         work:           resolve(__dirname, 'work.html'),
         contact:        resolve(__dirname, 'contact.html'),
         insights:       resolve(__dirname, 'insights.html'),
+        terms:          resolve(__dirname, 'terms.html'),
+        testimonial:    resolve(__dirname, 'testimonial.html'),
         admin:          resolve(__dirname, 'admin/index.html'),
         'work-nexus':      resolve(__dirname, 'work/nexus-dashboard.html'),
         'work-vanguard':   resolve(__dirname, 'work/vanguard-capital.html'),

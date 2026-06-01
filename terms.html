@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Terms &amp; Conditions — Eyuel Mulat</title>
+  <meta name="description" content="Terms of Use, Privacy Policy, and Cookie Policy for Eyuel Mulat — Creative Direction & Brand Identity."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;600;700&display=block" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
+  <link rel="manifest" href="/manifest.json"/>
+  <meta name="theme-color" content="#0F0F0F"/>
+  <link rel="stylesheet" href="/src/css/main.css"/>
+</head>
+<body class="bg-background text-on-surface grain-overlay min-h-screen">
+
+  <!-- Nav -->
+  <nav class="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-sm">
+    <div class="flex justify-between items-center px-10 md:px-[80px] py-8">
+      <a href="/" class="font-display text-2xl text-primary uppercase tracking-wide" data-nav-logo>EYUEL MULAT</a>
+      <div class="hidden md:flex gap-12 items-center">
+        <a href="/about.html" class="nav-link" data-nav="about">About</a>
+        <a href="/work.html"  class="nav-link" data-nav="work">Work</a>
+        <a href="/insights.html" class="nav-link" data-nav="insights">Insights</a>
+      </div>
+      <a href="/contact.html" class="hidden md:inline-flex nav-cta" data-nav="contact">Contact</a>
+      <button id="mob-menu-btn" aria-label="Open menu" aria-expanded="false" style="display:none;background:none;border:none;cursor:pointer;padding:4px;z-index:51;position:relative;flex-direction:column;gap:5px;align-items:flex-end;justify-content:center;width:32px;height:28px">
+        <span id="hb-1" style="display:block;width:24px;height:1.5px;background:#0F0F0F;transition:transform .3s,opacity .3s;transform-origin:center"></span>
+        <span id="hb-2" style="display:block;width:24px;height:1.5px;background:#0F0F0F;transition:transform .3s,opacity .3s"></span>
+        <span id="hb-3" style="display:block;width:16px;height:1.5px;background:#0F0F0F;transition:transform .3s,width .3s;transform-origin:center"></span>
+      </button>
+    </div>
+  </nav>
+  <div id="mob-menu" aria-hidden="true" style="position:fixed;inset:0;z-index:49;background:#0F0F0F;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;padding:100px 40px 48px;overflow-y:auto">
+    <nav style="display:flex;flex-direction:column">
+      <a href="/" style="font-family:Anton,sans-serif;font-size:clamp(36px,9vw,56px);text-transform:uppercase;color:rgba(245,242,238,.9);text-decoration:none;display:block;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.07);transition:color .2s" onmouseover="this.style.color='#FF4F00'" onmouseout="this.style.color='rgba(245,242,238,.9)'">Home</a>
+      <a href="/about.html" style="font-family:Anton,sans-serif;font-size:clamp(36px,9vw,56px);text-transform:uppercase;color:rgba(245,242,238,.9);text-decoration:none;display:block;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.07);transition:color .2s" onmouseover="this.style.color='#FF4F00'" onmouseout="this.style.color='rgba(245,242,238,.9)'">About</a>
+      <a href="/work.html" style="font-family:Anton,sans-serif;font-size:clamp(36px,9vw,56px);text-transform:uppercase;color:rgba(245,242,238,.9);text-decoration:none;display:block;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.07);transition:color .2s" onmouseover="this.style.color='#FF4F00'" onmouseout="this.style.color='rgba(245,242,238,.9)'">Work</a>
+      <a href="/insights.html" style="font-family:Anton,sans-serif;font-size:clamp(36px,9vw,56px);text-transform:uppercase;color:rgba(245,242,238,.9);text-decoration:none;display:block;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.07);transition:color .2s" onmouseover="this.style.color='#FF4F00'" onmouseout="this.style.color='rgba(245,242,238,.9)'">Insights</a>
+      <a href="/contact.html" style="font-family:Anton,sans-serif;font-size:clamp(36px,9vw,56px);text-transform:uppercase;color:rgba(245,242,238,.9);text-decoration:none;display:block;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.07);transition:color .2s" onmouseover="this.style.color='#FF4F00'" onmouseout="this.style.color='rgba(245,242,238,.9)'">Contact</a>
+      <a href="/terms.html" style="font-family:Anton,sans-serif;font-size:clamp(20px,4vw,28px);text-transform:uppercase;color:rgba(245,242,238,.35);text-decoration:none;display:block;padding:12px 0;margin-top:20px;transition:color .2s" onmouseover="this.style.color='rgba(245,242,238,.7)'" onmouseout="this.style.color='rgba(245,242,238,.35)'">Terms</a>
+    </nav>
+    <div style="margin-top:auto;padding-top:32px;border-top:1px solid rgba(255,255,255,.1)">
+      <a href="mailto:hello@eyuelmulat.com" style="font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:rgba(245,242,238,.4);text-decoration:none">hello@eyuelmulat.com</a>
+    </div>
+  </div>
+  <script>
+  ;(function(){
+    var btn=document.getElementById('mob-menu-btn');
+    var menu=document.getElementById('mob-menu');
+    if(!btn||!menu)return;
+    var l1=document.getElementById('hb-1'),l2=document.getElementById('hb-2'),l3=document.getElementById('hb-3');
+    var isOpen=false;
+    function checkMobile(){btn.style.display=window.innerWidth<768?'flex':'none';}
+    checkMobile();window.addEventListener('resize',checkMobile);
+    function openMenu(){isOpen=true;menu.style.transform='translateX(0)';menu.setAttribute('aria-hidden','false');btn.setAttribute('aria-expanded','true');document.body.style.overflow='hidden';if(l1)l1.style.transform='translateY(6.75px) rotate(45deg)';if(l2)l2.style.opacity='0';if(l3){l3.style.width='24px';l3.style.transform='translateY(-6.75px) rotate(-45deg)';}}
+    function closeMenu(){isOpen=false;menu.style.transform='translateX(100%)';menu.setAttribute('aria-hidden','true');btn.setAttribute('aria-expanded','false');document.body.style.overflow='';if(l1)l1.style.transform='';if(l2)l2.style.opacity='1';if(l3){l3.style.width='16px';l3.style.transform='';}}
+    btn.addEventListener('click',function(){isOpen?closeMenu():openMenu();});
+    menu.querySelectorAll('a').forEach(function(a){a.addEventListener('click',closeMenu);});
+  })();
+  </script>
+
+  <main>
+
+    <!-- Hero -->
+    <section class="px-10 md:px-[80px] pt-48 pb-24 border-b border-black/10">
+      <div class="reveal-hero">
+        <span class="label-caps text-accent tracking-[0.4em] mb-8 block">Legal</span>
+      </div>
+      <h1 class="font-display text-[64px] md:text-[96px] leading-[0.88] uppercase mb-10 reveal-hero delay-1">
+        Terms &amp;<br>Conditions
+      </h1>
+      <p class="text-base text-on-surface-variant max-w-xl leading-relaxed reveal-hero delay-2">
+        Please read these terms carefully before engaging with our services or using this website.
+      </p>
+    </section>
+
+    <!-- Terms Content -->
+    <section class="px-10 md:px-[80px] py-24">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-16">
+        <div class="md:col-span-8 md:col-start-3">
+          <div id="terms-body" data-editable="terms-body" data-editable-type="html" class="prose-terms">
+
+            <h2>Terms of Use</h2>
+            <p>By accessing or using this website (eyuelmulat.com), you agree to be bound by these Terms &amp; Conditions. If you do not agree with any part of these terms, please do not use this website.</p>
+            <p>These terms apply to all visitors, users, and others who access or use the website. We reserve the right to update these terms at any time without notice. Your continued use of the site following changes constitutes your acceptance of the revised terms.</p>
+
+            <h2>Intellectual Property</h2>
+            <p>All content on this website — including but not limited to text, images, logos, graphics, case studies, project work, design systems, and creative direction — is the exclusive intellectual property of Eyuel Mulat unless otherwise stated.</p>
+            <p>You may not reproduce, distribute, modify, publish, or use any content from this website for commercial purposes without prior written consent. Personal or educational use with proper attribution may be permitted — contact us to request permission.</p>
+
+            <h2>Project &amp; Payment Terms</h2>
+            <p>All client projects are governed by a separate written agreement or Statement of Work (SOW). The following general terms apply unless superseded by a signed agreement:</p>
+            <ul>
+              <li>A deposit of 50% is required to commence work on any project.</li>
+              <li>The remaining balance is due upon project completion before final files are released.</li>
+              <li>Invoices are payable within 14 days of issue unless otherwise agreed in writing.</li>
+              <li>Late payments may incur interest at the rate of 2% per month on overdue balances.</li>
+              <li>All prices are quoted exclusive of applicable taxes unless stated otherwise.</li>
+              <li>Scope changes must be agreed in writing and may affect project timeline and cost.</li>
+            </ul>
+
+            <h2>Privacy Policy</h2>
+            <p>We respect your privacy and are committed to protecting your personal data. This section outlines how we collect, use, and safeguard information when you visit our website or engage our services.</p>
+            <p><strong>Information we collect:</strong> We may collect your name, email address, project details, and enquiry information when you submit a contact form. We also collect anonymised usage analytics (pages visited, session duration, referral source) to improve the website.</p>
+            <p><strong>How we use your data:</strong> We use your information to respond to enquiries, manage project relationships, and improve our services. We do not sell, rent, or share your personal data with third parties except as required by law or with service providers who assist in operating our website under strict confidentiality.</p>
+            <p><strong>Data retention:</strong> We retain enquiry and project data for up to 5 years for business and legal compliance purposes. You may request deletion of your data at any time by contacting us at hello@eyuelmulat.com.</p>
+            <p><strong>Your rights:</strong> Depending on your jurisdiction, you may have the right to access, correct, delete, or restrict the processing of your personal data. To exercise these rights, contact us directly.</p>
+
+            <h2>Cookie Policy</h2>
+            <p>This website uses cookies and similar technologies to enhance your browsing experience and collect analytics data.</p>
+            <p><strong>Essential cookies:</strong> Required for the website to function correctly. These cannot be disabled.</p>
+            <p><strong>Analytics cookies:</strong> We use first-party analytics to understand how visitors interact with our website. This data is anonymised and not linked to individuals. You can decline analytics cookies via the consent banner when you first visit the site, or by clearing your browser's local storage.</p>
+            <p>By clicking "Accept" on our cookie consent banner, you consent to the use of analytics cookies. You can withdraw consent at any time by clearing your local storage or contacting us.</p>
+
+            <h2>Limitation of Liability</h2>
+            <p>To the fullest extent permitted by applicable law, Eyuel Mulat shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of this website or our services.</p>
+            <p>Our total liability in connection with any claim arising from the use of this website or our services shall not exceed the amount paid by you to us in the preceding 12 months.</p>
+            <p>This website and its content are provided on an "as is" and "as available" basis without warranties of any kind, express or implied.</p>
+
+            <h2>Governing Law</h2>
+            <p>These terms shall be governed by and construed in accordance with the laws of the Federal Democratic Republic of Ethiopia. Any disputes arising from these terms or your use of this website shall be subject to the exclusive jurisdiction of the courts of Addis Ababa, Ethiopia.</p>
+            <p>If any provision of these terms is found to be unenforceable, the remaining provisions shall continue in full force and effect.</p>
+
+            <h2>Contact</h2>
+            <p>For any questions regarding these terms, privacy practices, or data requests, please contact us at:</p>
+            <p><a href="mailto:hello@eyuelmulat.com">hello@eyuelmulat.com</a><br>Eyuel Mulat<br>Addis Ababa, Ethiopia</p>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-primary text-background px-10 md:px-[80px]">
+    <div class="pt-20 pb-16 grid grid-cols-12 gap-8">
+      <div class="col-span-12 md:col-span-3 flex flex-col gap-3">
+        <a href="mailto:hello@eyuelmulat.com" class="label-caps text-[11px] tracking-[0.25em] text-background/90 hover:text-background transition-colors" data-footer-email>hello@eyuelmulat.com</a>
+        <span class="label-caps text-[11px] tracking-[0.25em] text-background/60" data-footer-phone>+251 95 355 3856</span>
+      </div>
+      <div class="col-span-12 md:col-span-3 flex flex-col gap-4">
+        <span class="label-caps text-[11px] tracking-[0.25em] text-background/60" data-footer-address>Addis Ababa, Ethiopia</span>
+        <a href="/contact.html" class="inline-flex items-center gap-3 label-caps text-[11px] tracking-[0.25em] text-background hover:text-accent transition-colors">
+          Get in Touch
+          <span class="material-symbols-outlined text-accent" style="font-size:14px;line-height:1">arrow_forward</span>
+        </a>
+      </div>
+      <div class="col-span-6 md:col-span-3 flex flex-col gap-3" data-footer-pages>
+        <span class="label-caps text-[10px] tracking-[0.3em] text-background/50 mb-3 block">Pages</span>
+        <a href="/about.html" class="label-caps text-[11px] tracking-[0.2em] text-background/80 hover:text-background transition-colors">About</a>
+        <a href="/work.html" class="label-caps text-[11px] tracking-[0.2em] text-background/80 hover:text-background transition-colors">Work</a>
+        <a href="/insights.html" class="label-caps text-[11px] tracking-[0.2em] text-background/80 hover:text-background transition-colors">Insights</a>
+        <a href="/contact.html" class="label-caps text-[11px] tracking-[0.2em] text-background/80 hover:text-background transition-colors">Contact</a>
+        <a href="/terms.html" class="label-caps text-[11px] tracking-[0.2em] text-background/80 hover:text-background transition-colors">Terms</a>
+      </div>
+      <div class="col-span-6 md:col-span-3 flex flex-col gap-3" data-footer-social>
+        <span class="label-caps text-[10px] tracking-[0.3em] text-background/50 mb-3 block">Follow</span>
+        <a href="#" class="label-caps text-[11px] tracking-[0.2em] text-background/80 hover:text-background transition-colors">Instagram</a>
+        <a href="#" class="label-caps text-[11px] tracking-[0.2em] text-background/80 hover:text-background transition-colors">LinkedIn</a>
+        <a href="#" class="label-caps text-[11px] tracking-[0.2em] text-background/80 hover:text-background transition-colors">Behance</a>
+      </div>
+    </div>
+    <div class="overflow-hidden" data-footer-logo>
+      <div class="footer-brand font-display uppercase leading-none text-background">EYUEL MULAT</div>
+    </div>
+    <div class="py-6 text-center">
+      <span class="text-[10px] text-background/50 uppercase tracking-widest" data-footer-copyright>© 2024 Eyuel Mulat</span>
+    </div>
+  </footer>
+
+  <script type="module" src="/src/js/main.js"></script>
+  <script type="module" src="/src/js/content-loader.js"></script>
+  <script type="module" src="/src/js/analytics-sdk.js"></script>
+  <script>
+  // Load terms content from API
+  ;(async function () {
+    try {
+      const res = await fetch('/api/terms')
+      if (!res.ok) return
+      const data = await res.json()
+      if (data.content) {
+        const el = document.getElementById('terms-body')
+        if (el) el.innerHTML = data.content
+      }
+    } catch (e) {}
+  })()
+  </script>
+  <script src="/src/js/cookie-consent.js"></script>
+  <script>if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{})</script>
+</body>
+</html>

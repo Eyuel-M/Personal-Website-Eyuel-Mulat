@@ -15,6 +15,9 @@
   // Respect Do Not Track
   if (navigator.doNotTrack === '1') return
 
+  // Respect cookie consent — decline means no analytics
+  if (localStorage.getItem('em_consent') === 'false') return
+
   const INGEST = '/api/analytics/ingest'
   const HEARTBEAT_MS = 30_000
 

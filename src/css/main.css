@@ -374,3 +374,40 @@
 [data-editable-type="html"] a:hover {
   color: #FF4F00;
 }
+
+/* ─── Terms page: prose typography ──────────────────────────────────────────── */
+.prose-terms h2 {
+  font-family: Anton, sans-serif;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  text-transform: uppercase;
+  letter-spacing: .02em;
+  margin: 3rem 0 1rem;
+  color: #0F0F0F;
+  line-height: 1.1;
+}
+.prose-terms h2:first-child { margin-top: 0; }
+.prose-terms p {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: #6B6868;
+  margin: 0 0 1.25rem;
+}
+.prose-terms ul {
+  margin: 0 0 1.25rem 1.5rem;
+  padding: 0;
+  list-style: disc;
+}
+.prose-terms li {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: #6B6868;
+  margin-bottom: .5rem;
+}
+.prose-terms a {
+  color: #0F0F0F;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color .15s;
+}
+.prose-terms a:hover { color: #FF4F00; }
+.prose-terms strong { color: #1C1B1B; font-weight: 600; }

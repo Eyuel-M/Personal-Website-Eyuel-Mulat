@@ -274,9 +274,10 @@
         const nc = JSON.parse(localStorage.getItem('em_nav_cache') || '{}')
         allNavLinks = Array.isArray(nc.navLinks) ? nc.navLinks : []
       } catch {}
+      const KNOWN_LABELS = { '/terms.html': 'Terms & Conditions', '/privacy.html': 'Privacy' }
       const selected = ff.footerLinks.map(href => {
         const found = allNavLinks.find(l => l.href === href)
-        return found || { href, label: href.replace(/\//g, '').replace('.html', '') }
+        return found || { href, label: KNOWN_LABELS[href] || href.replace(/\//g, '').replace('.html', '') }
       })
       document.querySelectorAll('[data-footer-pages]').forEach(el => {
         el.innerHTML = ''
