@@ -261,42 +261,132 @@
     </script>
 
     <!-- ── Testimonials (03) ─────────────────────────────────────────────── -->
-    <section class="px-10 md:px-[80px] mb-40" id="testimonials-section" style="display:none">
-      <div class="section-header reveal">
-        <span class="label-caps tracking-[0.4em]">03 / Testimonials</span>
-        <span class="label-caps opacity-40">Clients</span>
-      </div>
-      <div id="testimonials-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <section class="border-t border-black/10 overflow-hidden mb-40" id="testimonials-section">
+      <div class="flex flex-col md:flex-row">
+        <!-- Left panel -->
+        <div class="md:w-80 lg:w-96 flex-shrink-0 px-10 md:pl-[80px] md:pr-12 py-16 md:py-24 md:border-r border-black/10 flex flex-col">
+          <div class="reveal">
+            <div class="flex items-center gap-2 mb-6">
+              <span class="w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0"></span>
+              <span class="label-caps text-[10px] tracking-[0.35em] text-accent" id="testi-suptitle">Client Stories</span>
+            </div>
+            <p class="label-caps text-[11px] tracking-[0.4em] text-on-surface/40 mb-6" id="testi-section-label">03 / Testimonials</p>
+            <p class="text-sm text-on-surface-variant leading-relaxed" id="testi-desc">Relationships built on clarity, craft, and results that speak for themselves.</p>
+          </div>
+          <div class="flex gap-3 mt-auto pt-10 reveal">
+            <button id="testi-prev" aria-label="Previous testimonial" class="w-10 h-10 border border-black/20 flex items-center justify-center text-on-surface-variant hover:border-primary hover:bg-primary hover:text-background transition-all duration-200">
+              <span class="material-symbols-outlined" style="font-size:16px">arrow_back</span>
+            </button>
+            <button id="testi-next" aria-label="Next testimonial" class="w-10 h-10 border border-black/20 flex items-center justify-center text-on-surface-variant hover:border-primary hover:bg-primary hover:text-background transition-all duration-200">
+              <span class="material-symbols-outlined" style="font-size:16px">arrow_forward</span>
+            </button>
+          </div>
+          <div class="mt-4 flex items-baseline gap-1 reveal">
+            <span id="testi-current" class="font-display text-3xl text-primary leading-none">01</span>
+            <span class="text-on-surface/20 text-sm mx-1">/</span>
+            <span id="testi-total" class="text-on-surface/40 text-sm">03</span>
+          </div>
+        </div>
+        <!-- Right panel -->
+        <div class="flex-1 px-10 md:px-16 lg:px-24 py-16 md:py-24 relative overflow-hidden">
+          <div class="font-display text-[120px] md:text-[160px] leading-[0.55] text-primary/[0.06] select-none pointer-events-none -ml-3 mb-2" aria-hidden="true">"</div>
+          <div id="testi-content" style="min-height:200px;transition:opacity .25s ease"></div>
+          <div id="testi-dots" class="flex gap-2 mt-8 items-center"></div>
+        </div>
       </div>
     </section>
     <script>
     ;(async function initTestimonials() {
+      var PLACEHOLDERS = [
+        {
+          id:'__p1', name:'A. Kebede', role:'CEO', company:'Nexus Technologies', rating:5,
+          comment:'Working with Eyuel was a transformative experience for our brand. The strategic clarity he brought to the visual identity gave us a foundation we can build on for years.',
+          extra:'The attention to detail and the seamless handoff process made the entire engagement exceptional.',
+          project:'Brand Identity'
+        },
+        {
+          id:'__p2', name:'S. Tesfaye', role:'Founder', company:'Meridian Studio', rating:5,
+          comment:'We needed a visual language that felt both premium and approachable. Eyuel nailed it. The result exceeded every brief we put in front of him.',
+          extra:'Our client retention improved significantly after the rebrand — the work speaks for itself.',
+          project:'Visual System'
+        },
+        {
+          id:'__p3', name:'M. Haile', role:'Creative Director', company:'Summit Advisory', rating:5,
+          comment:'The grid system and typography hierarchy Eyuel established have become the backbone of everything we produce. Disciplined, intentional, and beautifully executed.',
+          extra:'A rare talent who understands both aesthetics and the business rationale behind design decisions.',
+          project:'Design System'
+        },
+      ]
+
+      var items = PLACEHOLDERS
+      var current = 0
+
       try {
-        const r = await fetch('/api/testimonials')
-        if (!r.ok) return
-        const testimonials = await r.json()
-        if (!testimonials || !testimonials.length) return
-        const section = document.getElementById('testimonials-section')
-        const grid = document.getElementById('testimonials-grid')
-        if (!section || !grid) return
-        section.style.display = ''
-        testimonials.forEach(t => {
-          const stars = '★'.repeat(Math.max(1, Math.min(5, t.rating || 5))) + '☆'.repeat(5 - Math.max(1, Math.min(5, t.rating || 5)))
-          const card = document.createElement('div')
-          card.className = 'bg-surface-container-low border border-black/8 p-8 flex flex-col gap-6 reveal'
-          card.innerHTML = `
-            <div class="flex gap-1 text-accent text-xl leading-none">${stars}</div>
-            <blockquote class="text-base text-on-surface leading-relaxed flex-1">&ldquo;${(t.comment||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}&rdquo;</blockquote>
-            <div class="border-t border-black/8 pt-5 flex items-start justify-between gap-4">
-              <div>
-                <p class="font-semibold text-sm text-on-surface">${(t.name||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>
-                ${t.role || t.company ? `<p class="text-xs text-on-surface-variant mt-1">${[(t.role||'').replace(/</g,'&lt;'), (t.company||'').replace(/</g,'&lt;')].filter(Boolean).join(' · ')}</p>` : ''}
-              </div>
-              ${t.project ? `<span class="label-caps text-[10px] tracking-[0.2em] text-accent flex-shrink-0">${(t.project||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>` : ''}
-            </div>`
-          grid.appendChild(card)
+        var r = await fetch('/api/testimonials')
+        if (r.ok) { var d = await r.json(); if (d && d.length) items = d }
+      } catch(e) {}
+
+      try {
+        var cp = await fetch('/api/content/index')
+        if (cp.ok) {
+          var cd = await cp.json()
+          var flds = cd.fields || {}
+          if (flds['testimonials-suptitle']) document.getElementById('testi-suptitle').textContent = flds['testimonials-suptitle']
+          if (flds['testimonials-section-label']) document.getElementById('testi-section-label').textContent = flds['testimonials-section-label']
+          if (flds['testimonials-desc']) document.getElementById('testi-desc').textContent = flds['testimonials-desc']
+        }
+      } catch(e) {}
+
+      var contentEl = document.getElementById('testi-content')
+      var dotsEl = document.getElementById('testi-dots')
+      var currentEl = document.getElementById('testi-current')
+      var totalEl = document.getElementById('testi-total')
+      if (!contentEl) return
+
+      function pad(n) { return String(n).padStart(2,'0') }
+      function initials(name) { return (name||'?').split(' ').map(function(w){return w[0]||''}).join('').slice(0,2).toUpperCase() }
+      function esc(s) { return (s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+
+      function renderItem(idx) {
+        var t = items[idx]; if (!t) return
+        var stars = '★'.repeat(Math.max(1,Math.min(5,t.rating||5))) + '☆'.repeat(5-Math.max(1,Math.min(5,t.rating||5)))
+        contentEl.style.opacity = '0'
+        setTimeout(function() {
+          contentEl.innerHTML =
+            '<blockquote style="font-family:Anton,sans-serif;font-size:clamp(18px,2.5vw,26px);text-transform:uppercase;line-height:1.25;color:#0F0F0F;margin:0 0 28px">' + esc(t.comment) + '</blockquote>' +
+            (t.extra ? '<p style="font-size:14px;color:#6B6868;line-height:1.7;margin:0 0 28px;max-width:520px">' + esc(t.extra) + '</p>' : '') +
+            '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">' +
+              '<div style="width:44px;height:44px;border-radius:50%;background:#0F0F0F;color:#F5F2EE;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:Hanken Grotesk,sans-serif;flex-shrink:0">' + initials(t.name) + '</div>' +
+              '<div>' +
+                '<div style="color:#FF4F00;font-size:11px;letter-spacing:3px;margin-bottom:3px">' + stars + '</div>' +
+                '<p style="font-weight:600;font-size:13px;color:#0F0F0F;margin:0">' + esc(t.name) + '</p>' +
+                (t.role||t.company ? '<p style="font-size:11px;color:#6B6868;margin:2px 0 0">' + [esc(t.role),esc(t.company)].filter(Boolean).join(' · ') + '</p>' : '') +
+              '</div>' +
+              (t.project ? '<span style="margin-left:auto;font-size:9px;letter-spacing:.35em;text-transform:uppercase;font-weight:600;color:#FF4F00;opacity:.7">' + esc(t.project) + '</span>' : '') +
+            '</div>'
+          contentEl.style.opacity = '1'
+        }, 150)
+        if (currentEl) currentEl.textContent = pad(idx+1)
+        if (totalEl) totalEl.textContent = pad(items.length)
+        dotsEl.querySelectorAll('.testi-dot').forEach(function(dot,i) {
+          dot.style.background = i===idx ? '#0F0F0F' : 'rgba(15,15,15,.2)'
+          dot.style.width = i===idx ? '20px' : '6px'
         })
-      } catch (e) {}
+      }
+
+      items.forEach(function(_,i) {
+        var dot = document.createElement('button')
+        dot.className = 'testi-dot'
+        dot.setAttribute('aria-label','Go to testimonial '+(i+1))
+        dot.style.cssText = 'height:6px;border-radius:3px;border:none;cursor:pointer;transition:all .3s ease;background:rgba(15,15,15,.2);width:6px;padding:0'
+        dot.onclick = function(){ current=i; renderItem(i) }
+        dotsEl.appendChild(dot)
+      })
+
+      renderItem(0)
+
+      document.getElementById('testi-prev').onclick = function(){ current=(current-1+items.length)%items.length; renderItem(current) }
+      document.getElementById('testi-next').onclick = function(){ current=(current+1)%items.length; renderItem(current) }
     })()
     </script>
 

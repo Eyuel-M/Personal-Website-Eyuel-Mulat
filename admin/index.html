@@ -2159,6 +2159,42 @@ function renderTestimonials(){
   const c=document.getElementById('editor-inner')
   c.innerHTML=''
 
+  // ── Section Settings card ────────────────────────────────────────────────
+  const settingsCard=document.createElement('div');settingsCard.className='sc';settingsCard.style.marginBottom='24px'
+  const settingsInner=document.createElement('div');settingsInner.style.cssText='padding:16px 20px'
+  const settingsTitle=document.createElement('p');settingsTitle.style.cssText='font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--g600);margin:0 0 14px'
+  settingsTitle.textContent='Section Settings'
+  settingsInner.appendChild(settingsTitle)
+  const sFields=[
+    {key:'testimonials-suptitle',label:'Eyebrow Label',placeholder:'Client Stories'},
+    {key:'testimonials-section-label',label:'Section Label',placeholder:'03 / Testimonials'},
+    {key:'testimonials-desc',label:'Description',placeholder:'Relationships built on clarity, craft, and results.'},
+  ]
+  const sData={}
+  const sInputs={}
+  sFields.forEach(f=>{
+    const row=document.createElement('div');row.style.marginBottom='10px'
+    const lbl=document.createElement('label');lbl.className='fl';lbl.textContent=f.label;row.appendChild(lbl)
+    const inp=document.createElement('input');inp.className='fi';inp.placeholder=f.placeholder||'';inp.value='';inp.oninput=()=>sData[f.key]=inp.value
+    sInputs[f.key]=inp;row.appendChild(inp);settingsInner.appendChild(row)
+  })
+  // Load current values
+  api('GET','/api/content/index').then(cd=>{
+    const flds=(cd&&cd.fields)||{}
+    sFields.forEach(f=>{ if(flds[f.key]){sInputs[f.key].value=flds[f.key];sData[f.key]=flds[f.key]} })
+  }).catch(()=>{})
+  const sFoot=document.createElement('div');sFoot.style.cssText='display:flex;justify-content:flex-end;margin-top:12px'
+  const sBtn=document.createElement('button');sBtn.className='bp';sBtn.textContent='Save Settings'
+  sBtn.onclick=async()=>{
+    sBtn.disabled=true;sBtn.textContent='Saving…'
+    try{
+      await api('PUT','/api/content/index',{fields:sData})
+      sBtn.textContent='Saved';setTimeout(()=>{sBtn.disabled=false;sBtn.textContent='Save Settings'},1800)
+    }catch(e){sBtn.disabled=false;sBtn.textContent='Save Settings';alert('Failed to save settings.')}
+  }
+  sFoot.appendChild(sBtn);settingsInner.appendChild(sFoot)
+  settingsCard.appendChild(settingsInner);c.appendChild(settingsCard)
+
   // Header row with action buttons
   const hdr=document.createElement('div')
   hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px'
@@ -2225,6 +2261,7 @@ function renderTestimonials(){
             ${t.status!=='approved'?`<button class="ta-approve" data-id="${t.id}" style="font-size:11px;background:var(--green50);color:var(--green700);border:1px solid #86efac;border-radius:4px;padding:4px 10px;cursor:pointer;font-weight:600">Approve</button>`:''}
             ${t.status!=='rejected'&&t.status!=='archived'&&t.status!=='approved'?`<button class="ta-reject" data-id="${t.id}" style="font-size:11px;background:var(--red50);color:var(--red600);border:1px solid #fca5a5;border-radius:4px;padding:4px 10px;cursor:pointer;font-weight:600">Reject</button>`:''}
             ${t.status!=='archived'?`<button class="ta-archive" data-id="${t.id}" style="font-size:11px;background:none;border:1px solid var(--g200);color:var(--g500);border-radius:4px;padding:4px 10px;cursor:pointer">Archive</button>`:''}
+            <button class="ta-edit" data-id="${t.id}" style="font-size:11px;background:none;border:1px solid var(--navy);color:var(--navy);border-radius:4px;padding:4px 10px;cursor:pointer;font-weight:500">Edit</button>
             <button class="ta-delete" data-id="${t.id}" style="font-size:11px;background:none;border:none;color:var(--red400);cursor:pointer;padding:4px 8px;border-radius:4px">Delete</button>
           </div>
         </div>
@@ -2251,6 +2288,53 @@ function renderTestimonials(){
         await api('PATCH',`/api/admin/testimonials/${b.dataset.id}`,{status:'archived'})
         S.data=await api('GET','/api/admin/testimonials')
         renderList()
+      })
+      card.querySelectorAll('.ta-edit').forEach(b=>b.onclick=()=>{
+        const tid=b.dataset.id
+        const tobj=list.find(x=>String(x.id)===String(tid))||{}
+        const editOverlay=document.createElement('div')
+        editOverlay.style.cssText='position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center'
+        const editModal=document.createElement('div')
+        editModal.style.cssText='background:#fff;border-radius:12px;padding:32px;width:100%;max-width:500px;box-shadow:0 8px 48px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto'
+        const eh=document.createElement('h3');eh.style.cssText='font-size:15px;font-weight:600;margin:0 0 20px';eh.textContent='Edit Testimonial';editModal.appendChild(eh)
+        const ed={}
+        const eFields=[
+          {key:'name',label:'Name',placeholder:'Jane Smith',val:tobj.name||''},
+          {key:'company',label:'Company',placeholder:'Acme Inc',val:tobj.company||''},
+          {key:'role',label:'Role / Title',placeholder:'CEO',val:tobj.role||''},
+          {key:'project',label:'Project',placeholder:'Brand Identity',val:tobj.project||''},
+          {key:'comment',label:'Testimonial',placeholder:'Share your feedback…',type:'textarea',val:tobj.comment||''},
+          {key:'extra',label:'Secondary Quote (optional)',placeholder:'Additional context or highlight…',type:'textarea',val:tobj.extra||''},
+        ]
+        eFields.forEach(f=>{
+          const row=document.createElement('div');row.style.marginBottom='12px'
+          const lbl=document.createElement('label');lbl.className='fl';lbl.textContent=f.label;row.appendChild(lbl)
+          if(f.type==='textarea'){const ta=document.createElement('textarea');ta.className='fta';ta.rows=3;ta.placeholder=f.placeholder||'';ta.value=f.val;ta.oninput=()=>ed[f.key]=ta.value;ed[f.key]=f.val;row.appendChild(ta)}
+          else{const inp=document.createElement('input');inp.className='fi';inp.type='text';inp.placeholder=f.placeholder||'';inp.value=f.val;inp.oninput=()=>ed[f.key]=inp.value;ed[f.key]=f.val;row.appendChild(inp)}
+          editModal.appendChild(row)
+        })
+        const rrow=document.createElement('div');rrow.style.marginBottom='14px'
+        const rlbl=document.createElement('label');rlbl.className='fl';rlbl.textContent='Rating';rrow.appendChild(rlbl)
+        const rsel=document.createElement('select');rsel.className='fsel';ed.rating=tobj.rating||5
+        ;[5,4,3,2,1].forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent='★'.repeat(v)+'  ('+v+')';if(v===(tobj.rating||5))o.selected=true;rsel.appendChild(o)})
+        rsel.onchange=()=>ed.rating=parseInt(rsel.value)
+        rrow.appendChild(rsel);editModal.appendChild(rrow)
+        const eerr=document.createElement('p');eerr.style.cssText='color:var(--red600);font-size:12px;margin-bottom:12px;display:none';editModal.appendChild(eerr)
+        const efoot=document.createElement('div');efoot.style.cssText='display:flex;gap:8px;justify-content:flex-end'
+        const ecancel=document.createElement('button');ecancel.className='bs';ecancel.textContent='Cancel';ecancel.onclick=()=>editOverlay.remove()
+        const esave=document.createElement('button');esave.className='bp';esave.textContent='Save Changes'
+        esave.onclick=async()=>{
+          eerr.style.display='none';esave.disabled=true;esave.textContent='Saving…'
+          try{
+            await api('PATCH',`/api/admin/testimonials/${tid}`,ed)
+            S.data=await api('GET','/api/admin/testimonials')
+            editOverlay.remove();renderList()
+          }catch(e){eerr.textContent=e.message||'Failed.';eerr.style.display='block';esave.disabled=false;esave.textContent='Save Changes'}
+        }
+        efoot.appendChild(ecancel);efoot.appendChild(esave);editModal.appendChild(efoot)
+        editOverlay.appendChild(editModal)
+        editOverlay.onclick=e=>{if(e.target===editOverlay)editOverlay.remove()}
+        document.body.appendChild(editOverlay)
       })
       card.querySelectorAll('.ta-delete').forEach(b=>b.onclick=async()=>{
         if(!confirm('Delete this testimonial?'))return
@@ -2324,6 +2408,7 @@ function renderTestimonials(){
       {key:'role',label:'Role / Title',placeholder:'CEO'},
       {key:'project',label:'Project',placeholder:'Brand Identity'},
       {key:'comment',label:'Testimonial',placeholder:'Share your feedback…',type:'textarea'},
+      {key:'extra',label:'Secondary Quote (optional)',placeholder:'Additional context or highlight…',type:'textarea'},
     ]
     fields2.forEach(f=>{
       const row=document.createElement('div');row.style.marginBottom='14px'

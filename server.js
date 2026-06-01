@@ -547,10 +547,21 @@ app.post('/api/insight', auth, (req, res) => {
   })
 
   // ── Terms ─────────────────────────────────────────────────────────────────
+  function getDefaultTermsContent() {
+    try {
+      const html = fs.readFileSync(path.join(__dirname, 'terms.html'), 'utf8')
+      const m = html.match(/id="terms-body"[^>]*>([\s\S]+?)\s*<\/div>\s*<\/div>\s*<\/div>\s*<\/section>/)
+      return m ? m[1].trim() : ''
+    } catch { return '' }
+  }
   app.get('/api/terms', (req, res) => {
     const f = path.join(CONTENT_DIR, 'terms.json')
-    if (!fs.existsSync(f)) return res.json({ content: '', visible: true, updatedAt: null })
-    try { res.json(JSON.parse(fs.readFileSync(f, 'utf8'))) } catch { res.json({ content: '', visible: true, updatedAt: null }) }
+    if (!fs.existsSync(f)) return res.json({ content: getDefaultTermsContent(), visible: true, updatedAt: null })
+    try {
+      const saved = JSON.parse(fs.readFileSync(f, 'utf8'))
+      if (!saved.content) saved.content = getDefaultTermsContent()
+      res.json(saved)
+    } catch { res.json({ content: getDefaultTermsContent(), visible: true, updatedAt: null }) }
   })
   app.put('/api/terms', auth, (req, res) => {
     const data = { content: req.body.content || '', visible: req.body.visible !== false, updatedAt: new Date().toISOString() }
@@ -583,6 +594,7 @@ app.post('/api/insight', auth, (req, res) => {
       role: req.body.role || '',
       rating: Number(req.body.rating) || 5,
       comment: req.body.comment || '',
+      extra: req.body.extra || '',
       project: req.body.project || '',
       source: 'manual',
       status: 'approved',
