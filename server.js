@@ -546,6 +546,121 @@ app.post('/api/insight', auth, (req, res) => {
     res.json({ ok: true })
   })
 
+  // ── Terms ─────────────────────────────────────────────────────────────────
+  app.get('/api/terms', (req, res) => {
+    const f = path.join(CONTENT_DIR, 'terms.json')
+    if (!fs.existsSync(f)) return res.json({ content: '', visible: true, updatedAt: null })
+    try { res.json(JSON.parse(fs.readFileSync(f, 'utf8'))) } catch { res.json({ content: '', visible: true, updatedAt: null }) }
+  })
+  app.put('/api/terms', auth, (req, res) => {
+    const data = { content: req.body.content || '', visible: req.body.visible !== false, updatedAt: new Date().toISOString() }
+    fs.writeFileSync(path.join(CONTENT_DIR, 'terms.json'), JSON.stringify(data, null, 2))
+    res.json({ ok: true })
+  })
+
+  // ── Testimonials ───────────────────────────────────────────────────────────
+  function readTestimonials() {
+    const f = path.join(CONTENT_DIR, 'testimonials.json')
+    return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : []
+  }
+  function writeTestimonials(list) {
+    fs.writeFileSync(path.join(CONTENT_DIR, 'testimonials.json'), JSON.stringify(list, null, 2))
+  }
+
+  app.get('/api/testimonials', (req, res) => {
+    res.json(readTestimonials().filter(t => t.status === 'approved'))
+  })
+  app.get('/api/admin/testimonials', auth, (req, res) => {
+    res.json(readTestimonials())
+  })
+  app.post('/api/admin/testimonials', auth, (req, res) => {
+    const list = readTestimonials()
+    const item = {
+      id: Date.now(),
+      name: req.body.name || '',
+      email: req.body.email || '',
+      company: req.body.company || '',
+      role: req.body.role || '',
+      rating: Number(req.body.rating) || 5,
+      comment: req.body.comment || '',
+      project: req.body.project || '',
+      source: 'manual',
+      status: 'approved',
+      submittedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+    }
+    list.unshift(item)
+    writeTestimonials(list)
+    res.json({ ok: true, item })
+  })
+  app.patch('/api/admin/testimonials/:id', auth, (req, res) => {
+    const list = readTestimonials()
+    const idx = list.findIndex(t => String(t.id) === String(req.params.id))
+    if (idx < 0) return res.status(404).json({ error: 'Not found' })
+    list[idx] = { ...list[idx], ...req.body, id: list[idx].id }
+    writeTestimonials(list)
+    res.json({ ok: true, item: list[idx] })
+  })
+  app.delete('/api/admin/testimonials/:id', auth, (req, res) => {
+    writeTestimonials(readTestimonials().filter(t => String(t.id) !== String(req.params.id)))
+    res.json({ ok: true })
+  })
+  app.post('/api/admin/testimonials/request', auth, async (req, res) => {
+    const { name, email, project } = req.body
+    if (!name || !email) return res.status(400).json({ error: 'Name and email are required.' })
+    const token = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2) + Date.now().toString(36)
+    const list = readTestimonials()
+    const item = {
+      id: Date.now(),
+      name,
+      email,
+      company: '',
+      role: '',
+      rating: null,
+      comment: '',
+      project: project || '',
+      source: 'email',
+      status: 'pending-submission',
+      token,
+      requestedAt: new Date().toISOString(),
+      submittedAt: null,
+      createdAt: new Date().toISOString(),
+    }
+    list.unshift(item)
+    writeTestimonials(list)
+    const acct = getAccount()
+    if (acct.smtpUser && acct.smtpPass) {
+      try {
+        const origin = process.env.SITE_URL || `http://localhost:${PORT}`
+        const link = `${origin}/testimonial.html?token=${token}`
+        const t = nodemailer.createTransport({ service: 'gmail', auth: { user: acct.smtpUser, pass: acct.smtpPass } })
+        await t.sendMail({
+          from: `"Eyuel Mulat" <${acct.smtpUser}>`,
+          to: email,
+          subject: 'Share your experience working with Eyuel Mulat',
+          html: `<div style="font-family:sans-serif;max-width:520px;padding:40px;color:#111;line-height:1.6"><h2 style="font-size:24px;font-weight:700;margin:0 0 16px">Hi ${name},</h2><p style="margin:0 0 16px;color:#444">Thank you for working with me. I'd love to hear your feedback — it only takes a minute.</p><a href="${link}" style="display:inline-block;background:#0F0F0F;color:#fff;text-decoration:none;padding:14px 28px;border-radius:4px;font-weight:600;font-size:14px;letter-spacing:.05em;margin:8px 0 24px">Share Your Testimonial</a><p style="font-size:12px;color:#999;margin:0">Or copy this link: ${link}</p></div>`,
+        })
+      } catch(e) { console.warn('Testimonial email failed:', e.message) }
+    }
+    res.json({ ok: true, item })
+  })
+  app.post('/api/testimonials/submit/:token', (req, res) => {
+    const list = readTestimonials()
+    const idx = list.findIndex(t => t.token === req.params.token && t.status === 'pending-submission')
+    if (idx < 0) return res.status(404).json({ error: 'Invalid or expired token.' })
+    list[idx] = {
+      ...list[idx],
+      role: req.body.role || list[idx].role,
+      rating: Number(req.body.rating) || 5,
+      comment: req.body.comment || '',
+      status: 'pending',
+      submittedAt: new Date().toISOString(),
+      token: undefined,
+    }
+    writeTestimonials(list)
+    res.json({ ok: true })
+  })
+
   // ── Enquiries ──────────────────────────────────────────────────────────────
   app.post('/api/enquiry', (req, res) => {
     const f = path.join(CONTENT_DIR, 'enquiries.json')
@@ -700,6 +815,38 @@ app.post('/api/insight', auth, (req, res) => {
     res.json(fs.existsSync(f) ? JSON.parse(fs.readFileSync(f)) : [])
   })
 
+  // ── Sitemap & Robots ───────────────────────────────────────────────────────
+  app.get('/robots.txt', (req, res) => {
+    const origin = process.env.SITE_URL || `https://eyuelmulat.com`
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8')
+    res.send(`User-agent: *\nDisallow: /admin/\nDisallow: /api/\n\nSitemap: ${origin}/sitemap.xml\n`)
+  })
+  app.get('/sitemap.xml', (req, res) => {
+    const origin = process.env.SITE_URL || `https://eyuelmulat.com`
+    const staticPages = ['/', '/about.html', '/work.html', '/insights.html', '/contact.html', '/terms.html']
+    const urls = staticPages.map(p => `  <url><loc>${origin}${p}</loc><changefreq>weekly</changefreq></url>`)
+    try {
+      const pf = path.join(CONTENT_DIR, 'portfolio.json')
+      if (fs.existsSync(pf)) {
+        const portfolio = JSON.parse(fs.readFileSync(pf, 'utf8'))
+        ;(portfolio.items || []).filter(p => !p.status || p.status === 'published').forEach(p => {
+          urls.push(`  <url><loc>${origin}/work/${p.slug}.html</loc><changefreq>monthly</changefreq></url>`)
+        })
+      }
+    } catch {}
+    try {
+      const af = path.join(CONTENT_DIR, 'insights-data.json')
+      if (fs.existsSync(af)) {
+        const insightsData = JSON.parse(fs.readFileSync(af, 'utf8'))
+        ;(insightsData.items || []).forEach(a => {
+          urls.push(`  <url><loc>${origin}/insights/${a.slug}.html</loc><changefreq>monthly</changefreq></url>`)
+        })
+      }
+    } catch {}
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8')
+    res.send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>\n`)
+  })
+
   // ── Analytics ──────────────────────────────────────────────────────────────
   app.post('/api/analytics/ingest', ingestHandler)
   app.use('/api/analytics', auth, analyticsRouter)
@@ -718,15 +865,48 @@ app.post('/api/insight', auth, (req, res) => {
 function navHTML() {
   return `  <nav class="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-sm">
     <div class="flex justify-between items-center px-10 md:px-[80px] py-8">
-      <a href="/" class="font-display text-2xl text-primary uppercase tracking-wide">EYUEL MULAT</a>
+      <a href="/" class="font-display text-2xl text-primary uppercase tracking-wide" data-nav-logo>EYUEL MULAT</a>
       <div class="hidden md:flex gap-12 items-center">
         <a href="/about.html" class="nav-link" data-nav="about">About</a>
         <a href="/work.html" class="nav-link" data-nav="work">Work</a>
         <a href="/insights.html" class="nav-link" data-nav="insights">Insights</a>
       </div>
-      <a href="/contact.html" class="nav-cta" data-nav="contact">Contact</a>
+      <a href="/contact.html" class="hidden md:inline-flex nav-cta" data-nav="contact">Contact</a>
+      <button id="mob-menu-btn" aria-label="Open menu" aria-expanded="false" style="display:none;background:none;border:none;cursor:pointer;padding:4px;z-index:51;position:relative;flex-direction:column;gap:5px;align-items:flex-end;justify-content:center;width:32px;height:28px">
+        <span id="hb-1" style="display:block;width:24px;height:1.5px;background:#0F0F0F;transition:transform .3s,opacity .3s;transform-origin:center"></span>
+        <span id="hb-2" style="display:block;width:24px;height:1.5px;background:#0F0F0F;transition:transform .3s,opacity .3s"></span>
+        <span id="hb-3" style="display:block;width:16px;height:1.5px;background:#0F0F0F;transition:transform .3s,width .3s;transform-origin:center"></span>
+      </button>
     </div>
-  </nav>`
+  </nav>
+  <div id="mob-menu" aria-hidden="true" style="position:fixed;inset:0;z-index:49;background:#0F0F0F;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;padding:100px 40px 48px;overflow-y:auto">
+    <nav style="display:flex;flex-direction:column">
+      <a href="/" style="font-family:Anton,sans-serif;font-size:clamp(36px,9vw,56px);text-transform:uppercase;color:rgba(245,242,238,.9);text-decoration:none;display:block;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.07);transition:color .2s" onmouseover="this.style.color='#FF4F00'" onmouseout="this.style.color='rgba(245,242,238,.9)'">Home</a>
+      <a href="/about.html" style="font-family:Anton,sans-serif;font-size:clamp(36px,9vw,56px);text-transform:uppercase;color:rgba(245,242,238,.9);text-decoration:none;display:block;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.07);transition:color .2s" onmouseover="this.style.color='#FF4F00'" onmouseout="this.style.color='rgba(245,242,238,.9)'">About</a>
+      <a href="/work.html" style="font-family:Anton,sans-serif;font-size:clamp(36px,9vw,56px);text-transform:uppercase;color:rgba(245,242,238,.9);text-decoration:none;display:block;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.07);transition:color .2s" onmouseover="this.style.color='#FF4F00'" onmouseout="this.style.color='rgba(245,242,238,.9)'">Work</a>
+      <a href="/insights.html" style="font-family:Anton,sans-serif;font-size:clamp(36px,9vw,56px);text-transform:uppercase;color:rgba(245,242,238,.9);text-decoration:none;display:block;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.07);transition:color .2s" onmouseover="this.style.color='#FF4F00'" onmouseout="this.style.color='rgba(245,242,238,.9)'">Insights</a>
+      <a href="/contact.html" style="font-family:Anton,sans-serif;font-size:clamp(36px,9vw,56px);text-transform:uppercase;color:rgba(245,242,238,.9);text-decoration:none;display:block;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.07);transition:color .2s" onmouseover="this.style.color='#FF4F00'" onmouseout="this.style.color='rgba(245,242,238,.9)'">Contact</a>
+      <a href="/terms.html" style="font-family:Anton,sans-serif;font-size:clamp(20px,4vw,28px);text-transform:uppercase;color:rgba(245,242,238,.35);text-decoration:none;display:block;padding:12px 0;margin-top:20px;transition:color .2s" onmouseover="this.style.color='rgba(245,242,238,.7)'" onmouseout="this.style.color='rgba(245,242,238,.35)'">Terms</a>
+    </nav>
+    <div style="margin-top:auto;padding-top:32px;border-top:1px solid rgba(255,255,255,.1)">
+      <a href="mailto:hello@eyuelmulat.com" style="font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:rgba(245,242,238,.4);text-decoration:none">hello@eyuelmulat.com</a>
+    </div>
+  </div>
+  <script>
+  ;(function(){
+    var btn=document.getElementById('mob-menu-btn');
+    var menu=document.getElementById('mob-menu');
+    if(!btn||!menu)return;
+    var l1=document.getElementById('hb-1'),l2=document.getElementById('hb-2'),l3=document.getElementById('hb-3');
+    var isOpen=false;
+    function checkMobile(){btn.style.display=window.innerWidth<768?'flex':'none';}
+    checkMobile();window.addEventListener('resize',checkMobile);
+    function openMenu(){isOpen=true;menu.style.transform='translateX(0)';menu.setAttribute('aria-hidden','false');btn.setAttribute('aria-expanded','true');document.body.style.overflow='hidden';if(l1)l1.style.transform='translateY(6.75px) rotate(45deg)';if(l2)l2.style.opacity='0';if(l3){l3.style.width='24px';l3.style.transform='translateY(-6.75px) rotate(-45deg)';}}
+    function closeMenu(){isOpen=false;menu.style.transform='translateX(100%)';menu.setAttribute('aria-hidden','true');btn.setAttribute('aria-expanded','false');document.body.style.overflow='';if(l1)l1.style.transform='';if(l2)l2.style.opacity='1';if(l3){l3.style.width='16px';l3.style.transform='';}}
+    btn.addEventListener('click',function(){isOpen?closeMenu():openMenu();});
+    menu.querySelectorAll('a').forEach(function(a){a.addEventListener('click',closeMenu);});
+  })();
+  </script>`
 }
 
 function footerHTML() {
@@ -746,6 +926,7 @@ function footerHTML() {
         <a href="/work.html" class="label-caps text-[11px] tracking-[0.2em] text-background/80 hover:text-background transition-colors">Work</a>
         <a href="/insights.html" class="label-caps text-[11px] tracking-[0.2em] text-background/80 hover:text-background transition-colors">Insights</a>
         <a href="/contact.html" class="label-caps text-[11px] tracking-[0.2em] text-background/80 hover:text-background transition-colors">Contact</a>
+        <a href="/terms.html" class="label-caps text-[11px] tracking-[0.2em] text-background/80 hover:text-background transition-colors">Terms</a>
       </div>
       <div class="col-span-6 md:col-span-3 flex flex-col gap-3" data-footer-social>
         <span class="label-caps text-[10px] tracking-[0.3em] text-background/50 mb-3 block">Follow</span>
@@ -768,6 +949,8 @@ function headHTML(title, description = '') {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;600;700&display=block" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
+  <link rel="manifest" href="/manifest.json"/>
+  <meta name="theme-color" content="#0F0F0F"/>
   <link rel="stylesheet" href="/src/css/main.css"/>`
 }
 
@@ -894,6 +1077,8 @@ ${footerHTML()}
   <script type="module" src="/src/js/main.js"></script>
   <script type="module" src="/src/js/content-loader.js"></script>
   <script type="module" src="/src/js/analytics-sdk.js"></script>
+  <script src="/src/js/cookie-consent.js"></script>
+  <script>if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{})</script>
 </body>
 </html>`
 }
@@ -962,6 +1147,8 @@ ${footerHTML()}
   <script type="module" src="/src/js/main.js"></script>
   <script type="module" src="/src/js/content-loader.js"></script>
   <script type="module" src="/src/js/analytics-sdk.js"></script>
+  <script src="/src/js/cookie-consent.js"></script>
+  <script>if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{})</script>
 </body>
 </html>`
 }
