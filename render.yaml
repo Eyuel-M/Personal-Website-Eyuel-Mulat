@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: eyuelmulat-portfolio
+    runtime: node
+    buildCommand: npm install && npm run build:css && npx prisma generate
+    startCommand: npx prisma db push --accept-data-loss && node server.js
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: DATABASE_URL
+        sync: false
+      - key: ADMIN_PASS
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: SITE_URL
+        sync: false

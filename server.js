@@ -8,6 +8,7 @@ import nodemailer from 'nodemailer'
 import { ImapFlow } from 'imapflow'
 import { simpleParser } from 'mailparser'
 import { ingestHandler, analyticsRouter } from './analytics-server.js'
+import { restoreFromDb, patchFsWrites } from './src/content-persist.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const PORT = process.env.PORT || 3001
@@ -1168,6 +1169,8 @@ ${footerHTML()}
 // ── Standalone mode (npm run admin) ─────────────────────────────────────────
 const isMain = process.argv[1] === fileURLToPath(import.meta.url)
 if (isMain) {
+  patchFsWrites(CONTENT_DIR)        // intercept writes → mirror to DB
+  await restoreFromDb(CONTENT_DIR)  // pull saved content from DB on startup
   const app = createApiApp()
   app.use('/admin', express.static(path.join(__dirname, 'admin')))
   // Serve pre-compiled Tailwind CSS if available (production).
