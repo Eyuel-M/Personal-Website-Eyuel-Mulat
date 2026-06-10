@@ -849,6 +849,7 @@ app.post('/api/insight', auth, (req, res) => {
   // JSON error handler — only for API routes; non-API 404s fall through to static serving
   // eslint-disable-next-line no-unused-vars
   app.use((err, req, res, next) => {
+    console.log('[DIAG] error handler hit, path:', req.path, 'status:', err.status, 'msg:', err.message)
     if (req.path.startsWith('/api/')) {
       res.status(err.status || 500).json({ error: err.message || 'Internal server error' })
     } else if (err.status === 404) {
@@ -1179,9 +1180,15 @@ if (isMain) {
   if (fs.existsSync(compiledCss)) {
     app.get('/src/css/main.css', (_req, res) => res.sendFile(compiledCss))
   }
-  // Explicit routes for root and all top-level HTML pages — bypasses any Express 5
-  // 404-to-error-handler routing that would otherwise intercept static file requests
-  app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')))
+  // Diagnostic: confirm isMain block is running and paths are correct
+  console.log('[DIAG] isMain block running, __dirname:', __dirname)
+  console.log('[DIAG] index.html exists:', fs.existsSync(path.join(__dirname, 'index.html')))
+
+  // Explicit routes for root and all top-level HTML pages
+  app.get('/', (req, res) => {
+    console.log('[DIAG] GET / handler hit')
+    res.sendFile(path.join(__dirname, 'index.html'))
+  })
   app.get('/:page.html', (req, res, next) => {
     const filePath = path.join(__dirname, req.params.page + '.html')
     if (fs.existsSync(filePath)) return res.sendFile(filePath)
