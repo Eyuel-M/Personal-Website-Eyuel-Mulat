@@ -243,6 +243,11 @@ export function createApiApp() {
 
   // ── Routes ────────────────────────────────────────────────────────────────
 
+  // Diagnostic endpoint — identifies which process is handling requests on this port
+  app.get('/diag', (req, res) => {
+    res.json({ pid: process.pid, dirname: __dirname, nodeEnv: process.env.NODE_ENV, port: PORT })
+  })
+
   // Login
   app.post('/api/login', (req, res) => {
     const acct = getAccount()
