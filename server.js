@@ -1184,10 +1184,16 @@ if (isMain) {
   console.log('[DIAG] isMain block running, __dirname:', __dirname)
   console.log('[DIAG] index.html exists:', fs.existsSync(path.join(__dirname, 'index.html')))
 
+  // Raw request logger — first middleware, logs every single request that reaches Express
+  app.use((req, res, next) => {
+    console.log('[REQUEST]', req.method, req.url)
+    next()
+  })
+
   // Explicit routes for root and all top-level HTML pages
   app.get('/', (req, res) => {
     console.log('[DIAG] GET / handler hit')
-    res.sendFile(path.join(__dirname, 'index.html'))
+    res.send('DIAG-OK: index.html would be served here')
   })
   app.get('/:page.html', (req, res, next) => {
     const filePath = path.join(__dirname, req.params.page + '.html')
