@@ -89,24 +89,6 @@ function seedIfMissing(filename, data) {
   if (!fs.existsSync(file)) fs.writeFileSync(file, JSON.stringify(data, null, 2))
 }
 
-seedIfMissing('portfolio.json', {
-  title: 'Work', subtitle: 'Selected Projects',
-  items: [
-    { id: 1716000000001, slug: 'nexus-dashboard', title: 'Nexus Dashboard', category: 'Branding & UI', client: 'Nexus Technologies', year: '2024', tags: ['Brand Identity', 'UI Design'], description: 'A high-performance SaaS interface designed for complex data visualization and seamless user workflows — precision at enterprise scale.', thumbnail: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBga90sr654rVPGPEaB3kJeifl98bSDxlZBsKWfUjsSFqSEteMcDzxZ2X8DI9wNnkiRQXmSPw2yPmztXBYxqj0GuDwUG1Acgtf8ZsPJYMCoHKuPOAdAK38hAzLpvGLwdL5W3U-6cG6Sc8hV6n30pgK_smwSP8kievA0z2dr8GJOsyctxdUC5RCqkfCnoZM-gaS6sG0aXQwWmbDLjY9nGrNFCRA_fLcJJEN4pNxaLHdDkwIZkpTEijUa6bP7s3cbA-WYecL_HK6Yg_0', scope: 'Brand Identity · UI Design', role: 'Creative Director', overviewH2: 'Data at scale. Clarity by design.', overviewText: '<p class="text-base text-on-surface-variant leading-relaxed mb-6">Nexus Technologies needed an interface that could handle enterprise-scale data while remaining immediately legible to any user. The challenge: complexity without confusion.</p><p class="text-base text-on-surface-variant leading-relaxed">We built a visual language rooted in spatial hierarchy — clear typographic scales, a restrained color palette, and a grid system precise enough to hold hundreds of data points without visual noise.</p>', img1: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDOWQNwCA_Sy3BPn64hPnpoO02uP_2_I6oW5rpYeyhmhbJcwdODE21QCKmNBnLYpjNRQvkZI7H-37UsPWD4dPdVF7KLHyKL4fMT6LjMz1R1Riqe4PDbEd8ECAxfvke5UBMQ2RnMElW_xDtjq2oan1PCWh863-eSkEa-k_8ihQV0Ww3edsCB43nZJJJqts4HseBRGEvomTagI29z3PqwNDUNQddqSueZb4rURX2KArszCjq8N-BVQXNl1h9vIjUAO0ihvRIynh-y3AM', deliverables: [{title:'Brand Identity',desc:'Logo system, color palette, typography scale, and brand guidelines for digital and print.'},{title:'UI Design System',desc:'Component library, layout patterns, and interaction states for the full dashboard product.'},{title:'Marketing Assets',desc:'Landing page design, social templates, and pitch deck visual system.'}], gallery: [], blocks: [], archivedBlocks: [] },
-    { id: 1716000000002, slug: 'vanguard-capital', title: 'Vanguard Capital', category: 'Identity System', client: 'Vanguard Capital Group', year: '2023', tags: ['Identity', 'Strategy', 'Print'], description: 'A comprehensive visual identity system for a category-defining brand. Structural rigour meets modern expression.', thumbnail: 'https://lh3.googleusercontent.com/aida-public/AB6AXuApiyh_3aaVjPbYqtnEYBYYCxdU270rhO_lQ0MlcPYGhxDlpPR1GJwvBolsdfXepO0m06UPWAFYvjKsHqwNyFnFZ8UzBq5qUYEMMzTm-PNLwhrRHkmHx-0UsTIVuo9CyfbyQq9j_TjkVdQJRQWNO7S__j6X-y8v3yxbf9p0MDfFO-3s9aIJzbpP4pDagWdhgpBHAFHN_BxkoMOkfgk9ur5yvt6DpaCaGorEo70Rhca1Zi8Pwd7VKUoRiXpeOMhV3pwXoZA8xxFUikw', scope: 'Identity · Strategy · Print', role: 'Brand Director', overviewH2: 'Authority built from the ground up.', overviewText: '<p class="text-base text-on-surface-variant leading-relaxed mb-6">Vanguard Capital was entering a crowded market with a differentiated thesis but a brand that didn\'t reflect it. They needed an identity that projected the same structural confidence as their investment philosophy.</p><p class="text-base text-on-surface-variant leading-relaxed">We built a system grounded in architectural geometry — a mark that works at billboard scale and business card scale, a typographic hierarchy that commands trust, and a color vocabulary that signals precision without coldness.</p>', img1: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDOWQNwCA_Sy3BPn64hPnpoO02uP_2_I6oW5rpYeyhmhbJcwdODE21QCKmNBnLYpjNRQvkZI7H-37UsPWD4dPdVF7KLHyKL4fMT6LjMz1R1Riqe4PDbEd8ECAxfvke5UBMQ2RnMElW_xDtjq2oan1PCWh863-eSkEa-k_8ihQV0Ww3edsCB43nZJJJqts4HseBRGEvomTagI29z3PqwNDUNQddqSueZb4rURX2KArszCjq8N-BVQXNl1h9vIjUAO0ihvRIynh-y3AM', deliverables: [{title:'Logo System',desc:'Primary mark, wordmark, and responsive lockups for all scales from digital favicon to exterior signage.'},{title:'Brand Standards',desc:'Comprehensive brand guidelines covering color, typography, photography style, and usage rules.'},{title:'Collateral Suite',desc:'Business cards, letterhead, pitch deck template, and investor report design system.'}], gallery: [], blocks: [], archivedBlocks: [] },
-  ],
-  archivedItems: [],
-})
-
-seedIfMissing('insights-data.json', {
-  items: [
-    { id: 1716000000003, slug: 'why-brand-systems-outlast-assets', title: 'Why Brand Systems Outlast Assets', category: 'Brand Strategy', date: '2024-05-01', excerpt: 'The difference between a brand that scales and one that fragments isn\'t budget — it\'s whether the thinking behind every visual decision is systematic or intuitive. Systems compound. Assets decay.', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDOWQNwCA_Sy3BPn64hPnpoO02uP_2_I6oW5rpYeyhmhbJcwdODE21QCKmNBnLYpjNRQvkZI7H-37UsPWD4dPdVF7KLHyKL4fMT6LjMz1R1Riqe4PDbEd8ECAxfvke5UBMQ2RnMElW_xDtjq2oan1PCWh863-eSkEa-k_8ihQV0Ww3edsCB43nZJJJqts4HseBRGEvomTagI29z3PqwNDUNQddqSueZb4rURX2KArszCjq8N-BVQXNl1h9vIjUAO0ihvRIynh-y3AM', body: '', blocks: [], archivedBlocks: [] },
-    { id: 1716000000004, slug: 'the-grid-beneath-everything', title: 'The Grid Beneath Everything', category: 'Typography', date: '2024-02-01', excerpt: 'Typographic grids aren\'t about constraint — they\'re about creating a framework flexible enough to hold any content while maintaining visual authority. How spatial systems become creative tools.', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBga90sr654rVPGPEaB3kJeifl98bSDxlZBsKWfUjsSFqSEteMcDzxZ2X8DI9wNnkiRQXmSPw2yPmztXBYxqj0GuDwUG1Acgtf8ZsPJYMCoHKuPOAdAK38hAzLpvGLwdL5W3U-6cG6Sc8hV6n30pgK_smwSP8kievA0z2dr8GJOsyctxdUC5RCqkfCnoZM-gaS6sG0aXQwWmbDLjY9nGrNFCRA_fLcJJEN4pNxaLHdDkwIZkpTEijUa6bP7s3cbA-WYecL_HK6Yg_0', body: '', blocks: [], archivedBlocks: [] },
-    { id: 1716000000005, slug: 'restraint-as-a-design-strategy', title: 'Restraint as a Design Strategy', category: 'Identity Design', date: '2023-10-01', excerpt: 'The hardest design decisions aren\'t what to add — they\'re what to remove. Architectural restraint as a discipline means trusting negative space, trusting the reader, and trusting the work itself.', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuApiyh_3aaVjPbYqtnEYBYYCxdU270rhO_lQ0MlcPYGhxDlpPR1GJwvBolsdfXepO0m06UPWAFYvjKsHqwNyFnFZ8UzBq5qUYEMMzTm-PNLwhrRHkmHx-0UsTIVuo9CyfbyQq9j_TjkVdQJRQWNO7S__j6X-y8v3yxbf9p0MDfFO-3s9aIJzbpP4pDagWdhgpBHAFHN_BxkoMOkfgk9ur5yvt6DpaCaGorEo70Rhca1Zi8Pwd7VKUoRiXpeOMhV3pwXoZA8xxFUikw', body: '', blocks: [], archivedBlocks: [] },
-  ],
-  archivedItems: [],
-})
-
 seedIfMissing('home.json', {
   fields: {
     'hero-label': { value: 'Strategy & Design' },
@@ -953,11 +935,23 @@ function footerHTML() {
   </footer>`
 }
 
+function getSiteSettings() {
+  const f = path.join(CONTENT_DIR, 'site.json')
+  try { return fs.existsSync(f) ? (JSON.parse(fs.readFileSync(f, 'utf8')).fields || {}) : {} }
+  catch { return {} }
+}
+
 function headHTML(title, description = '') {
+  const site = getSiteSettings()
+  const esc = s => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+  const favicon = site.favicon ? `\n  <link rel="icon" href="${site.favicon}"/>` : ''
+  const ogTitle = `\n  <meta property="og:title" content="${esc(site.siteTitle || (title + ' — Eyuel Mulat'))}"/>`
+  const ogDesc = (site.metaDescription || description) ? `\n  <meta property="og:description" content="${esc(site.metaDescription || description)}"/>` : ''
+  const ogImage = site.ogImage ? `\n  <meta property="og:image" content="${site.ogImage}"/>` : ''
   return `  <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>${title} — Eyuel Mulat</title>
-  ${description ? `<meta name="description" content="${description}"/>` : ''}
+  ${description ? `<meta name="description" content="${esc(description)}"/>` : ''}${favicon}${ogTitle}${ogDesc}${ogImage}
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;600;700&display=block" rel="stylesheet"/>
@@ -1187,6 +1181,28 @@ if (isMain) {
       if (fs.existsSync(candidate)) { req.url = p + '.html'; return next() }
     }
     next()
+  })
+  // Inject favicon + OG tags from site settings into static HTML pages
+  app.use((req, res, next) => {
+    const p = req.path
+    const resolved = p === '/' ? '/index.html' : p
+    if (!resolved.endsWith('.html') || resolved.startsWith('/admin')) return next()
+    const filePath = path.join(__dirname, resolved)
+    if (!fs.existsSync(filePath)) return next()
+    try {
+      const site = getSiteSettings()
+      const esc = s => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+      let tags = ''
+      if (site.favicon) tags += `\n  <link rel="icon" href="${site.favicon}"/>`
+      if (site.siteTitle) tags += `\n  <meta property="og:title" content="${esc(site.siteTitle)}"/>`
+      if (site.metaDescription) tags += `\n  <meta property="og:description" content="${esc(site.metaDescription)}"/>`
+      if (site.ogImage) tags += `\n  <meta property="og:image" content="${site.ogImage}"/>`
+      if (!tags) return next()
+      let html = fs.readFileSync(filePath, 'utf8')
+      html = html.replace('</head>', tags + '\n</head>')
+      res.setHeader('Content-Type', 'text/html; charset=utf-8')
+      return res.send(html)
+    } catch { return next() }
   })
   app.use(express.static(path.join(__dirname)))
   app.use((req, res) => res.status(404).sendFile(path.join(__dirname, '404.html')))
