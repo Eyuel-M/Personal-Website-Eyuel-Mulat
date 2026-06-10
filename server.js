@@ -1161,7 +1161,7 @@ ${footerHTML()}
 }
 
 // ── Standalone mode (npm run admin) ─────────────────────────────────────────
-const isMain = process.argv[1] === fileURLToPath(import.meta.url)
+const isMain = process.argv[1] === fileURLToPath(import.meta.url) || process.env.NODE_ENV === 'production'
 if (isMain) {
   patchFsWrites(CONTENT_DIR)        // intercept writes → mirror to DB
   await restoreFromDb(CONTENT_DIR)  // pull saved content from DB on startup
