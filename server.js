@@ -1170,6 +1170,12 @@ const isMain = process.argv[1] === fileURLToPath(import.meta.url)
 if (isMain) {
   const app = createApiApp()
   app.use('/admin', express.static(path.join(__dirname, 'admin')))
+  // Serve pre-compiled Tailwind CSS if available (production).
+  // In dev, Vite intercepts /src/css/main.css before Express touches it.
+  const compiledCss = path.join(__dirname, 'public', 'css', 'main.css')
+  if (fs.existsSync(compiledCss)) {
+    app.get('/src/css/main.css', (_req, res) => res.sendFile(compiledCss))
+  }
   // Rewrite clean URLs → .html before static serving
   app.use((req, res, next) => {
     const p = req.path
