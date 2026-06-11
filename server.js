@@ -243,11 +243,6 @@ export function createApiApp() {
 
   // ── Routes ────────────────────────────────────────────────────────────────
 
-  // Diagnostic endpoint — identifies which process is handling requests on this port
-  app.get('/diag', (req, res) => {
-    res.json({ pid: process.pid, dirname: __dirname, nodeEnv: process.env.NODE_ENV, port: PORT })
-  })
-
   // Login
   app.post('/api/login', (req, res) => {
     const acct = getAccount()
@@ -1185,21 +1180,6 @@ if (isMain) {
   if (fs.existsSync(compiledCss)) {
     app.get('/src/css/main.css', (_req, res) => res.sendFile(compiledCss))
   }
-  // Diagnostic: confirm isMain block is running and paths are correct
-  console.log('[DIAG] isMain block running, __dirname:', __dirname)
-  console.log('[DIAG] index.html exists:', fs.existsSync(path.join(__dirname, 'index.html')))
-
-  // Raw request logger — first middleware, logs every single request that reaches Express
-  app.use((req, res, next) => {
-    console.log('[REQUEST]', req.method, req.url)
-    next()
-  })
-
-  // Explicit routes for root and all top-level HTML pages
-  app.get('/', (req, res) => {
-    console.log('[DIAG] GET / handler hit')
-    res.send('DIAG-OK: index.html would be served here')
-  })
   app.get('/:page.html', (req, res, next) => {
     const filePath = path.join(__dirname, req.params.page + '.html')
     if (fs.existsSync(filePath)) return res.sendFile(filePath)
