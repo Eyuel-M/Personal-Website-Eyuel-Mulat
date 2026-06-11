@@ -2499,9 +2499,9 @@ async function renderAnalytics(){
   c.appendChild(loadEl)
 
   // ── Fetch all data ─────────────────────────────────────────────────────────
-  let ov={},ts=[],pages=[],sources=[],devData={devices:[],browsers:[]},evts=[],perf={},rt={}
+  let ov={},ts=[],pages=[],sources=[],devData={devices:[],browsers:[]},evts=[],perf={},rt={},locs=[]
   try{
-    ;[ov,ts,pages,sources,devData,evts,perf,rt]=await Promise.all([
+    ;[ov,ts,pages,sources,devData,evts,perf,rt,locs]=await Promise.all([
       api('GET',`/api/analytics/overview?range=${range}`),
       api('GET',`/api/analytics/timeseries?range=${range}`),
       api('GET',`/api/analytics/pages?range=${range}`),
@@ -2510,6 +2510,7 @@ async function renderAnalytics(){
       api('GET',`/api/analytics/events?range=${range}`),
       api('GET',`/api/analytics/performance?range=${range}`),
       api('GET','/api/analytics/realtime'),
+      api('GET',`/api/analytics/locations?range=${range}`),
     ])
   }catch(e){
     loadEl.textContent='Could not load analytics. Make sure the database is connected.'
@@ -2571,9 +2572,9 @@ async function renderAnalytics(){
 
   row2.appendChild(pCard);row2.appendChild(sCard);c.appendChild(row2)
 
-  // ── Devices + browsers ─────────────────────────────────────────────────────
+  // ── Devices + browsers + countries ────────────────────────────────────────
   const row3=document.createElement('div')
-  row3.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px'
+  row3.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px'
 
   const devCard=document.createElement('div')
   devCard.style.cssText='background:#fff;border:1px solid var(--g200);border-radius:12px;padding:20px 24px'
@@ -2585,7 +2586,13 @@ async function renderAnalytics(){
   const brRows=(devData.browsers||[]).map(b=>`<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--g100)"><div style="flex:1;font-size:12px;color:var(--g800)">${b.browser}</div><div style="width:80px;height:4px;background:var(--g100);border-radius:2px;flex-shrink:0"><div style="width:${Math.round(b.count/maxBr*100)}%;height:100%;background:var(--g900);border-radius:2px"></div></div><div style="font-size:11px;font-weight:600;color:var(--g600);width:28px;text-align:right;flex-shrink:0">${b.count}</div></div>`).join('')
   brCard.innerHTML=`<div style="font-size:12px;font-weight:600;color:var(--g700);margin-bottom:12px">Browsers</div>${brRows||'<p style="font-size:12px;color:var(--g400);padding:12px 0">No data yet</p>'}`
 
-  row3.appendChild(devCard);row3.appendChild(brCard);c.appendChild(row3)
+  const locCard=document.createElement('div')
+  locCard.style.cssText='background:#fff;border:1px solid var(--g200);border-radius:12px;padding:20px 24px'
+  const maxLoc=Math.max(1,...(locs||[]).map(l=>l.count))
+  const locRows=(locs||[]).slice(0,8).map(l=>`<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--g100)"><div style="flex:1;font-size:12px;color:var(--g800);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${l.country}</div><div style="width:60px;height:4px;background:var(--g100);border-radius:2px;flex-shrink:0"><div style="width:${Math.round(l.count/maxLoc*100)}%;height:100%;background:var(--g900);border-radius:2px"></div></div><div style="font-size:11px;font-weight:600;color:var(--g600);width:28px;text-align:right;flex-shrink:0">${l.count}</div></div>`).join('')
+  locCard.innerHTML=`<div style="font-size:12px;font-weight:600;color:var(--g700);margin-bottom:12px">Top Countries</div>${locRows||'<p style="font-size:12px;color:var(--g400);padding:12px 0">No location data yet — visit your site to start tracking</p>'}`
+
+  row3.appendChild(devCard);row3.appendChild(brCard);row3.appendChild(locCard);c.appendChild(row3)
 
   // ── Events + Performance ────────────────────────────────────────────────────
   const row4=document.createElement('div')

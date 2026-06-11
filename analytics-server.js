@@ -37,6 +37,29 @@ function isRateLimited(ip, limit = 120, windowMs = 60_000) {
   return false
 }
 
+// ── Geo lookup ────────────────────────────────────────────────────────────────
+const _geoCache = new Map()
+const _PRIVATE_RE = /^(127\.|10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.|::1$|fd|fc)/i
+
+async function lookupCountry(ip) {
+  if (!ip || _PRIVATE_RE.test(ip)) return null
+  if (_geoCache.has(ip)) return _geoCache.get(ip)
+  try {
+    const r = await fetch(`http://ip-api.com/json/${encodeURIComponent(ip)}?fields=status,country`, {
+      signal: AbortSignal.timeout(3000),
+    })
+    if (!r.ok) { _geoCache.set(ip, null); return null }
+    const d = await r.json()
+    const country = (d.status === 'success' && d.country) ? d.country : null
+    _geoCache.set(ip, country)
+    if (_geoCache.size > 2000) _geoCache.delete(_geoCache.keys().next().value)
+    return country
+  } catch {
+    _geoCache.set(ip, null)
+    return null
+  }
+}
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function anonymizeIp(ip = '') {
   const masked = ip.includes(':')
@@ -132,6 +155,10 @@ export async function ingestHandler(req, res) {
         },
         update: { lastSeenAt: new Date() },
       })
+      // Async geo lookup — don't block the response
+      lookupCountry(ip).then(country => {
+        if (country) prisma.session.updateMany({ where: { id: sessionId }, data: { country } }).catch(() => {})
+      }).catch(() => {})
 
     } else if (type === 'pageview') {
       if (!sessionId) return res.status(400).end()
@@ -381,6 +408,25 @@ analyticsRouter.get('/performance', async (req, res) => {
     })
   } catch (err) {
     console.error('[Analytics] performance error:', err.message)
+    res.status(500).json({ error: 'Internal error' })
+  }
+})
+
+// GET /api/analytics/locations?range=30d
+analyticsRouter.get('/locations', async (req, res) => {
+  if (!dbOk()) return res.json([])
+  try {
+    const { from } = getDateRange(req.query.range)
+    const rows = await prisma.session.groupBy({
+      by:      ['country'],
+      where:   { startedAt: { gte: from }, country: { not: null } },
+      _count:  { country: true },
+      orderBy: { _count: { country: 'desc' } },
+      take:    15,
+    })
+    res.json(rows.map(r => ({ country: r.country, count: r._count.country })))
+  } catch (err) {
+    console.error('[Analytics] locations error:', err.message)
     res.status(500).json({ error: 'Internal error' })
   }
 })
