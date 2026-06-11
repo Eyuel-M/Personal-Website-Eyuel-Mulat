@@ -2529,20 +2529,13 @@ async function renderAnalytics(){
   })
   c.appendChild(grid)
 
-  // Demo banner
-  if(isDemo){
-    const banner=document.createElement('div')
-    banner.style.cssText='display:flex;align-items:center;gap:12px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;padding:12px 18px;margin-bottom:20px;font-size:12px;color:#92400E'
-    banner.innerHTML=`<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span><strong>Preview mode</strong> — this is sample data so you can explore the dashboard. Once you connect a PostgreSQL database via <code style="background:rgba(0,0,0,.07);padding:1px 5px;border-radius:3px;font-family:monospace">DATABASE_URL</code> and deploy to yegara.com, real visitor data will appear here automatically.</span>`
-    c.insertBefore(banner,grid.nextSibling)
-  }
 
   // ── Realtime strip ─────────────────────────────────────────────────────────
   const rtEl=document.createElement('div')
   rtEl.style.cssText='background:#111827;border-radius:12px;padding:16px 24px;margin-bottom:24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap'
   const rtDot=`<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#22C55E;margin-right:8px;animation:rtpulse 2s infinite"></span>`
   const rtPages=((rt.activePages||[]).slice(0,3).map(p=>`<span style="background:rgba(255,255,255,.1);border-radius:4px;padding:2px 8px;font-size:11px;color:#9CA3AF">${p.page} <strong style="color:#fff">${p.count}</strong></span>`).join(' '))||''
-  const rtDemoTag=isDemo?`<span style="margin-left:auto;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6B7280;background:rgba(255,255,255,.08);padding:2px 8px;border-radius:4px">Preview</span>`:''
+  const rtDemoTag=''
   rtEl.innerHTML=`<style>@keyframes rtpulse{0%,100%{opacity:1}50%{opacity:.4}}</style><div style="font-size:13px;color:#fff;font-weight:600">${rtDot}${rt.activeVisitors||0} active right now</div><div style="display:flex;gap:8px;flex-wrap:wrap">${rtPages}</div>${rtDemoTag}`
   c.appendChild(rtEl)
 
