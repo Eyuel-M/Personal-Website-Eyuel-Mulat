@@ -25,9 +25,16 @@ fs.mkdirSync(BRIEFS_DIR,  { recursive: true })
 
 function getAccount () {
   const f = path.join(CONTENT_DIR, 'account.json')
-  const d = { email: DEFAULT_EMAIL, password: DEFAULT_PASS, recoveryEmail: '', smtpUser: '', smtpPass: '', imapHost: '', imapPort: '993', imapUser: '', imapPass: '' }
+  const d = { email: DEFAULT_EMAIL, password: DEFAULT_PASS, recoveryEmail: '', smtpHost: '', smtpPort: '587', smtpUser: '', smtpPass: '', imapHost: '', imapPort: '993', imapUser: '', imapPass: '' }
   if (!fs.existsSync(f)) return d
   try { return { ...d, ...JSON.parse(fs.readFileSync(f, 'utf8')) } } catch { return d }
+}
+
+function makeTransporter (acct) {
+  if (acct.smtpHost) {
+    return nodemailer.createTransport({ host: acct.smtpHost, port: Number(acct.smtpPort) || 587, secure: Number(acct.smtpPort) === 465, auth: { user: acct.smtpUser, pass: acct.smtpPass } })
+  }
+  return nodemailer.createTransport({ service: 'gmail', auth: { user: acct.smtpUser, pass: acct.smtpPass } })
 }
 
 // ── Messages (IMAP inbox + local sent/drafts) ─────────────────────────────────
@@ -263,6 +270,8 @@ export function createApiApp() {
     const updated = { ...acct,
       email:         req.body.email         ?? acct.email,
       recoveryEmail: req.body.recoveryEmail ?? acct.recoveryEmail,
+      smtpHost:      req.body.smtpHost      ?? acct.smtpHost,
+      smtpPort:      req.body.smtpPort      ?? acct.smtpPort,
       smtpUser:      req.body.smtpUser      ?? acct.smtpUser,
       smtpPass:      req.body.smtpPass      ?? acct.smtpPass,
       imapHost:      req.body.imapHost      ?? acct.imapHost,
@@ -288,7 +297,7 @@ export function createApiApp() {
     if (!acct.recoveryEmail) return res.status(400).json({ error: 'No recovery email configured.' })
     if (!acct.smtpUser || !acct.smtpPass) return res.status(400).json({ error: 'SMTP credentials not saved yet.' })
     try {
-      const t = nodemailer.createTransport({ service: 'gmail', auth: { user: acct.smtpUser, pass: acct.smtpPass } })
+      const t = makeTransporter(acct)
       await t.sendMail({
         from: `"Eyuel Mulat Admin" <${acct.smtpUser}>`,
         to: acct.recoveryEmail,
@@ -306,7 +315,7 @@ export function createApiApp() {
   async function sendResetEmail (toAddress, code) {
     const acct = getAccount()
     if (!acct.smtpUser || !acct.smtpPass) throw new Error('Email sending is not configured. Set up Gmail SMTP in Account Settings first.')
-    const t = nodemailer.createTransport({ service: 'gmail', auth: { user: acct.smtpUser, pass: acct.smtpPass } })
+    const t = makeTransporter(acct)
     await t.sendMail({
       from: `"Eyuel Mulat Admin" <${acct.smtpUser}>`,
       to: toAddress,
@@ -628,7 +637,7 @@ app.post('/api/insight', auth, (req, res) => {
       try {
         const origin = process.env.SITE_URL || `http://localhost:${PORT}`
         const link = `${origin}/testimonial.html?token=${token}`
-        const t = nodemailer.createTransport({ service: 'gmail', auth: { user: acct.smtpUser, pass: acct.smtpPass } })
+        const t = makeTransporter(acct)
         await t.sendMail({
           from: `"Eyuel Mulat" <${acct.smtpUser}>`,
           to: email,
@@ -747,7 +756,7 @@ app.post('/api/insight', auth, (req, res) => {
     const acct = getAccount()
     if (!acct.smtpUser || !acct.smtpPass) return res.status(400).json({ error: 'SMTP not configured. Set up Gmail credentials in Account Settings.' })
     try {
-      const t = nodemailer.createTransport({ service: 'gmail', auth: { user: acct.smtpUser, pass: acct.smtpPass } })
+      const t = makeTransporter(acct)
       await t.sendMail({
         from: `"Eyuel Mulat" <${acct.smtpUser}>`,
         replyTo: acct.smtpUser,

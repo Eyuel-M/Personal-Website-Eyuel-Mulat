@@ -1483,11 +1483,13 @@ function renderAccount(){
     mkInput('Recovery Address','recoveryEmail',d,'This Gmail receives your password reset codes. Required for Forgot Password to work.','email'),
   ))
 
-  // ── Gmail SMTP ────────────────────────────────────────────────────────────
+  // ── SMTP ──────────────────────────────────────────────────────────────────
   const helpNote=document.createElement('p');helpNote.className='fh'
-  helpNote.innerHTML='Used to send reset codes to your recovery address. Requires a <a href="https://myaccount.google.com/apppasswords" target="_blank" style="color:var(--navy)">Gmail App Password</a> — not your regular Gmail password.'
-  const smtpUser=mkInput('Gmail Address (sender)','smtpUser',d,'','email')
-  const smtpPassDiv=mkInput('Gmail App Password','smtpPass',d,'16-character app password from Google Account security settings.')
+  helpNote.innerHTML='Used to send emails from your site. <strong>cPanel/Yegara:</strong> Host: <code style="background:rgba(0,0,0,.07);padding:1px 5px;border-radius:3px">mail.eyuelmulat.com</code> · Port: <code style="background:rgba(0,0,0,.07);padding:1px 5px;border-radius:3px">465</code> · Username: your full email address. Leave host empty to use Gmail (requires an App Password).'
+  const smtpHost=mkInput('SMTP Host','smtpHost',d,'e.g. mail.eyuelmulat.com (leave empty for Gmail)')
+  const smtpPort=mkInput('SMTP Port','smtpPort',d,'465 (SSL) or 587 (TLS)')
+  const smtpUser=mkInput('Email Address (sender)','smtpUser',d,'','email')
+  const smtpPassDiv=mkInput('Email Password','smtpPass',d,'Your email password or Gmail App Password')
   addEyeToggle(smtpPassDiv)
   const testBtn=document.createElement('button');testBtn.className='bs';testBtn.style.marginTop='4px';testBtn.textContent='Send test email to recovery address'
   const testMsg=document.createElement('p');testMsg.style.cssText='font-size:12px;min-height:18px;margin-top:8px'
@@ -1502,7 +1504,7 @@ function renderAccount(){
   }
   const saveNote=document.createElement('p');saveNote.className='fh';saveNote.style.color='#6B7280'
   saveNote.textContent='Save your settings above before clicking test.'
-  c.appendChild(mkSC('Email Sending (Gmail SMTP)',helpNote,smtpUser,smtpPassDiv,saveNote,testBtn,testMsg))
+  c.appendChild(mkSC('Email Sending (SMTP)',helpNote,smtpHost,smtpPort,smtpUser,smtpPassDiv,saveNote,testBtn,testMsg))
 
   // ── IMAP Inbox ────────────────────────────────────────────────────────────
   const imapNote=document.createElement('p');imapNote.className='fh';imapNote.style.color='#6B7280'
