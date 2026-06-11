@@ -622,7 +622,11 @@ async function saveSection(){
     else if(id==='analytics'){/* read-only section */}
     else if(id==='testimonials'){/* read-only section — actions via direct API calls */}
     else if(id==='terms'){await api('PUT','/api/terms',S.data)}
-    else if(id==='account'){await api('PUT','/api/account',S.data)}
+    else if(id==='account'){
+      document.querySelectorAll('#editor-inner input[data-key]').forEach(inp=>{if(inp.dataset.key in S.data)S.data[inp.dataset.key]=inp.value})
+      await api('PUT','/api/account',S.data)
+      await loadSection('account');render()
+    }
     else if(id==='hero'){await api('PUT','/api/content/home',{fields:S.data})}
     else{
       await api('PUT',`/api/content/${id}`,{fields:S.data})
@@ -701,7 +705,7 @@ function addEyeToggle(container){
 function mkInput(label,key,obj,hint='',type='text'){
   const d=mkField(label,hint)
   const i=document.createElement('input');i.className='fi';i.type=type;i.value=obj[key]||''
-  i.oninput=()=>obj[key]=i.value;d.appendChild(i);return d
+  i.dataset.key=key;i.oninput=i.onchange=()=>obj[key]=i.value;d.appendChild(i);return d
 }
 function mkTextarea(label,key,obj,rows=3,hint=''){
   const d=mkField(label,hint)
