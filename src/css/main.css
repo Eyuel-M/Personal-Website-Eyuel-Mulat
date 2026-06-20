@@ -149,7 +149,7 @@
 /* ─── Hero image: scroll-expand to full screen ───────────────────────────── */
 .scroll-expand-section {
   height: calc(100vh + 160px);
-  margin-bottom: 4rem;
+  margin-bottom: 1.5rem;
 }
 @media (min-width: 768px) {
   .scroll-expand-section {
@@ -248,11 +248,17 @@
 /* ─── Section header rule ────────────────────────────────────────────────── */
 .section-header {
   border-top: 1px solid rgba(0, 0, 0, 0.1);
-  padding-top: 4rem;
-  margin-bottom: 6rem;
+  padding-top: 2rem;
+  margin-bottom: 3rem;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+}
+@media (min-width: 768px) {
+  .section-header {
+    padding-top: 4rem;
+    margin-bottom: 6rem;
+  }
 }
 
 /* ─── Label caps ─────────────────────────────────────────────────────────── */
