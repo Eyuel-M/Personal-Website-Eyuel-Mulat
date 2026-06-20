@@ -1254,6 +1254,28 @@ if (isMain) {
         )
       }
 
+      // Server-side nav logo replacement — eliminates logo FOUC
+      const navFields = (ssrData['navigation'] || {}).fields || {}
+      if (navFields.logoImage || navFields.logoText) {
+        const logoInner = navFields.logoImage
+          ? `<img src="${navFields.logoImage}" alt="${esc(navFields.logoText || '')}" style="height:${navFields.logoHeight || 28}px;object-fit:contain;display:block">`
+          : esc(navFields.logoText)
+        html = html.replace(
+          /(<[^>]*\bdata-nav-logo\b[^>]*>)[^<]*(<\/[^>]+>)/g,
+          `$1${logoInner}$2`
+        )
+      }
+
+      // Server-side footer logo replacement — eliminates footer logo FOUC
+      const footerFields = (ssrData['footer'] || {}).fields || {}
+      if (footerFields.footerLogo) {
+        const footerLogoImg = `<img src="${footerFields.footerLogo}" alt="" style="width:100%;height:auto;display:block;object-fit:contain">`
+        html = html.replace(
+          /(<[^>]*\bdata-footer-logo\b[^>]*>)[\s\S]*?<\/div>\s*(<\/div>)/,
+          `$1${footerLogoImg}$2`
+        )
+      }
+
       // Inject SSR data as inline script so content-loader.js can apply it synchronously
       const ssrScript = Object.keys(ssrData).length
         ? `\n  <script>window.__SSR_DATA__=${JSON.stringify(ssrData)}</script>`
@@ -1265,7 +1287,13 @@ if (isMain) {
       return res.send(html)
     } catch { return next() }
   })
-  app.use(express.static(path.join(__dirname)))
+  app.use(express.static(path.join(__dirname), {
+    setHeaders(res, fp) {
+      if (fp.includes('/uploads/') || fp.includes('/src/css/') || fp.includes('/src/js/')) {
+        res.setHeader('Cache-Control', 'public, max-age=86400')
+      }
+    },
+  }))
   app.use((req, res) => res.status(404).sendFile(path.join(__dirname, '404.html')))
   app.listen(PORT, () => {
     console.log(`\n  ◆ Site + Admin  →  http://localhost:${PORT}`)
