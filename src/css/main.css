@@ -148,7 +148,7 @@
 
 /* ─── Hero image: scroll-expand to full screen ───────────────────────────── */
 .scroll-expand-wrapper {
-  clip-path: inset(12% 20% round 16px);
+  clip-path: inset(15% 22% round 20px);
   will-change: clip-path;
 }
 

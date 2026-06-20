@@ -41,14 +41,16 @@ if (expandWrapper) {
   function updateExpand() {
     rafId = null
     const rect = expandSection.getBoundingClientRect()
+    // scrollRoom = the 400px extra height above 100vh where animation plays
     const scrollRoom = expandSection.offsetHeight - window.innerHeight
+    // progress 0 when section top hits viewport top; 1 after scrollRoom px of scroll
     const progress = scrollRoom > 0
       ? Math.max(0, Math.min(1, -rect.top / scrollRoom))
       : 0
 
-    const vInset = (12 * (1 - progress)).toFixed(2)
-    const hInset = (20 * (1 - progress)).toFixed(2)
-    const radius = (16 * (1 - progress)).toFixed(1)
+    const vInset = (15 * (1 - progress)).toFixed(2)
+    const hInset = (22 * (1 - progress)).toFixed(2)
+    const radius = (20 * (1 - progress)).toFixed(1)
 
     expandWrapper.style.clipPath =
       `inset(${vInset}% ${hInset}% round ${radius}px)`
