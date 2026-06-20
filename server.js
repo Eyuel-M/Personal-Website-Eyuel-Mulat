@@ -136,11 +136,7 @@ seedIfMissing('about.json', {
   },
 })
 
-seedIfMissing('slides.json', [
-  {media:'https://lh3.googleusercontent.com/aida-public/AB6AXuDOWQNwCA_Sy3BPn64hPnpoO02uP_2_I6oW5rpYeyhmhbJcwdODE21QCKmNBnLYpjNRQvkZI7H-37UsPWD4dPdVF7KLHyKL4fMT6LjMz1R1Riqe4PDbEd8ECAxfvke5UBMQ2RnMElW_xDtjq2oan1PCWh863-eSkEa-k_8ihQV0Ww3edsCB43nZJJJqts4HseBRGEvomTagI29z3PqwNDUNQddqSueZb4rURX2KArszCjq8N-BVQXNl1h9vIjUAO0ihvRIynh-y3AM',title:''},
-  {media:'https://lh3.googleusercontent.com/aida-public/AB6AXuBga90sr654rVPGPEaB3kJeifl98bSDxlZBsKWfUjsSFqSEteMcDzxZ2X8DI9wNnkiRQXmSPw2yPmztXBYxqj0GuDwUG1Acgtf8ZsPJYMCoHKuPOAdAK38hAzLpvGLwdL5W3U-6cG6Sc8hV6n30pgK_smwSP8kievA0z2dr8GJOsyctxdUC5RCqkfCnoZM-gaS6sG0aXQwWmbDLjY9nGrNFCRA_fLcJJEN4pNxaLHdDkwIZkpTEijUa6bP7s3cbA-WYecL_HK6Yg_0',title:''},
-  {media:'https://lh3.googleusercontent.com/aida-public/AB6AXuApiyh_3aaVjPbYqtnEYBYYCxdU270rhO_lQ0MlcPYGhxDlpPR1GJwvBolsdfXepO0m06UPWAFYvjKsHqwNyFnFZ8UzBq5qUYEMMzTm-PNLwhrRHkmHx-0UsTIVuo9CyfbyQq9j_TjkVdQJRQWNO7S__j6X-y8v3yxbf9p0MDfFO-3s9aIJzbpP4pDagWdhgpBHAFHN_BxkoMOkfgk9ur5yvt6DpaCaGorEo70Rhca1Zi8Pwd7VKUoRiXpeOMhV3pwXoZA8xxFUikw',title:''},
-])
+seedIfMissing('slides.json', [])
 seedIfMissing('clients.json', [
   {id:'1',name:'Nexus Technologies',logo:'',url:''},
   {id:'2',name:'Vanguard Capital',logo:'',url:''},
