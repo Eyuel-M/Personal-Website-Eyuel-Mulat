@@ -148,8 +148,8 @@
 
 /* ─── Hero image: scroll-expand to full screen ───────────────────────────── */
 .scroll-expand-section {
-  height: calc(100vh + 160px);
-  margin-bottom: 1.5rem;
+  height: 100vh;
+  margin-bottom: 2rem;
 }
 @media (min-width: 768px) {
   .scroll-expand-section {
