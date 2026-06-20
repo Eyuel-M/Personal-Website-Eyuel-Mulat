@@ -34,7 +34,7 @@ document.querySelectorAll('[data-nav]').forEach((link) => {
 
 // ─── Hero image: scroll-expand to full screen ────────────────────────────────
 const expandWrapper = document.querySelector('.scroll-expand-wrapper')
-if (expandWrapper) {
+if (expandWrapper && window.matchMedia('(min-width: 768px)').matches) {
   let rafId = null
   const expandSection = expandWrapper.closest('section')
 
@@ -42,12 +42,9 @@ if (expandWrapper) {
     rafId = null
     const rect = expandSection.getBoundingClientRect()
     const scrollRoom = expandSection.offsetHeight - window.innerHeight
-    // No scroll room (mobile / short section) → remove clip entirely
-    if (scrollRoom <= 0) {
-      expandWrapper.style.clipPath = 'none'
-      return
-    }
-    const progress = Math.max(0, Math.min(1, -rect.top / scrollRoom))
+    const progress = scrollRoom > 0
+      ? Math.max(0, Math.min(1, -rect.top / scrollRoom))
+      : 0
     const vInset = (15 * (1 - progress)).toFixed(2)
     const hInset = (22 * (1 - progress)).toFixed(2)
     const radius = (20 * (1 - progress)).toFixed(1)
