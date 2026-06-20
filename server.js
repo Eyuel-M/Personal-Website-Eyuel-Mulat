@@ -1207,7 +1207,7 @@ if (isMain) {
     }
     next()
   })
-  // Inject favicon + OG tags from site settings into static HTML pages
+  // Server-side HTML enrichment: title, OG tags, favicon, SSR content data + image src injection
   app.use((req, res, next) => {
     const p = req.path
     const resolved = p === '/' ? '/index.html' : p
@@ -1215,16 +1215,52 @@ if (isMain) {
     const filePath = path.join(__dirname, resolved)
     if (!fs.existsSync(filePath)) return next()
     try {
+      let html = fs.readFileSync(filePath, 'utf8')
       const site = getSiteSettings()
       const esc = s => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;')
-      let tags = ''
-      if (site.favicon) tags += `\n  <link rel="icon" href="${site.favicon}"/>`
-      if (site.siteTitle) tags += `\n  <meta property="og:title" content="${esc(site.siteTitle)}"/>`
-      if (site.metaDescription) tags += `\n  <meta property="og:description" content="${esc(site.metaDescription)}"/>`
-      if (site.ogImage) tags += `\n  <meta property="og:image" content="${site.ogImage}"/>`
-      if (!tags) return next()
-      let html = fs.readFileSync(filePath, 'utf8')
-      html = html.replace('</head>', tags + '\n</head>')
+
+      // Fix <title> tag
+      if (site.siteTitle) {
+        html = html.replace(/<title>[^<]*<\/title>/, `<title>${esc(site.siteTitle)}</title>`)
+      }
+
+      // Build head injection tags
+      let headTags = ''
+      if (site.favicon) headTags += `\n  <link rel="icon" href="${site.favicon}"/>`
+      if (site.siteTitle) headTags += `\n  <meta property="og:title" content="${esc(site.siteTitle)}"/>`
+      if (site.metaDescription) headTags += `\n  <meta property="og:description" content="${esc(site.metaDescription)}"/>`
+      if (site.ogImage) headTags += `\n  <meta property="og:image" content="${site.ogImage}"/>`
+
+      // Determine page key and load content files for SSR data injection
+      const pageKey = resolved === '/index.html' ? 'home'
+        : resolved.replace(/^\//, '').replace(/\.html$/, '')
+      const ssrData = {}
+      for (const key of [pageKey, 'navigation', 'footer']) {
+        const cf = path.join(CONTENT_DIR, `${key}.json`)
+        if (fs.existsSync(cf)) {
+          try { ssrData[key] = JSON.parse(fs.readFileSync(cf, 'utf8')) } catch {}
+        }
+      }
+
+      // Server-side image src replacement — eliminates image FOUC entirely
+      const pageFields = (ssrData[pageKey] || {}).fields || {}
+      for (const [key, value] of Object.entries(pageFields)) {
+        const val = typeof value === 'object' && value !== null ? value.value : value
+        if (!val || typeof val !== 'string') continue
+        // Replace src attribute on <img data-editable="key"> elements (any attribute order)
+        html = html.replace(
+          new RegExp(`(<img(?=[^>]*data-editable="${key}")[^>]*\\bsrc=")[^"]*"`, 'g'),
+          `$1${val}"`
+        )
+      }
+
+      // Inject SSR data as inline script so content-loader.js can apply it synchronously
+      const ssrScript = Object.keys(ssrData).length
+        ? `\n  <script>window.__SSR_DATA__=${JSON.stringify(ssrData)}</script>`
+        : ''
+
+      if (!headTags && !ssrScript) return next()
+      html = html.replace('</head>', headTags + ssrScript + '\n</head>')
       res.setHeader('Content-Type', 'text/html; charset=utf-8')
       return res.send(html)
     } catch { return next() }
