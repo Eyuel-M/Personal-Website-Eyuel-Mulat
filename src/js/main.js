@@ -34,7 +34,7 @@ document.querySelectorAll('[data-nav]').forEach((link) => {
 
 // ─── Hero image: scroll-expand to full screen ────────────────────────────────
 const expandWrapper = document.querySelector('.scroll-expand-wrapper')
-if (expandWrapper) {
+if (expandWrapper && window.matchMedia('(min-width: 768px)').matches) {
   let rafId = null
   const expandSection = expandWrapper.closest('section')
 

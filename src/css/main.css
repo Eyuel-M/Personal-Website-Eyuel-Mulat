@@ -158,9 +158,16 @@
   }
 }
 
+/* Mobile: no clip-path — image fills the full section */
 .scroll-expand-wrapper {
-  clip-path: inset(15% 22% round 20px);
-  will-change: clip-path;
+  clip-path: none;
+}
+/* Desktop: start clipped, animate to full-screen on scroll */
+@media (min-width: 768px) {
+  .scroll-expand-wrapper {
+    clip-path: inset(15% 22% round 20px);
+    will-change: clip-path;
+  }
 }
 
 /* ─── Hero slideshow: fast-cycling montage ───────────────────────────────── */
