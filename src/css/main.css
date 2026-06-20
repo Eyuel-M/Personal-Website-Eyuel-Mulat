@@ -148,13 +148,19 @@
 
 /* ─── Hero image: scroll-expand to full screen ───────────────────────────── */
 .scroll-expand-section {
-  height: 100vh;
+  height: 55vw;
   margin-bottom: 2rem;
+}
+.slideshow-sticky {
+  height: 55vw;
 }
 @media (min-width: 768px) {
   .scroll-expand-section {
     height: calc(100vh + 320px);
     margin-bottom: 6rem;
+  }
+  .slideshow-sticky {
+    height: 100vh;
   }
 }
 
