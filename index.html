@@ -536,7 +536,7 @@
     </div>
   </footer>
 
-  <script type="module" src="/src/js/main.js"></script>
+  <script type="module" src="/src/js/main.js?v=4"></script>
   <script type="module" src="/src/js/content-loader.js"></script>
   <script type="module" src="/src/js/analytics-sdk.js"></script>
   <script>
@@ -622,9 +622,13 @@
     const isMd = window.matchMedia('(min-width: 768px)').matches
     section.style.height  = isMd ? 'calc(100vh + 320px)' : '55vw'
     if (stickyEl) stickyEl.style.height = isMd ? '100vh' : '55vw'
-    // On mobile: remove clip-path so image fills edge-to-edge
+    // On mobile: force clip-path none and keep it none on every scroll
     const wrapper = section.querySelector('.scroll-expand-wrapper')
-    if (wrapper && !isMd) wrapper.style.clipPath = 'none'
+    if (wrapper && !isMd) {
+      const forceNone = () => { wrapper.style.clipPath = 'none' }
+      forceNone()
+      window.addEventListener('scroll', forceNone, { passive: true })
+    }
 
     if (!slides.length) return
     container.innerHTML = ''
