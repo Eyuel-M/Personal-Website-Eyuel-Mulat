@@ -147,6 +147,17 @@
 }
 
 /* ─── Hero image: scroll-expand to full screen ───────────────────────────── */
+.scroll-expand-section {
+  height: calc(100vh + 160px);
+  margin-bottom: 4rem;
+}
+@media (min-width: 768px) {
+  .scroll-expand-section {
+    height: calc(100vh + 320px);
+    margin-bottom: 6rem;
+  }
+}
+
 .scroll-expand-wrapper {
   clip-path: inset(15% 22% round 20px);
   will-change: clip-path;
