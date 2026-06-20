@@ -618,12 +618,13 @@
     const container = document.querySelector('.hero-slideshow')
     if (!section || !container) return
 
-    // Set heights via JS so they work even if the compiled CSS is outdated
+    // Set layout via JS — overrides any outdated compiled CSS on the server
     const isMd = window.matchMedia('(min-width: 768px)').matches
-    const sectionH = isMd ? 'calc(100vh + 320px)' : '55vw'
-    const stickyH  = isMd ? '100vh' : '55vw'
-    section.style.height  = sectionH
-    if (stickyEl) stickyEl.style.height = stickyH
+    section.style.height  = isMd ? 'calc(100vh + 320px)' : '55vw'
+    if (stickyEl) stickyEl.style.height = isMd ? '100vh' : '55vw'
+    // On mobile: remove clip-path so image fills edge-to-edge
+    const wrapper = section.querySelector('.scroll-expand-wrapper')
+    if (wrapper && !isMd) wrapper.style.clipPath = 'none'
 
     if (!slides.length) return
     container.innerHTML = ''
