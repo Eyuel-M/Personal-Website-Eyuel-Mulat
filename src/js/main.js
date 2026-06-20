@@ -41,8 +41,11 @@ if (expandWrapper) {
   function updateExpand() {
     rafId = null
     const rect = expandSection.getBoundingClientRect()
-    // progress 0 when section bottom enters viewport; 1 when section top reaches viewport top
-    const progress = Math.max(0, Math.min(1, 1 - rect.top / window.innerHeight))
+    // scrollRoom = extra height above 100vh; animation plays over that distance
+    const scrollRoom = expandSection.offsetHeight - window.innerHeight
+    const progress = scrollRoom > 0
+      ? Math.max(0, Math.min(1, -rect.top / scrollRoom))
+      : 0
 
     const vInset = (15 * (1 - progress)).toFixed(2)
     const hInset = (22 * (1 - progress)).toFixed(2)
