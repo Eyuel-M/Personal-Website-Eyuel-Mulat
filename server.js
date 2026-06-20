@@ -208,7 +208,10 @@ export function createApiApp() {
   })
 
   const storage = multer.diskStorage({
-    destination: UPLOADS_DIR,
+    destination: (req, file, cb) => {
+      fs.mkdirSync(UPLOADS_DIR, { recursive: true })
+      cb(null, UPLOADS_DIR)
+    },
     filename: (req, file, cb) => {
       const ext  = path.extname(file.originalname).toLowerCase()
       const name = path.basename(file.originalname, ext)
