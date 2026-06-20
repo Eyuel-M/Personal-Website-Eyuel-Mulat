@@ -1247,10 +1247,14 @@ if (isMain) {
       for (const [key, value] of Object.entries(pageFields)) {
         const val = typeof value === 'object' && value !== null ? value.value : value
         if (!val || typeof val !== 'string') continue
-        // Replace src attribute on <img data-editable="key"> elements (any attribute order)
+        // Replace src and remove display:none on <img data-editable="key"> elements
         html = html.replace(
           new RegExp(`(<img(?=[^>]*data-editable="${key}")[^>]*\\bsrc=")[^"]*"`, 'g'),
           `$1${val}"`
+        )
+        html = html.replace(
+          new RegExp(`(<img(?=[^>]*data-editable="${key}")[^>]*)\\sstyle="display:none"`, 'g'),
+          '$1'
         )
       }
 
