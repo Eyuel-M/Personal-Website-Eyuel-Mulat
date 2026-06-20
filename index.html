@@ -89,26 +89,20 @@
       </div>
     </section>
 
-    <!-- ── Hero Image: full-screen scroll reveal ────────────────────────── -->
-    <!-- Inline style block uses ID specificity to beat any outdated compiled CSS -->
+    <!-- ── Hero Image: scroll-expand montage ───────────────────────────── -->
     <style>
-      #slideshow-section { height: 55vw; margin-bottom: 2rem; }
-      #slideshow-sticky  { height: 55vw; }
-      #slideshow-section .scroll-expand-wrapper { clip-path: none; }
-      @media (min-width: 768px) {
-        #slideshow-section { height: calc(100vh + 600px); margin-bottom: 5rem; }
-        #slideshow-sticky  { height: 100vh; }
-        #slideshow-section .scroll-expand-wrapper { clip-path: inset(15% 22% round 20px); will-change: clip-path; }
+      /* Mobile: full-width, no clip-path, tighter margin */
+      @media (max-width: 767px) {
+        #slideshow-section { padding-left: 0 !important; padding-right: 0 !important; margin-bottom: 2rem !important; }
+        #slideshow-section .scroll-expand-wrapper { clip-path: none !important; border: none !important; }
       }
     </style>
-    <section class="relative" id="slideshow-section">
-      <div id="slideshow-sticky" style="position:sticky;top:0;width:100%">
-        <div class="scroll-expand-wrapper" style="width:100%;height:100%;overflow:hidden">
-          <div class="hero-slideshow" style="width:100%;height:100%">
-            <img src="" alt="" class="hero-slide hero-slide-1" style="object-fit:cover"/>
-            <img src="" alt="" class="hero-slide hero-slide-2" style="object-fit:cover"/>
-            <img src="" alt="" class="hero-slide hero-slide-3" style="object-fit:cover"/>
-          </div>
+    <section class="px-10 md:px-[80px] mb-40 bg-background" id="slideshow-section">
+      <div class="w-full overflow-hidden aspect-[21/9] border-l border-black/10 scroll-expand-wrapper">
+        <div class="hero-slideshow w-full h-full">
+          <img src="" alt="" class="hero-slide hero-slide-1 w-full h-full object-cover"/>
+          <img src="" alt="" class="hero-slide hero-slide-2 w-full h-full object-cover"/>
+          <img src="" alt="" class="hero-slide hero-slide-3 w-full h-full object-cover"/>
         </div>
       </div>
     </section>
