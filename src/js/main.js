@@ -32,17 +32,22 @@ document.querySelectorAll('[data-nav]').forEach((link) => {
   if (isHome || isAbout || isWork || isContact || isInsights) link.classList.add('is-active')
 })
 
-// ─── Hero image: scroll-expand (completes after 500px of scroll) ─────────────
+// ─── Hero image: scroll-expand to full screen ────────────────────────────────
 const expandWrapper = document.querySelector('.scroll-expand-wrapper')
 if (expandWrapper && window.matchMedia('(min-width: 768px)').matches) {
   let rafId = null
+  const expandSection = expandWrapper.closest('section')
 
   function updateExpand() {
     rafId = null
-    const progress = Math.max(0, Math.min(1, window.scrollY / 500))
-    const vInset = (10 * (1 - progress)).toFixed(2)
+    const rect = expandSection.getBoundingClientRect()
+    const scrollRoom = expandSection.offsetHeight - window.innerHeight
+    const progress = scrollRoom > 0
+      ? Math.max(0, Math.min(1, -rect.top / scrollRoom))
+      : 0
+    const vInset = (15 * (1 - progress)).toFixed(2)
     const hInset = (22 * (1 - progress)).toFixed(2)
-    const radius = (16 * (1 - progress)).toFixed(1)
+    const radius = (20 * (1 - progress)).toFixed(1)
     expandWrapper.style.clipPath =
       `inset(${vInset}% ${hInset}% round ${radius}px)`
   }
