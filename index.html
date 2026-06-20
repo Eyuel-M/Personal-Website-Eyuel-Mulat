@@ -90,9 +90,19 @@
     </section>
 
     <!-- ── Hero Image: full-screen scroll reveal ────────────────────────── -->
-    <section class="relative scroll-expand-section" id="slideshow-section">
-      <div class="slideshow-sticky" id="slideshow-sticky" style="position:sticky;top:0;width:100%">
-        <!-- scroll-expand-wrapper: clip-path animates via main.js -->
+    <!-- Inline style block uses ID specificity to beat any outdated compiled CSS -->
+    <style>
+      #slideshow-section { height: 55vw; margin-bottom: 2rem; }
+      #slideshow-sticky  { height: 55vw; }
+      #slideshow-section .scroll-expand-wrapper { clip-path: none; }
+      @media (min-width: 768px) {
+        #slideshow-section { height: calc(100vh + 320px); margin-bottom: 5rem; }
+        #slideshow-sticky  { height: 100vh; }
+        #slideshow-section .scroll-expand-wrapper { clip-path: inset(15% 22% round 20px); will-change: clip-path; }
+      }
+    </style>
+    <section class="relative" id="slideshow-section">
+      <div id="slideshow-sticky" style="position:sticky;top:0;width:100%">
         <div class="scroll-expand-wrapper" style="width:100%;height:100%;overflow:hidden">
           <div class="hero-slideshow" style="width:100%;height:100%">
             <img src="" alt="" class="hero-slide hero-slide-1" style="object-fit:cover"/>
@@ -613,23 +623,9 @@
     if (!slidesRes || !slidesRes.ok) return
     const slides = (await slidesRes.json()).filter(s => s.media || s.image)
 
-    const section  = document.getElementById('slideshow-section')
-    const stickyEl = document.getElementById('slideshow-sticky')
+    const section   = document.getElementById('slideshow-section')
     const container = document.querySelector('.hero-slideshow')
     if (!section || !container) return
-
-    // Set layout via JS — overrides any outdated compiled CSS on the server
-    const isMd = window.matchMedia('(min-width: 768px)').matches
-    section.style.height  = isMd ? 'calc(100vh + 320px)' : '55vw'
-    if (stickyEl) stickyEl.style.height = isMd ? '100vh' : '55vw'
-    // On mobile: force clip-path none and keep it none on every scroll
-    const wrapper = section.querySelector('.scroll-expand-wrapper')
-    if (wrapper && !isMd) {
-      const forceNone = () => { wrapper.style.clipPath = 'none' }
-      forceNone()
-      window.addEventListener('scroll', forceNone, { passive: true })
-    }
-
     if (!slides.length) return
     container.innerHTML = ''
 
