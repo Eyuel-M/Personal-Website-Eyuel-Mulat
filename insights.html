@@ -80,7 +80,7 @@
     </section>
 
     <!-- ── Featured Post ─────────────────────────────────────────────────── -->
-    <section class="px-10 md:px-[80px] pt-24 pb-0" id="insights-featured">
+    <section class="px-10 md:px-[80px] pt-24 pb-0" id="insights-featured" style="visibility:hidden">
       <a href="/insights/why-brand-systems-outlast-assets.html" class="group block border-b border-black/10 pb-24 reveal">
         <div class="grid grid-cols-12 gap-8 md:gap-16 items-center">
           <div class="col-span-12 md:col-span-6 overflow-hidden bg-surface-container-low aspect-[16/9]">
@@ -113,7 +113,7 @@
     </section>
 
     <!-- ── Articles List ─────────────────────────────────────────────────── -->
-    <section class="px-10 md:px-[80px]" id="insights-list">
+    <section class="px-10 md:px-[80px]" id="insights-list" style="visibility:hidden">
 
       <!-- Article 02 -->
       <a href="/insights/the-grid-beneath-everything.html" class="group block border-b border-black/10 py-16 reveal">
@@ -329,12 +329,18 @@
         }
       }
 
+      const revealInsights = () => {
+        const f = document.getElementById('insights-featured')
+        const l = document.getElementById('insights-list')
+        if (f) f.style.visibility = ''
+        if (l) l.style.visibility = ''
+      }
       try {
         const r = await fetch('/api/content/insights-data')
-        if (!r.ok) return
+        if (!r.ok) { revealInsights(); return }
         const data = await r.json()
         const items = (data.items || []).filter(a => !a.status || a.status === 'published')
-        if (!items.length) return
+        if (!items.length) { revealInsights(); return }
 
         const countEl = document.getElementById('insights-hero-count')
         if (countEl) countEl.textContent = items.length + ' Article' + (items.length !== 1 ? 's' : '')
@@ -345,16 +351,18 @@
         function goToPage(page) {
           const featuredSection = document.getElementById('insights-featured')
           if (featuredSection) {
-            if (page === 1) { renderFeatured(items[0]) }
+            if (page === 1) { renderFeatured(items[0]); featuredSection.style.visibility = '' }
             else { featuredSection.style.display = 'none' }
           }
           renderList(listItems, page)
+          const l = document.getElementById('insights-list')
+          if (l) l.style.visibility = ''
           renderPagination(totalPages, page, goToPage)
-          window.scrollTo({ top: 0, behavior: 'smooth' })
+          if (page > 1) window.scrollTo({ top: 0, behavior: 'smooth' })
         }
 
         goToPage(1)
-      } catch(e) { console.error('insights load error', e) }
+      } catch(e) { revealInsights() }
     })()
   </script>
   <script src="/src/js/cookie-consent.js"></script>

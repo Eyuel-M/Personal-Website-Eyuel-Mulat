@@ -141,7 +141,7 @@
       </div>
 
       <div id="caps-scroll-wrapper">
-        <div id="caps-grid" class="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-24">
+        <div id="caps-grid" class="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-24" style="visibility:hidden">
 
           <div class="flex flex-col items-start gap-10 group reveal" data-cap-item>
             <div class="w-16 h-16 text-on-surface/30 group-hover:text-accent transition-colors duration-500" data-cap-icon>
@@ -193,13 +193,14 @@
 
     <script>
     (async function initCaps() {
+      const grid = document.getElementById('caps-grid')
+      const revealCaps = () => { if (grid) grid.style.visibility = '' }
       try {
         const r = await fetch('/api/capabilities')
-        if (!r.ok) return
+        if (!r.ok) { revealCaps(); return }
         const caps = await r.json()
-        if (!caps || !caps.length) return
+        if (!caps || !caps.length) { revealCaps(); return }
 
-        const grid = document.getElementById('caps-grid')
         if (!grid) return
 
         // Always rebuild grid from scratch with consistent item structure
@@ -267,8 +268,9 @@
           grid.parentElement.insertAdjacentElement('afterend', navEl)
           goToPage(0)
         }
+        revealCaps()
       } catch(e) {
-        // silently fail — static content remains
+        revealCaps()
       }
     })()
     </script>
@@ -406,7 +408,7 @@
         <span class="label-caps tracking-[0.4em] text-on-surface-variant/50">Clients & Partners</span>
         <span class="label-caps text-[10px] text-on-surface-variant/30 tracking-[0.3em]">Selected</span>
       </div>
-      <div class="clients-grid-wrap grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 divide-x divide-y divide-black/8 border border-black/8">
+      <div class="clients-grid-wrap grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 divide-x divide-y divide-black/8 border border-black/8" style="visibility:hidden">
 
         <div class="flex items-center justify-center py-12 px-6 group reveal">
           <span class="font-display text-[20px] uppercase text-on-surface/20 group-hover:text-on-surface/60 transition-colors duration-500 text-center leading-tight">Nexus<br>Technologies</span>
@@ -436,12 +438,13 @@
     </section>
     <script>
 ;(async () => {
+  const section = document.querySelector('.clients-grid-wrap')
+  const revealClients = () => { if (section) section.style.visibility = '' }
   try {
     const res = await fetch('/api/clients')
-    if (!res.ok) return
+    if (!res.ok) { revealClients(); return }
     const clients = await res.json()
-    if (!Array.isArray(clients) || !clients.length) return
-    const section = document.querySelector('.clients-grid-wrap')
+    if (!Array.isArray(clients) || !clients.length) { revealClients(); return }
     if (!section) return
     // rebuild
     section.innerHTML = ''
@@ -485,7 +488,8 @@
       document.head.appendChild(styleEl)
       track.classList.add('clients-march')
     }
-  } catch(e) {}
+    revealClients()
+  } catch(e) { revealClients() }
 })()
 </script>
 

@@ -1288,6 +1288,68 @@ if (isMain) {
         )
       }
 
+      // ── SSR: replace all text/HTML data-editable elements (eliminates text FOUC) ──
+      ;(function() {
+        const eRx  = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        const eRpl = s => s.replace(/\$/g, '$$$$')
+        const eH   = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+
+        for (const [key, value] of Object.entries(pageFields)) {
+          const raw = typeof value === 'object' && value !== null ? value.value : value
+          if (!raw || typeof raw !== 'string') continue
+          const fullTagM = html.match(new RegExp(`<([a-zA-Z][a-zA-Z0-9]*)(?=[^>]*\\bdata-editable="${eRx(key)}")[^>]*>`))
+          if (!fullTagM) continue
+          const tag = fullTagM[1]
+          const typeM = fullTagM[0].match(/\bdata-editable-type="([^"]+)"/)
+          const type = typeM ? typeM[1] : 'text'
+          if (type === 'image') continue
+          const repl = type === 'html' ? eRpl(raw) : eRpl(eH(raw))
+          try {
+            html = html.replace(
+              new RegExp(`(<${tag}(?=[^>]*\\bdata-editable="${eRx(key)}")[^>]*>)[\\s\\S]*?(<\\/${tag}>)`),
+              `$1${repl}$2`
+            )
+          } catch {}
+        }
+
+        // ── SSR footer / CTA text fields ────────────────────────────────────────
+        const ff = (ssrData.footer || {}).fields || {}
+        ;[
+          ['data-footer-email',     ff.email,      false],
+          ['data-footer-phone',     ff.phone,      false],
+          ['data-footer-address',   ff.address,    false],
+          ['data-footer-copyright', ff.copyright,  false],
+          ['data-cta-label',        ff.ctaLabel,   false],
+          ['data-cta-heading',      ff.ctaHeading, true ],
+        ].forEach(([attr, val, isHtml]) => {
+          if (!val) return
+          const repl = eRpl(isHtml ? val : eH(val))
+          try {
+            html = html.replace(
+              new RegExp(`(<[a-zA-Z][a-zA-Z0-9]*(?=[^>]*\\b${eRx(attr)}\\b)[^>]*>)[\\s\\S]*?(<\\/[a-zA-Z][a-zA-Z0-9]*>)`, 'g'),
+              `$1${repl}$2`
+            )
+          } catch {}
+        })
+        if (ff.ctaBtn) {
+          const ctaInner = `${eH(ff.ctaBtn)} <span class="material-symbols-outlined text-accent" style="font-size:18px;line-height:1">north_east</span>`
+          try {
+            html = html.replace(
+              new RegExp(`(<[a-zA-Z][a-zA-Z0-9]*(?=[^>]*\\bdata-cta-btn\\b)[^>]*>)[\\s\\S]*?(<\\/[a-zA-Z][a-zA-Z0-9]*>)`, 'g'),
+              `$1${eRpl(ctaInner)}$2`
+            )
+          } catch {}
+        }
+        if (ff.ctaHref) {
+          try {
+            html = html.replace(
+              new RegExp(`(<[a-zA-Z][a-zA-Z0-9]*(?=[^>]*\\bdata-cta-btn\\b)[^>]*\\bhref=")[^"]*"`),
+              `$1${eRpl(ff.ctaHref)}"`
+            )
+          } catch {}
+        }
+      })()
+
       // Inject SSR data as inline script so content-loader.js can apply it synchronously
       const ssrScript = Object.keys(ssrData).length
         ? `\n  <script>window.__SSR_DATA__=${JSON.stringify(ssrData)}</script>`
