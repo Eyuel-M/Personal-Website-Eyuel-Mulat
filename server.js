@@ -1182,6 +1182,13 @@ if (isMain) {
   await restoreFromDb(CONTENT_DIR)  // pull saved content from DB on startup
   const app = createApiApp()
   app.use('/admin', express.static(path.join(__dirname, 'admin')))
+  // Serve public/ at root so /favicon.svg, /manifest.json, /sw.js resolve correctly.
+  app.use(express.static(path.join(__dirname, 'public')))
+  // Serve favicon.ico (Google's crawler checks this URL) by aliasing the SVG.
+  app.get('/favicon.ico', (_req, res) => {
+    res.set('Content-Type', 'image/svg+xml')
+    res.sendFile(path.join(__dirname, 'public', 'favicon.svg'))
+  })
   // Serve pre-compiled Tailwind CSS if available (production).
   // In dev, Vite intercepts /src/css/main.css before Express touches it.
   const compiledCss = path.join(__dirname, 'public', 'css', 'main.css')
