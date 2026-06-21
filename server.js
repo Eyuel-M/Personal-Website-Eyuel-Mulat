@@ -1184,8 +1184,13 @@ if (isMain) {
   app.use('/admin', express.static(path.join(__dirname, 'admin')))
   // Serve public/ at root so /favicon.svg, /manifest.json, /sw.js resolve correctly.
   app.use(express.static(path.join(__dirname, 'public')))
-  // Serve favicon.ico (Google's crawler checks this URL) by aliasing the SVG.
+  // Serve favicon.ico — Google's crawler checks this URL specifically.
+  // Use the admin-uploaded favicon if set, otherwise fall back to the SVG.
   app.get('/favicon.ico', (_req, res) => {
+    const site = getSiteSettings()
+    if (site.favicon && site.favicon.startsWith('/')) {
+      return res.redirect(302, site.favicon)
+    }
     res.set('Content-Type', 'image/svg+xml')
     res.sendFile(path.join(__dirname, 'public', 'favicon.svg'))
   })
