@@ -1232,12 +1232,26 @@ if (isMain) {
         html = html.replace(/<title>[^<]*<\/title>/, `<title>${esc(site.siteTitle)}</title>`)
       }
 
+      // Fix <meta name="description"> for Google search snippets
+      if (site.metaDescription) {
+        html = html.replace(
+          /<meta name="description" content="[^"]*"/,
+          `<meta name="description" content="${esc(site.metaDescription)}"`
+        )
+      }
+
       // Build head injection tags
       let headTags = ''
       headTags += `\n  <link rel="icon" href="${site.favicon || '/favicon.svg'}"/>`
       if (site.siteTitle) headTags += `\n  <meta property="og:title" content="${esc(site.siteTitle)}"/>`
       if (site.metaDescription) headTags += `\n  <meta property="og:description" content="${esc(site.metaDescription)}"/>`
       if (site.ogImage) headTags += `\n  <meta property="og:image" content="${site.ogImage}"/>`
+      // WebSite schema — tells Google to show the brand name instead of the domain
+      if (resolved === '/index.html') {
+        const siteName = site.siteTitle ? site.siteTitle.split(/[—–-]/)[0].trim() : 'Eyuel Mulat'
+        const siteUrl  = site.siteUrl || 'https://eyuelmulat.com'
+        headTags += `\n  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"${esc(siteName)}","url":"${siteUrl}"}</script>`
+      }
 
       // Determine page key and load content files for SSR data injection
       const pageKey = resolved === '/index.html' ? 'home'
