@@ -310,34 +310,19 @@
     </section>
     <script>
     ;(async function initTestimonials() {
-      var PLACEHOLDERS = [
-        {
-          id:'__p1', name:'A. Kebede', role:'CEO', company:'Nexus Technologies', rating:5,
-          comment:'Working with Eyuel was a transformative experience for our brand. The strategic clarity he brought to the visual identity gave us a foundation we can build on for years.',
-          extra:'The attention to detail and the seamless handoff process made the entire engagement exceptional.',
-          project:'Brand Identity'
-        },
-        {
-          id:'__p2', name:'S. Tesfaye', role:'Founder', company:'Meridian Studio', rating:5,
-          comment:'We needed a visual language that felt both premium and approachable. Eyuel nailed it. The result exceeded every brief we put in front of him.',
-          extra:'Our client retention improved significantly after the rebrand — the work speaks for itself.',
-          project:'Visual System'
-        },
-        {
-          id:'__p3', name:'M. Haile', role:'Creative Director', company:'Summit Advisory', rating:5,
-          comment:'The grid system and typography hierarchy Eyuel established have become the backbone of everything we produce. Disciplined, intentional, and beautifully executed.',
-          extra:'A rare talent who understands both aesthetics and the business rationale behind design decisions.',
-          project:'Design System'
-        },
-      ]
-
-      var items = PLACEHOLDERS
+      var items = []
       var current = 0
 
       try {
         var r = await fetch('/api/testimonials')
         if (r.ok) { var d = await r.json(); if (d && d.length) items = d }
       } catch(e) {}
+
+      if (!items.length) {
+        var sec = document.getElementById('testimonials-section')
+        if (sec) sec.style.display = 'none'
+        return
+      }
 
       try {
         var cp = await fetch('/api/content/index')
