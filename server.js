@@ -1229,7 +1229,7 @@ if (isMain) {
 
       // Build head injection tags
       let headTags = ''
-      if (site.favicon) headTags += `\n  <link rel="icon" href="${site.favicon}"/>`
+      headTags += `\n  <link rel="icon" href="${site.favicon || '/favicon.svg'}"/>`
       if (site.siteTitle) headTags += `\n  <meta property="og:title" content="${esc(site.siteTitle)}"/>`
       if (site.metaDescription) headTags += `\n  <meta property="og:description" content="${esc(site.metaDescription)}"/>`
       if (site.ogImage) headTags += `\n  <meta property="og:image" content="${site.ogImage}"/>`
