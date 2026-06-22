@@ -223,8 +223,15 @@ export function createApiApp() {
         if (idx < 0) return serve404()
         const item = items[idx]
         const nextItem = items.length > 1 ? items[(idx + 1) % items.length] : null
+        let html = buildProjectPage(item, nextItem)
+        const _ssr = { [item.slug]: { fields: {} } }
+        const _navCf    = path.join(CONTENT_DIR, 'navigation.json')
+        const _footerCf = path.join(CONTENT_DIR, 'footer.json')
+        try { if (fs.existsSync(_navCf))    _ssr.navigation = JSON.parse(fs.readFileSync(_navCf,    'utf8')) } catch {}
+        try { if (fs.existsSync(_footerCf)) _ssr.footer     = JSON.parse(fs.readFileSync(_footerCf, 'utf8')) } catch {}
+        html = html.replace('</head>', `\n  <script>window.__SSR_DATA__=${JSON.stringify(_ssr)}</script>\n</head>`)
         res.setHeader('Content-Type', 'text/html; charset=utf-8')
-        return res.send(buildProjectPage(item, nextItem))
+        return res.send(html)
       } catch { return serve404() }
     }
     if ((m = req.url.match(/^\/insights\/([a-z0-9][a-z0-9-]*)(?:\.html)?(\?.*)?$/i))) {
@@ -242,8 +249,24 @@ export function createApiApp() {
         if (idx < 0) return serve404()
         const item = items[idx]
         const nextItem = items.length > 1 ? items[(idx + 1) % items.length] : null
+        let html = buildInsightPage(item, nextItem)
+        // Inject __SSR_DATA__ so content-loader applies nav/footer synchronously (no flash)
+        const _ssrFields = {
+          [`${item.slug}-title`]:    { value: item.title    || '' },
+          [`${item.slug}-category`]: { value: item.category || '' },
+          [`${item.slug}-date`]:     { value: item.date     || '' },
+          [`${item.slug}-excerpt`]:  { value: item.excerpt  || '' },
+          [`${item.slug}-hero-img`]: { value: item.image    || '' },
+          [`${item.slug}-body`]:     { value: item.bodyTitle ? `<h2 class="font-display text-[32px] md:text-[40px] uppercase leading-tight mb-6">${item.bodyTitle}</h2>${item.body||''}` : (item.body || '') },
+        }
+        const _ssr = { [item.slug]: { fields: _ssrFields } }
+        const _navCf    = path.join(CONTENT_DIR, 'navigation.json')
+        const _footerCf = path.join(CONTENT_DIR, 'footer.json')
+        try { if (fs.existsSync(_navCf))    _ssr.navigation = JSON.parse(fs.readFileSync(_navCf,    'utf8')) } catch {}
+        try { if (fs.existsSync(_footerCf)) _ssr.footer     = JSON.parse(fs.readFileSync(_footerCf, 'utf8')) } catch {}
+        html = html.replace('</head>', `\n  <script>window.__SSR_DATA__=${JSON.stringify(_ssr)}</script>\n</head>`)
         res.setHeader('Content-Type', 'text/html; charset=utf-8')
-        return res.send(buildInsightPage(item, nextItem))
+        return res.send(html)
       } catch { return serve404() }
     }
     next()
@@ -1151,7 +1174,7 @@ ${footerHTML()}
 </html>`
 }
 
-function buildInsightPage({ slug, title, category, date, excerpt, body }, nextItem) {
+function buildInsightPage({ slug, title, category, date, excerpt, body, image }, nextItem) {
   const nextSection = nextItem ? `
     <section class="border-t border-black/10 bg-background">
       <a href="/insights/${nextItem.slug}.html" class="group block px-10 md:px-[80px] py-24">
@@ -1192,7 +1215,7 @@ ${navHTML()}
 
     <section class="px-10 md:px-[80px] mb-24 bg-background">
       <div class="w-full overflow-hidden aspect-[16/9] border-l border-black/10">
-        <img data-editable="${slug}-hero-img" data-editable-type="image" src="" alt="${title}" class="w-full h-full object-cover"/>
+        <img data-editable="${slug}-hero-img" data-editable-type="image" src="${image || ''}" alt="${title}" class="w-full h-full object-cover"${image ? '' : ' style="display:none"'}/>
       </div>
     </section>
 
