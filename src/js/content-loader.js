@@ -243,10 +243,12 @@ function applyFooterData(ff) {
       allNavLinks = Array.isArray(nc.navLinks) ? nc.navLinks : []
     } catch {}
     const KNOWN_LABELS = { '/terms.html': 'Terms & Conditions', '/privacy.html': 'Privacy' }
-    const selected = ff.footerLinks.map(href => {
-      const found = allNavLinks.find(l => l.href === href)
-      return found || { href, label: KNOWN_LABELS[href] || href.replace(/\//g, '').replace('.html', '') }
-    })
+    const selected = ff.footerLinks
+      .filter(href => href !== '/terms.html' && href !== '/privacy.html')
+      .map(href => {
+        const found = allNavLinks.find(l => l.href === href)
+        return found || { href, label: KNOWN_LABELS[href] || href.replace(/\//g, '').replace('.html', '') }
+      })
     document.querySelectorAll('[data-footer-pages]').forEach(el => {
       el.innerHTML = ''
       const header = document.createElement('span')
