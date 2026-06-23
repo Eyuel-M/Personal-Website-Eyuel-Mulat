@@ -1214,19 +1214,73 @@ function renderNav(){
 // ── Hero ──────────────────────────────────────────────────────────────────────
 function renderHero(){
   const c=document.getElementById('editor-inner');c.innerHTML=''
-  function mkFV(label,key,hint,multiline){
+  function mkFV(label,key,hint,multiline,allowFiles=false,isHtml=false){
     const d=document.createElement('div')
-    const l=document.createElement('label');l.className='fl';l.textContent=label;d.appendChild(l)
-    if(hint){const h=document.createElement('p');h.className='fh';h.textContent=hint;d.appendChild(h)}
     if(!S.data[key])S.data[key]={value:''}
-    if(multiline){const ta=document.createElement('textarea');ta.className='fta';ta.rows=3;ta.value=S.data[key].value||'';ta.oninput=()=>S.data[key].value=ta.value;d.appendChild(ta)}
-    else{const i=document.createElement('input');i.className='fi';i.value=S.data[key].value||'';i.oninput=()=>S.data[key].value=i.value;d.appendChild(i)}
+    // Label row — Files button shown inline with label when enabled
+    const lr=document.createElement('div');lr.className='ta-lrow'
+    const lbl=document.createElement('label');lbl.className='fl';lbl.style.marginBottom='0';lbl.textContent=label;lr.appendChild(lbl)
+    let _taS=0,_taE=0
+    if(allowFiles&&multiline){
+      const folderSvg='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>'
+      const fb=document.createElement('button');fb.type='button';fb.className='ta-fb'
+      fb.innerHTML=folderSvg+'Files'
+      fb.onclick=()=>{
+        const start=_taS,end=_taE
+        openFilePicker(
+          file=>{
+            let ins
+            if(isHtml){
+              if(/^image\//i.test(file.mimeType))ins=`<img src="${file.url}" alt="${file.originalName}">`
+              else ins=`<a href="/api/files/${file.id}/download">${file.originalName}</a>`
+            } else { ins=`/api/files/${file.id}/download` }
+            const before=ta.value.slice(0,start),after=ta.value.slice(end)
+            ta.value=before+ins+after
+            S.data[key].value=isHtml?ta.value.replace(/\n/g,'<br>'):ta.value
+            ta.selectionStart=ta.selectionEnd=start+ins.length;ta.focus()
+          },
+          file=>{
+            if(isHtml){
+              const sel=ta.value.slice(start,end)
+              const link=`<a href="/api/files/${file.id}/download">${sel||file.originalName}</a>`
+              const before=ta.value.slice(0,start),after=ta.value.slice(end)
+              ta.value=before+link+after
+              S.data[key].value=ta.value.replace(/\n/g,'<br>')
+              ta.selectionStart=ta.selectionEnd=start+link.length;ta.focus()
+            } else {
+              const url=`/api/files/${file.id}/download`
+              navigator.clipboard.writeText(url).catch(()=>{}).finally(()=>{
+                const prev=fb.innerHTML;fb.textContent='Copied!'
+                setTimeout(()=>{fb.innerHTML=prev},1500)
+              })
+            }
+          }
+        )
+      }
+      lr.appendChild(fb)
+    }
+    d.appendChild(lr)
+    if(hint){const h=document.createElement('p');h.className='fh';h.textContent=hint;d.appendChild(h)}
+    if(multiline){
+      const ta=document.createElement('textarea');ta.className='fta';ta.rows=3
+      ta.value=isHtml?(S.data[key].value||'').replace(/<br\s*\/?>\s*/gi,'\n'):(S.data[key].value||'')
+      ta.oninput=()=>{S.data[key].value=isHtml?ta.value.replace(/\n/g,'<br>'):ta.value}
+      if(allowFiles){
+        const _saveSel=()=>{_taS=ta.selectionStart;_taE=ta.selectionEnd}
+        ta.addEventListener('blur',_saveSel)
+        ta.addEventListener('mouseup',_saveSel)
+        ta.addEventListener('keyup',_saveSel)
+      }
+      d.appendChild(ta)
+    } else {
+      const i=document.createElement('input');i.className='fi';i.value=S.data[key].value||'';i.oninput=()=>S.data[key].value=i.value;d.appendChild(i)
+    }
     return d
   }
   c.appendChild(mkSC('Hero Text',
     mkFV('Eyebrow Label','hero-label','Small caps text above the heading — e.g. "Strategy & Design"'),
-    mkFV('Heading','hero-heading','Supports HTML — use <br> for line breaks, <span class="text-accent">…</span> for accent color.',true),
-    mkFV('Description','hero-subtitle','The paragraph of text below the heading.',true)
+    mkFV('Heading','hero-heading','Supports HTML — use &lt;br&gt; for line breaks, &lt;span class="text-accent"&gt;…&lt;/span&gt; for accent color.',true,true,true),
+    mkFV('Description','hero-subtitle','The paragraph of text below the heading.',true,true,false)
   ))
 }
 
