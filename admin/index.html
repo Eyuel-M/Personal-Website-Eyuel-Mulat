@@ -718,12 +718,15 @@ function mkTextarea(label,key,obj,rows=3,hint='',allowFiles=false,isHtml=false){
   const lr=document.createElement('div');lr.className='ta-lrow'
   const lbl=document.createElement('label');lbl.className='fl';lbl.style.marginBottom='0';lbl.textContent=label
   lr.appendChild(lbl)
+  // Track textarea selection — saved on blur/mouseup/keyup because clicking the
+  // Files button steals focus and resets selectionStart/selectionEnd to 0 before onclick fires
+  let _taS=0,_taE=0
   if(allowFiles){
     const fb=document.createElement('button');fb.type='button';fb.className='ta-fb'
     const folderSvg='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>'
     fb.innerHTML=folderSvg+'Files'
     fb.onclick=()=>{
-      const start=ta.selectionStart,end=ta.selectionEnd
+      const start=_taS,end=_taE
       openFilePicker(
         file=>{
           let ins
@@ -765,6 +768,11 @@ function mkTextarea(label,key,obj,rows=3,hint='',allowFiles=false,isHtml=false){
   // For HTML fields: load <br> as \n so editing is natural; save \n back as <br>
   ta.value=isHtml?(obj[key]||'').replace(/<br\s*\/?>\s*/gi,'\n'):(obj[key]||'')
   ta.oninput=()=>{obj[key]=isHtml?ta.value.replace(/\n/g,'<br>'):ta.value}
+  // Keep _taS/_taE current so Files button always knows the last selection/cursor position
+  const _saveSel=()=>{_taS=ta.selectionStart;_taE=ta.selectionEnd}
+  ta.addEventListener('blur',_saveSel)
+  ta.addEventListener('mouseup',_saveSel)
+  ta.addEventListener('keyup',_saveSel)
   d.appendChild(ta);return d
 }
 function mkSC(title,...children){
