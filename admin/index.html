@@ -2048,9 +2048,20 @@ function openFilePicker(onSelect){
       const prev=document.createElement('div');prev.style.cssText='height:90px;background:var(--g50);display:flex;align-items:center;justify-content:center;overflow:hidden'
       if(isImg){const img=document.createElement('img');img.src=file.url;img.style.cssText='width:100%;height:100%;object-fit:cover';prev.appendChild(img)}
       else{prev.innerHTML=`<span style="font-family:Anton,sans-serif;font-size:20px;color:${color}">${label}</span>`}
-      const nm=document.createElement('div');nm.style.cssText='padding:6px 8px;font-size:11px;font-weight:600;color:var(--g700);overflow:hidden;text-overflow:ellipsis;white-space:nowrap';nm.title=file.originalName||file.filename;nm.textContent=file.originalName||file.filename
-      item.appendChild(prev);item.appendChild(nm)
-      item.onclick=()=>{ov.remove();onSelect(file)}
+      const nm=document.createElement('div');nm.style.cssText='padding:6px 8px 4px;font-size:11px;font-weight:600;color:var(--g700);overflow:hidden;text-overflow:ellipsis;white-space:nowrap';nm.title=file.originalName||file.filename;nm.textContent=file.originalName||file.filename
+      const acts=document.createElement('div');acts.style.cssText='display:flex;gap:4px;padding:0 6px 7px'
+      acts.onclick=e=>e.stopPropagation()
+      const insertBtn=document.createElement('button');insertBtn.className='bp';insertBtn.style.cssText='flex:1;font-size:10px;padding:4px 6px'
+      insertBtn.textContent='Insert'
+      insertBtn.onclick=()=>{ov.remove();onSelect(file)}
+      const cpBtn=document.createElement('button');cpBtn.className='bn';cpBtn.style.cssText='flex:1;font-size:10px;padding:4px 6px'
+      cpBtn.textContent='Copy Link'
+      const _lnk=isImg?file.url:`/api/files/${file.id}/download`
+      cpBtn.onclick=()=>{navigator.clipboard.writeText(_lnk).then(()=>{cpBtn.textContent='✓ Copied';setTimeout(()=>{cpBtn.textContent='Copy Link'},2000)}).catch(()=>{prompt('Copy:',_lnk)})}
+      acts.appendChild(insertBtn);acts.appendChild(cpBtn)
+      item.style.cursor='default'
+      item.onmouseenter=null;item.onmouseleave=null
+      item.appendChild(prev);item.appendChild(nm);item.appendChild(acts)
       pickGrid.appendChild(item)
     })
   }
