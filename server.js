@@ -527,6 +527,19 @@ app.delete('/api/files/:id', auth, (req, res) => {
   res.json({ ok: true })
 })
 
+// Public download route — forces Content-Disposition: attachment so browsers always download
+app.get('/api/files/:id/download', (req, res) => {
+  const meta = readFileMeta()
+  const entry = meta.find(f => f.id === req.params.id)
+  if (!entry) return res.status(404).send('Not found')
+  const filePath = path.join(UPLOADS_DIR, 'files', entry.filename)
+  if (!fs.existsSync(filePath)) return res.status(404).send('File not found on disk')
+  const safeName = entry.originalName.replace(/[^\w.\- ]/g, '_')
+  res.setHeader('Content-Disposition', `attachment; filename="${safeName}"`)
+  res.setHeader('Content-Type', entry.mimeType || 'application/octet-stream')
+  res.sendFile(filePath)
+})
+
 // Create new project page
 app.post('/api/project', auth, (req, res) => {
   const { slug, title, category, year, client, scope, description, role } = req.body

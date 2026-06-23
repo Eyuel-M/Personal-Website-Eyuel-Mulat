@@ -876,7 +876,7 @@ function mkRT(block,onChange){
       if(isImg){
         document.execCommand('insertHTML',false,`<img src="${file.url}" alt="${file.originalName||''}" style="max-width:100%;height:auto;display:block;margin:8px 0">`)
       } else {
-        document.execCommand('insertHTML',false,`<a href="${file.url}" download="${file.originalName||''}" target="_blank" rel="noopener noreferrer">${file.originalName||'Download'}</a>`)
+        document.execCommand('insertHTML',false,`<a href="/api/files/${file.id}/download">${file.originalName||'Download'}</a>`)
       }
       sync()
     })
@@ -1980,7 +1980,8 @@ function renderFiles(){
       const acts=document.createElement('div');acts.style.cssText='display:flex;gap:6px;padding:8px 12px;border-top:1px solid var(--g100)'
       const copyBtn=document.createElement('button');copyBtn.className='bn';copyBtn.style.cssText='flex:1;font-size:11px;padding:5px 8px;display:flex;align-items:center;justify-content:center;gap:4px'
       copyBtn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy URL'
-      copyBtn.onclick=()=>{navigator.clipboard.writeText(file.url).then(()=>{copyBtn.textContent='✓ Copied!';setTimeout(()=>{copyBtn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy URL'},2000)}).catch(()=>{prompt('Copy this URL:',file.url)})}
+      const _copyUrl=isImg?file.url:`/api/files/${file.id}/download`
+      copyBtn.onclick=()=>{navigator.clipboard.writeText(_copyUrl).then(()=>{copyBtn.textContent='✓ Copied!';setTimeout(()=>{copyBtn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy URL'},2000)}).catch(()=>{prompt('Copy this URL:',_copyUrl)})}
       const delBtn=document.createElement('button');delBtn.className='bd';delBtn.style.cssText='font-size:11px;padding:5px 8px;color:var(--red400)'
       delBtn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>'
       delBtn.onclick=async()=>{if(!confirm('Delete "'+( file.originalName||file.filename)+'"?'))return;try{await api('DELETE','/api/files/'+file.id);_fileLibCache=_fileLibCache.filter(f=>f.id!==file.id);renderGrid()}catch(e){alert('Delete failed.')}}
