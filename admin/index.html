@@ -894,11 +894,14 @@ function mkRT(block,onChange){
   function _lnkApply(){
     const url=lnkIn.value.trim()
     if(!url||!_lnkRange){_lnkHide();return}
-    const a=document.createElement('a')
-    a.href=url.startsWith('http')?url:'https://'+url
-    a.target='_blank';a.rel='noopener noreferrer'
-    try{a.appendChild(_lnkRange.extractContents());_lnkRange.insertNode(a)}catch(e){}
-    const s=window.getSelection();if(s)s.removeAllRanges()
+    ed.focus()
+    const s=window.getSelection();s.removeAllRanges();s.addRange(_lnkRange)
+    const href=url.startsWith('http')?url:'https://'+url
+    // Use a temp marker URL so we can find the created <a> and set target/rel
+    const marker='_lnk_'+Date.now()
+    document.execCommand('createLink',false,marker)
+    const newLink=ed.querySelector('a[href="'+marker+'"]')
+    if(newLink){newLink.href=href;newLink.target='_blank';newLink.rel='noopener noreferrer'}
     _lnkHide();sync();ed.focus()
   }
   lnkBtn.onmousedown=e=>{
@@ -936,13 +939,14 @@ function mkRT(block,onChange){
       file=>{
         const dlUrl=`/api/files/${file.id}/download`
         ed.focus()
-        if(hasSelection){
+        if(hasSelection&&savedRange){
           const s=window.getSelection();s.removeAllRanges();s.addRange(savedRange)
-          const a=document.createElement('a');a.href=dlUrl
-          try{a.appendChild(savedRange.extractContents());savedRange.insertNode(a)}catch(ex){}
-          const s2=window.getSelection();if(s2)s2.removeAllRanges()
+          const marker='_fl_'+Date.now()
+          document.execCommand('createLink',false,marker)
+          const lnk=ed.querySelector('a[href="'+marker+'"]')
+          if(lnk){lnk.href=dlUrl;lnk.target='_blank';lnk.rel='noopener noreferrer'}
         } else {
-          document.execCommand('insertHTML',false,`<a href="${dlUrl}">${file.originalName||'Download'}</a>`)
+          document.execCommand('insertHTML',false,`<a href="${dlUrl}" target="_blank" rel="noopener noreferrer">${file.originalName||'Download'}</a>`)
         }
         sync()
       }
@@ -950,10 +954,14 @@ function mkRT(block,onChange){
   }
   bar.appendChild(fileBtn)
   const ed=document.createElement('div');ed.className='rt-ed';ed.contentEditable='true'
-  if(block.html)ed.innerHTML=block.html
-  function sync(){block.html=ed.innerHTML;onChange(block)}
+  // Always start inside a <p> so insertParagraph creates <p> elements (not <div>)
+  ed.innerHTML=block.html||'<p><br></p>'
+  function sync(){
+    const raw=ed.innerHTML
+    block.html=(raw==='<p><br></p>'||raw==='<br>')?'':raw
+    onChange(block)
+  }
   ed.oninput=sync
-  // Force <p> on Enter (Chrome uses <div> by default which is less semantic)
   ed.addEventListener('keydown',e=>{
     if(e.key==='Enter'&&!e.shiftKey){
       e.preventDefault()

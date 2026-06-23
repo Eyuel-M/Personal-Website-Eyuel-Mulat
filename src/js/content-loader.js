@@ -96,7 +96,7 @@ function applyPageData(data) {
           el.appendChild(h)
         }
         const div = document.createElement('div')
-        div.className = 'text-base text-on-surface-variant leading-relaxed max-w-2xl'
+        div.className = 'text-base text-on-surface-variant leading-relaxed max-w-2xl prose-article'
         div.innerHTML = block.value || ''
         div.querySelectorAll('a').forEach(a => { a.target = '_blank'; a.rel = 'noopener noreferrer' })
         el.appendChild(div)

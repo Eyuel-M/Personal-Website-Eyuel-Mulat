@@ -1106,7 +1106,7 @@ function headHTML(title, description = '') {
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
   <link rel="manifest" href="/manifest.json"/>
   <meta name="theme-color" content="#0F0F0F"/>
-  <link rel="stylesheet" href="/src/css/main.css"/>`
+  <link rel="stylesheet" href="/src/css/main.css?v=2"/>`
 }
 
 function ctaHTML() {
