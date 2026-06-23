@@ -534,10 +534,7 @@ app.get('/api/files/:id/download', (req, res) => {
   if (!entry) return res.status(404).send('Not found')
   const filePath = path.join(UPLOADS_DIR, 'files', entry.filename)
   if (!fs.existsSync(filePath)) return res.status(404).send('File not found on disk')
-  const safeName = entry.originalName.replace(/[^\w.\- ]/g, '_')
-  res.setHeader('Content-Disposition', `attachment; filename="${safeName}"`)
-  res.setHeader('Content-Type', entry.mimeType || 'application/octet-stream')
-  res.sendFile(filePath)
+  res.download(filePath, entry.originalName)
 })
 
 // Create new project page

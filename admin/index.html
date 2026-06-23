@@ -867,19 +867,33 @@ function mkRT(block,onChange){
   fileBtn.style.cssText='display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--navy)'
   fileBtn.onmousedown=e=>{
     e.preventDefault()
-    const savedRange=window.getSelection()?.rangeCount>0?window.getSelection().getRangeAt(0).cloneRange():null
-    openFilePicker(file=>{
-      const isImg=/^image\//i.test(file.mimeType)
-      // restore cursor
-      if(savedRange){const s=window.getSelection();s.removeAllRanges();s.addRange(savedRange)}
-      else ed.focus()
-      if(isImg){
-        document.execCommand('insertHTML',false,`<img src="${file.url}" alt="${file.originalName||''}" style="max-width:100%;height:auto;display:block;margin:8px 0">`)
-      } else {
-        document.execCommand('insertHTML',false,`<a href="/api/files/${file.id}/download">${file.originalName||'Download'}</a>`)
+    const sel=window.getSelection()
+    const savedRange=(sel&&sel.rangeCount>0)?sel.getRangeAt(0).cloneRange():null
+    const hasSelection=savedRange&&!savedRange.collapsed
+    openFilePicker(
+      // onInsert — places file at cursor
+      file=>{
+        const isImg=/^image\//i.test(file.mimeType)
+        if(savedRange){const s=window.getSelection();s.removeAllRanges();s.addRange(savedRange)}else ed.focus()
+        if(isImg){document.execCommand('insertHTML',false,`<img src="${file.url}" alt="${file.originalName||''}" style="max-width:100%;height:auto;display:block;margin:8px 0">`)}
+        else{document.execCommand('insertHTML',false,`<a href="/api/files/${file.id}/download">${file.originalName||'Download'}</a>`)}
+        sync()
+      },
+      // onLink — wraps selected text with the file's download URL
+      file=>{
+        const dlUrl=`/api/files/${file.id}/download`
+        ed.focus()
+        if(hasSelection){
+          const s=window.getSelection();s.removeAllRanges();s.addRange(savedRange)
+          const a=document.createElement('a');a.href=dlUrl
+          try{a.appendChild(savedRange.extractContents());savedRange.insertNode(a)}catch(ex){}
+          const s2=window.getSelection();if(s2)s2.removeAllRanges()
+        } else {
+          document.execCommand('insertHTML',false,`<a href="${dlUrl}">${file.originalName||'Download'}</a>`)
+        }
+        sync()
       }
-      sync()
-    })
+    )
   }
   bar.appendChild(fileBtn)
   const ed=document.createElement('div');ed.className='rt-ed';ed.contentEditable='true'
@@ -1996,8 +2010,8 @@ function renderFiles(){
   api('GET','/api/files').then(data=>{_fileLibCache=data||[];renderGrid()}).catch(()=>{grid.innerHTML='<p style="font-size:13px;color:var(--red400);padding:24px 0">Failed to load files.</p>';grid.style.display='block'})
 }
 
-// File picker modal — call with a callback; callback receives {url, originalName, mimeType}
-function openFilePicker(onSelect){
+// File picker modal — onInsert places file at cursor; onLink wraps selected text with download URL
+function openFilePicker(onInsert, onLink){
   const ov=document.createElement('div')
   ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px'
   const box=document.createElement('div')
@@ -2053,12 +2067,12 @@ function openFilePicker(onSelect){
       acts.onclick=e=>e.stopPropagation()
       const insertBtn=document.createElement('button');insertBtn.className='bp';insertBtn.style.cssText='flex:1;font-size:10px;padding:4px 6px'
       insertBtn.textContent='Insert'
-      insertBtn.onclick=()=>{ov.remove();onSelect(file)}
-      const cpBtn=document.createElement('button');cpBtn.className='bn';cpBtn.style.cssText='flex:1;font-size:10px;padding:4px 6px'
-      cpBtn.textContent='Copy Link'
-      const _lnk=isImg?file.url:`/api/files/${file.id}/download`
-      cpBtn.onclick=()=>{navigator.clipboard.writeText(_lnk).then(()=>{cpBtn.textContent='✓ Copied';setTimeout(()=>{cpBtn.textContent='Copy Link'},2000)}).catch(()=>{prompt('Copy:',_lnk)})}
-      acts.appendChild(insertBtn);acts.appendChild(cpBtn)
+      insertBtn.onclick=()=>{ov.remove();onInsert(file)}
+      const lnkBtn=document.createElement('button');lnkBtn.className='bn';lnkBtn.style.cssText='flex:1;font-size:10px;padding:4px 6px'
+      lnkBtn.textContent='Link'
+      lnkBtn.title='Wrap selected text in editor with this file\'s download URL'
+      lnkBtn.onclick=()=>{ov.remove();if(onLink)onLink(file)}
+      acts.appendChild(insertBtn);acts.appendChild(lnkBtn)
       item.style.cursor='default'
       item.onmouseenter=null;item.onmouseleave=null
       item.appendChild(prev);item.appendChild(nm);item.appendChild(acts)
