@@ -1280,7 +1280,7 @@ function renderHero(){
   c.appendChild(mkSC('Hero Text',
     mkFV('Eyebrow Label','hero-label','Small caps text above the heading — e.g. "Strategy & Design"'),
     mkFV('Heading','hero-heading','Supports HTML — use &lt;br&gt; for line breaks, &lt;span class="text-accent"&gt;…&lt;/span&gt; for accent color.',true,true,true),
-    mkFV('Description','hero-subtitle','The paragraph of text below the heading.',true,true,false)
+    mkFV('Description','hero-subtitle','The paragraph of text below the heading.',true,true,true)
   ))
 }
 
@@ -1351,7 +1351,7 @@ function renderAbout(){
   c.appendChild(mkSC('Hero',
     mkInput('Eyebrow Label','about-hero-label',S.data,'Small caps label above the heading — e.g. "Creative Director"'),
     mkTextarea('Heading','about-h1',S.data,3,'Supports HTML — use &lt;br&gt; for line breaks, &lt;span class="text-accent"&gt;…&lt;/span&gt; for orange, &lt;span class="text-on-surface/25"&gt;…&lt;/span&gt; for muted.',true,true),
-    mkTextarea('Intro Paragraph','about-intro',S.data,3,'',true)))
+    mkTextarea('Intro Paragraph','about-intro',S.data,3,'',true,true)))
   c.appendChild(mkSC('Header Image',mkIU({label:'Wide Photo',hint:'21:9 — full-width image below the hero',value:S.data['about-img']||'',onChange:v=>S.data['about-img']=v,aspect:'21/9'})))
   c.appendChild(mkSC('Quote Breaker',
     mkTextarea('Quote Text','about-quote-text',S.data,4,'Supports HTML — use &lt;span class="text-accent"&gt;…&lt;/span&gt; for orange, &lt;br&gt; for line breaks',true,true),
@@ -1528,7 +1528,7 @@ function renderContact(){
     mkInput('Eyebrow Text','contact-h1',S.data,'Small caps label above the main heading — e.g. "Get in Touch"'),
     mkInput('Email Address','contact-email',S.data,'','email'),
     mkInput('Phone','contact-phone',S.data),
-    mkTextarea('Side Description','contact-subtitle',S.data,3,'Short paragraph shown in the left column beside the form.',true)
+    mkTextarea('Side Description','contact-subtitle',S.data,3,'Short paragraph shown in the left column beside the form.',true,true)
   ))
   const svcsCard=document.createElement('div');svcsCard.className='sc';svcsCard.innerHTML='<div class="sc-h"><h3>Services Checklist</h3></div>'
   const sb=document.createElement('div');sb.className='sc-b'
