@@ -90,6 +90,10 @@ input,textarea,select,button{font-family:inherit}
 .fi,.fta,.fsel{width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--g800);background:#fff;outline:none;transition:border-color .12s,box-shadow .12s;line-height:1.5}
 .fi:focus,.fta:focus,.fsel:focus{border-color:var(--navy50);box-shadow:0 0 0 3px var(--navy10)}
 .fta{resize:vertical;min-height:80px}
+.ta-lrow{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.ta-lrow .fl{margin-bottom:0}
+.ta-fb{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--g400);background:none;border:1px solid var(--g200);border-radius:4px;cursor:pointer;padding:2px 8px;display:inline-flex;align-items:center;gap:3px;line-height:1.6;transition:color .12s,border-color .12s}
+.ta-fb:hover{color:var(--navy);border-color:var(--navy50)}
 .fsel{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239CA3AF'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;cursor:pointer}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
@@ -708,37 +712,59 @@ function mkInput(label,key,obj,hint='',type='text'){
   const i=document.createElement('input');i.className='fi';i.type=type;i.value=obj[key]||''
   i.dataset.key=key;i.oninput=i.onchange=()=>obj[key]=i.value;d.appendChild(i);return d
 }
-function mkTextarea(label,key,obj,rows=3,hint='',allowFiles=false){
-  const d=mkField(label,hint)
-  const ta=document.createElement('textarea');ta.className='fta';ta.rows=rows;ta.value=obj[key]||''
-  ta.oninput=()=>obj[key]=ta.value
+function mkTextarea(label,key,obj,rows=3,hint='',allowFiles=false,isHtml=false){
+  const d=document.createElement('div')
+  // Label row — Files button sits inline with the label when enabled
+  const lr=document.createElement('div');lr.className='ta-lrow'
+  const lbl=document.createElement('label');lbl.className='fl';lbl.style.marginBottom='0';lbl.textContent=label
+  lr.appendChild(lbl)
   if(allowFiles){
-    const bar=document.createElement('div');bar.style.cssText='display:flex;gap:4px;margin-bottom:4px'
-    const fb=document.createElement('button');fb.type='button';fb.className='rt-btn';fb.textContent='Files'
+    const fb=document.createElement('button');fb.type='button';fb.className='ta-fb'
+    const folderSvg='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>'
+    fb.innerHTML=folderSvg+'Files'
     fb.onclick=()=>{
       const start=ta.selectionStart,end=ta.selectionEnd
       openFilePicker(
         file=>{
           let ins
-          if(/\.(jpg|jpeg|png|gif|webp|svg)$/i.test(file.originalName))
-            ins=`<img src="${file.url}" alt="${file.originalName}">`
-          else
-            ins=`<a href="/api/files/${file.id}/download">${file.originalName}</a>`
+          if(isHtml){
+            if(/^image\//i.test(file.mimeType))ins=`<img src="${file.url}" alt="${file.originalName}">`
+            else ins=`<a href="/api/files/${file.id}/download">${file.originalName}</a>`
+          } else {
+            ins=`/api/files/${file.id}/download`
+          }
           const before=ta.value.slice(0,start),after=ta.value.slice(end)
-          ta.value=before+ins+after;obj[key]=ta.value
+          ta.value=before+ins+after
+          obj[key]=isHtml?ta.value.replace(/\n/g,'<br>'):ta.value
           ta.selectionStart=ta.selectionEnd=start+ins.length;ta.focus()
         },
         file=>{
-          const sel=ta.value.slice(start,end)
-          const link=`<a href="/api/files/${file.id}/download">${sel||file.originalName}</a>`
-          const before=ta.value.slice(0,start),after=ta.value.slice(end)
-          ta.value=before+link+after;obj[key]=ta.value
-          ta.selectionStart=ta.selectionEnd=start+link.length;ta.focus()
+          if(isHtml){
+            const sel=ta.value.slice(start,end)
+            const link=`<a href="/api/files/${file.id}/download">${sel||file.originalName}</a>`
+            const before=ta.value.slice(0,start),after=ta.value.slice(end)
+            ta.value=before+link+after
+            obj[key]=ta.value.replace(/\n/g,'<br>')
+            ta.selectionStart=ta.selectionEnd=start+link.length;ta.focus()
+          } else {
+            // Plain text field — copy URL to clipboard instead of inserting raw HTML
+            const url=`/api/files/${file.id}/download`
+            navigator.clipboard.writeText(url).catch(()=>{}).finally(()=>{
+              const prev=fb.innerHTML;fb.textContent='Copied!'
+              setTimeout(()=>{fb.innerHTML=prev},1500)
+            })
+          }
         }
       )
     }
-    bar.appendChild(fb);d.appendChild(bar)
+    lr.appendChild(fb)
   }
+  d.appendChild(lr)
+  if(hint){const h=document.createElement('p');h.className='fh';h.textContent=hint;d.appendChild(h)}
+  const ta=document.createElement('textarea');ta.className='fta';ta.rows=rows
+  // For HTML fields: load <br> as \n so editing is natural; save \n back as <br>
+  ta.value=isHtml?(obj[key]||'').replace(/<br\s*\/?>\s*/gi,'\n'):(obj[key]||'')
+  ta.oninput=()=>{obj[key]=isHtml?ta.value.replace(/\n/g,'<br>'):ta.value}
   d.appendChild(ta);return d
 }
 function mkSC(title,...children){
@@ -890,9 +916,8 @@ function mkRT(block,onChange){
   bar.appendChild(lnkWrap)
   // ── File insert button ────────────────────────────────────────────────────
   bar.appendChild(rdiv())
-  const fileBtn=document.createElement('button');fileBtn.type='button';fileBtn.className='rt-b';fileBtn.title='Insert file link or image from Media Library'
-  fileBtn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><polyline points="9 14 12 17 15 14"/></svg> Files'
-  fileBtn.style.cssText='display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--navy)'
+  const fileBtn=document.createElement('button');fileBtn.type='button';fileBtn.className='ta-fb';fileBtn.title='Insert file link or image from Media Library'
+  fileBtn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>Files'
   fileBtn.onmousedown=e=>{
     e.preventDefault()
     const sel=window.getSelection()
@@ -1255,11 +1280,11 @@ function renderAbout(){
   if(!Array.isArray(S.data.archivedProcessItems))S.data.archivedProcessItems=[]
   c.appendChild(mkSC('Hero',
     mkInput('Eyebrow Label','about-hero-label',S.data,'Small caps label above the heading — e.g. "Creative Director"'),
-    mkTextarea('Heading','about-h1',S.data,3,'Supports HTML — use &lt;br&gt; for line breaks, &lt;span class="text-accent"&gt;…&lt;/span&gt; for orange, &lt;span class="text-on-surface/25"&gt;…&lt;/span&gt; for muted.',true),
+    mkTextarea('Heading','about-h1',S.data,3,'Supports HTML — use &lt;br&gt; for line breaks, &lt;span class="text-accent"&gt;…&lt;/span&gt; for orange, &lt;span class="text-on-surface/25"&gt;…&lt;/span&gt; for muted.',true,true),
     mkTextarea('Intro Paragraph','about-intro',S.data,3,'',true)))
   c.appendChild(mkSC('Header Image',mkIU({label:'Wide Photo',hint:'21:9 — full-width image below the hero',value:S.data['about-img']||'',onChange:v=>S.data['about-img']=v,aspect:'21/9'})))
   c.appendChild(mkSC('Quote Breaker',
-    mkTextarea('Quote Text','about-quote-text',S.data,4,'Supports HTML — use &lt;span class="text-accent"&gt;…&lt;/span&gt; for orange, &lt;br&gt; for line breaks',true),
+    mkTextarea('Quote Text','about-quote-text',S.data,4,'Supports HTML — use &lt;span class="text-accent"&gt;…&lt;/span&gt; for orange, &lt;br&gt; for line breaks',true,true),
     mkInput('Attribution','about-quote-attr',S.data,'Line shown below the quote — e.g. "— Eyuel Mulat"'),
     mkIU({label:'Portrait Photo',hint:'3:4 portrait shown beside the quote (optional — section looks great without it too)',value:S.data['about-quote-img']||'',onChange:v=>S.data['about-quote-img']=v,aspect:'3/4'})))
   function mkDynList(container,arr,archived,rowLabel,singularLabel,mkFields,newItem){
@@ -1499,7 +1524,7 @@ function renderFooter(){
   c.appendChild(mkSC('Copyright',mkInput('Copyright Text','copyright',S.data)))
   c.appendChild(mkSC('Call to Action',
     mkInput('Label Text','ctaLabel',S.data,'Small text above the heading'),
-    mkTextarea('Heading','ctaHeading',S.data,3,'Supports HTML — use &lt;br&gt; for line breaks, &lt;span class="text-accent"&gt;…&lt;/span&gt; for orange accent color.',true),
+    mkTextarea('Heading','ctaHeading',S.data,3,'Supports HTML — use &lt;br&gt; for line breaks, &lt;span class="text-accent"&gt;…&lt;/span&gt; for orange accent color.',true,true),
     mkG2(
       mkInput('Button Text','ctaBtn',S.data),
       mkInput('Button Link','ctaHref',S.data,'e.g. /contact.html','url')

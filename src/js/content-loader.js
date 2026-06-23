@@ -38,7 +38,14 @@ function applyPageData(data) {
         el.querySelectorAll('a').forEach(a => { a.target = '_blank'; a.rel = 'noopener noreferrer' })
       }
     } else {
-      if (ov.value !== undefined) el.textContent = ov.value
+      if (ov.value !== undefined) {
+        if (ov.value.includes('\n')) {
+          // Preserve line breaks typed in the admin textarea
+          el.innerHTML = ov.value.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')
+        } else {
+          el.textContent = ov.value
+        }
+      }
     }
 
     const m = ov.margin  || {}
