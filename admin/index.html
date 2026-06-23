@@ -331,6 +331,7 @@ const SECTIONS=[
   {id:'enquiries',label:'Enquiries',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'},
   {id:'messages',label:'Messages',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>'},
   {id:'testimonials',label:'Testimonials',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg>'},
+  {id:'files',label:'Media Library',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><polyline points="9 14 12 17 15 14"/></svg>'},
   {id:'terms',label:'Terms & Conditions',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>'},
   {id:'analytics',label:'Analytics',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>'},
   {id:'account',label:'Account & Security',icon:'<svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="16" height="16"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>'},
@@ -536,7 +537,7 @@ async function updateEnquiryBadge(){
     else badge.style.display='none'
   }catch{badge.style.display='none'}
 }
-const READ_ONLY_SECTIONS=new Set(['enquiries','messages','analytics','testimonials'])
+const READ_ONLY_SECTIONS=new Set(['enquiries','messages','analytics','testimonials','files'])
 function updateSidebarActive(){
   document.querySelectorAll('.ni').forEach(b=>b.classList.toggle('on',b.dataset.id===S.section))
   document.getElementById('tb-title').textContent=SECTIONS.find(s=>s.id===S.section)?.label||''
@@ -673,7 +674,7 @@ function render(){
     if(S.editView==='insight'&&S.editIdx!==null)return renderInsightEditor()
     return renderInsights()
   }
-  const map={site:renderSite,navigation:renderNav,hero:renderHero,slideshow:renderSlideshow,about:renderAbout,capabilities:renderCapabilities,categories:renderCategories,contact:renderContact,clients:renderClients,footer:renderFooter,enquiries:renderEnquiries,messages:renderMessages,testimonials:renderTestimonials,terms:renderTerms,analytics:renderAnalytics,account:renderAccount}
+  const map={site:renderSite,navigation:renderNav,hero:renderHero,slideshow:renderSlideshow,about:renderAbout,capabilities:renderCapabilities,categories:renderCategories,contact:renderContact,clients:renderClients,footer:renderFooter,enquiries:renderEnquiries,messages:renderMessages,testimonials:renderTestimonials,terms:renderTerms,analytics:renderAnalytics,account:renderAccount,files:renderFiles}
   if(map[S.section])map[S.section]()
   else c.innerHTML='<p class="pg-intro">Section coming soon.</p>'
 }
@@ -859,6 +860,28 @@ function mkRT(block,onChange){
   lnkX.onclick=()=>{_lnkHide();ed.focus()}
   lnkWrap.appendChild(lnkBtn);lnkWrap.appendChild(lnkIn);lnkWrap.appendChild(lnkOk);lnkWrap.appendChild(lnkX)
   bar.appendChild(lnkWrap)
+  // ── File insert button ────────────────────────────────────────────────────
+  bar.appendChild(rdiv())
+  const fileBtn=document.createElement('button');fileBtn.type='button';fileBtn.className='rt-b';fileBtn.title='Insert file link or image from Media Library'
+  fileBtn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><polyline points="9 14 12 17 15 14"/></svg> Files'
+  fileBtn.style.cssText='display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--navy)'
+  fileBtn.onmousedown=e=>{
+    e.preventDefault()
+    const savedRange=window.getSelection()?.rangeCount>0?window.getSelection().getRangeAt(0).cloneRange():null
+    openFilePicker(file=>{
+      const isImg=/^image\//i.test(file.mimeType)
+      // restore cursor
+      if(savedRange){const s=window.getSelection();s.removeAllRanges();s.addRange(savedRange)}
+      else ed.focus()
+      if(isImg){
+        document.execCommand('insertHTML',false,`<img src="${file.url}" alt="${file.originalName||''}" style="max-width:100%;height:auto;display:block;margin:8px 0">`)
+      } else {
+        document.execCommand('insertHTML',false,`<a href="${file.url}" download="${file.originalName||''}" target="_blank" rel="noopener noreferrer">${file.originalName||'Download'}</a>`)
+      }
+      sync()
+    })
+  }
+  bar.appendChild(fileBtn)
   const ed=document.createElement('div');ed.className='rt-ed';ed.contentEditable='true'
   if(block.html)ed.innerHTML=block.html
   function sync(){block.html=ed.innerHTML;onChange(block)}
@@ -1849,6 +1872,192 @@ function renderMessages(){
     }
   }
   loadTab('inbox')
+}
+
+// ── Media Library ─────────────────────────────────────────────────────────────
+let _fileLibCache=[]
+function fmtBytes(b){if(!b)return'0 B';const k=1024,sizes=['B','KB','MB','GB'];const i=Math.floor(Math.log(b)/Math.log(k));return(b/Math.pow(k,i)).toFixed(i?1:0)+' '+sizes[i]}
+function fileTypeLabel(mime,name){
+  const ext=(name||'').split('.').pop().toUpperCase()
+  if(/image\//i.test(mime))return'IMAGE'
+  if(/pdf/i.test(mime))return'PDF'
+  if(/zip|x-rar|x-7z/i.test(mime))return'ARCHIVE'
+  if(/photoshop|psd/i.test(mime)||ext==='PSD')return'PSD'
+  if(/illustrator/i.test(mime)||ext==='AI')return'AI'
+  if(/indesign/i.test(mime)||ext==='INDD')return'INDD'
+  if(ext==='FBX'||ext==='OBJ'||ext==='GLB'||ext==='GLTF'||ext==='STL')return'3D'
+  if(/video\//i.test(mime))return'VIDEO'
+  if(ext)return ext
+  return'FILE'
+}
+function fileTypeColor(label){
+  const m={IMAGE:'#0ea5e9',PDF:'#ef4444',PSD:'#3b82f6',AI:'#f97316',INDD:'#8b5cf6',ARCHIVE:'#6b7280','3D':'#10b981',VIDEO:'#f59e0b'}
+  return m[label]||'#6b7280'
+}
+
+function renderFiles(){
+  const c=document.getElementById('editor-inner');c.innerHTML=''
+  const intro=document.createElement('p');intro.className='pg-intro';intro.textContent='Upload files to share downloads — images, PSDs, Illustrator files, 3D models, mockups, PDFs and more. Copy any file URL to use it as a download link in your content.';c.appendChild(intro)
+
+  // Upload zone
+  const uploadCard=document.createElement('div');uploadCard.className='sc';uploadCard.style.marginBottom='20px'
+  uploadCard.innerHTML='<div class="sc-h"><h3>Upload Files</h3></div>'
+  const uploadBody=document.createElement('div');uploadBody.className='sc-b'
+  const dropZone=document.createElement('div')
+  dropZone.style.cssText='border:2px dashed var(--g200);border-radius:10px;padding:36px 24px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;background:var(--g50)'
+  dropZone.innerHTML='<div style="font-size:32px;margin-bottom:8px">↑</div><div style="font-size:13px;font-weight:600;color:var(--g700);margin-bottom:4px">Click to upload or drag & drop</div><div style="font-size:12px;color:var(--g400)">Images, PSDs, AI, INDD, 3D files, PDFs, ZIPs — up to 200 MB each</div>'
+  const fileIn=document.createElement('input');fileIn.type='file';fileIn.multiple=true;fileIn.style.display='none'
+  const uploadStatus=document.createElement('div');uploadStatus.style.cssText='font-size:12px;color:var(--g500);margin-top:10px;min-height:18px'
+  dropZone.onclick=()=>fileIn.click()
+  dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.style.borderColor='var(--navy)';dropZone.style.background='var(--navy10)'})
+  dropZone.addEventListener('dragleave',()=>{dropZone.style.borderColor='var(--g200)';dropZone.style.background='var(--g50)'})
+  dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.style.borderColor='var(--g200)';dropZone.style.background='var(--g50)';handleUploadFiles(e.dataTransfer.files)})
+  fileIn.onchange=e=>{if(e.target.files.length)handleUploadFiles(e.target.files);e.target.value=''}
+  async function handleUploadFiles(files){
+    const arr=[...files]
+    uploadStatus.style.color='var(--g500)';uploadStatus.textContent=`Uploading ${arr.length} file${arr.length!==1?'s':''}…`
+    let done=0,failed=0
+    for(const f of arr){
+      try{
+        const fd=new FormData();fd.append('file',f)
+        const r=await fetch('/api/files/upload',{method:'POST',headers:{'x-token':S.token},body:fd})
+        const j=await r.json();if(j.error)throw new Error(j.error)
+        _fileLibCache.unshift(j);done++
+        uploadStatus.textContent=`Uploading… ${done}/${arr.length} done`
+        renderGrid()
+      }catch(e){failed++;console.error(e)}
+    }
+    uploadStatus.style.color=failed?'var(--red400)':'var(--green700,#15803d)'
+    uploadStatus.textContent=failed?`${done} uploaded, ${failed} failed.`:`${done} file${done!==1?'s':''} uploaded successfully.`
+    setTimeout(()=>{uploadStatus.textContent=''},4000)
+  }
+  uploadBody.appendChild(dropZone);uploadBody.appendChild(fileIn);uploadBody.appendChild(uploadStatus)
+  uploadCard.appendChild(uploadBody);c.appendChild(uploadCard)
+
+  // Search + grid
+  const searchWrap=document.createElement('div');searchWrap.style.cssText='position:relative;margin-bottom:16px'
+  const searchInp=document.createElement('input');searchInp.type='text';searchInp.placeholder='Search files by name or type…'
+  searchInp.style.cssText='width:100%;box-sizing:border-box;padding:8px 12px 8px 34px;font-size:13px;border:1px solid var(--g200);border-radius:6px;background:#fff;color:var(--g800);outline:none'
+  const searchIco=document.createElement('span');searchIco.style.cssText='position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--g300);pointer-events:none;display:flex'
+  searchIco.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>'
+  searchWrap.appendChild(searchIco);searchWrap.appendChild(searchInp);c.appendChild(searchWrap)
+  const grid=document.createElement('div');grid.style.cssText='display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px';c.appendChild(grid)
+
+  function renderGrid(){
+    const q=searchInp.value.toLowerCase().trim()
+    const items=q?_fileLibCache.filter(f=>(f.originalName||f.filename||'').toLowerCase().includes(q)||fileTypeLabel(f.mimeType,f.originalName).toLowerCase().includes(q)):_fileLibCache
+    grid.innerHTML=''
+    if(!items.length&&!_fileLibCache.length){
+      grid.style.display='block'
+      grid.innerHTML='<p style="font-size:13px;color:var(--g400);padding:24px 0">No files uploaded yet. Use the upload area above.</p>'
+      return
+    }
+    if(!items.length){
+      grid.style.display='block'
+      grid.innerHTML='<p style="font-size:13px;color:var(--g400);padding:24px 0">No files match your search.</p>'
+      return
+    }
+    grid.style.display='grid'
+    items.forEach(file=>{
+      const isImg=/^image\//i.test(file.mimeType)
+      const label=fileTypeLabel(file.mimeType,file.originalName||file.filename)
+      const color=fileTypeColor(label)
+      const card=document.createElement('div')
+      card.style.cssText='border:1px solid var(--g200);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;background:#fff'
+      // Preview or icon
+      const prev=document.createElement('div')
+      prev.style.cssText='height:120px;background:var(--g50);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden'
+      if(isImg){const img=document.createElement('img');img.src=file.url;img.style.cssText='width:100%;height:100%;object-fit:cover';prev.appendChild(img)}
+      else{prev.innerHTML=`<span style="font-family:Anton,sans-serif;font-size:28px;letter-spacing:.05em;color:${color}">${label}</span>`}
+      card.appendChild(prev)
+      // Info
+      const info=document.createElement('div');info.style.cssText='padding:10px 12px;flex:1;display:flex;flex-direction:column;gap:4px'
+      const name=document.createElement('div');name.style.cssText='font-size:12px;font-weight:600;color:var(--g800);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%'
+      name.title=file.originalName||file.filename;name.textContent=file.originalName||file.filename
+      const meta=document.createElement('div');meta.style.cssText='font-size:11px;color:var(--g400)';meta.textContent=fmtBytes(file.size)
+      info.appendChild(name);info.appendChild(meta)
+      // Actions
+      const acts=document.createElement('div');acts.style.cssText='display:flex;gap:6px;padding:8px 12px;border-top:1px solid var(--g100)'
+      const copyBtn=document.createElement('button');copyBtn.className='bn';copyBtn.style.cssText='flex:1;font-size:11px;padding:5px 8px;display:flex;align-items:center;justify-content:center;gap:4px'
+      copyBtn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy URL'
+      copyBtn.onclick=()=>{navigator.clipboard.writeText(file.url).then(()=>{copyBtn.textContent='✓ Copied!';setTimeout(()=>{copyBtn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy URL'},2000)}).catch(()=>{prompt('Copy this URL:',file.url)})}
+      const delBtn=document.createElement('button');delBtn.className='bd';delBtn.style.cssText='font-size:11px;padding:5px 8px;color:var(--red400)'
+      delBtn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>'
+      delBtn.onclick=async()=>{if(!confirm('Delete "'+( file.originalName||file.filename)+'"?'))return;try{await api('DELETE','/api/files/'+file.id);_fileLibCache=_fileLibCache.filter(f=>f.id!==file.id);renderGrid()}catch(e){alert('Delete failed.')}}
+      acts.appendChild(copyBtn);acts.appendChild(delBtn);card.appendChild(info);card.appendChild(acts)
+      grid.appendChild(card)
+    })
+  }
+  searchInp.addEventListener('input',renderGrid)
+
+  // Load files
+  grid.innerHTML='<p style="font-size:13px;color:var(--g400);padding:24px 0">Loading…</p>';grid.style.display='block'
+  api('GET','/api/files').then(data=>{_fileLibCache=data||[];renderGrid()}).catch(()=>{grid.innerHTML='<p style="font-size:13px;color:var(--red400);padding:24px 0">Failed to load files.</p>';grid.style.display='block'})
+}
+
+// File picker modal — call with a callback; callback receives {url, originalName, mimeType}
+function openFilePicker(onSelect){
+  const ov=document.createElement('div')
+  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px'
+  const box=document.createElement('div')
+  box.style.cssText='background:#fff;border-radius:12px;width:100%;max-width:760px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.25);overflow:hidden'
+  const head=document.createElement('div');head.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--g100)'
+  const htitle=document.createElement('span');htitle.style.cssText='font-size:14px;font-weight:700;color:var(--g800)';htitle.textContent='Media Library — Select a File'
+  const closeX=document.createElement('button');closeX.innerHTML='&times;';closeX.style.cssText='background:none;border:none;font-size:22px;cursor:pointer;color:var(--g400);line-height:1;padding:0 4px'
+  closeX.onclick=()=>ov.remove()
+  head.appendChild(htitle);head.appendChild(closeX)
+  const subhead=document.createElement('div');subhead.style.cssText='padding:12px 20px;border-bottom:1px solid var(--g100);display:flex;align-items:center;gap:10px'
+  const pickSearch=document.createElement('input');pickSearch.type='text';pickSearch.placeholder='Search files…'
+  pickSearch.style.cssText='flex:1;padding:7px 12px;font-size:13px;border:1px solid var(--g200);border-radius:6px;outline:none'
+  const upBtn=document.createElement('button');upBtn.className='bp';upBtn.style.cssText='font-size:12px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px'
+  upBtn.innerHTML='↑ Upload New'
+  const upIn=document.createElement('input');upIn.type='file';upIn.multiple=true;upIn.style.display='none'
+  upBtn.onclick=()=>upIn.click()
+  const upStatus=document.createElement('span');upStatus.style.cssText='font-size:11px;color:var(--g400)'
+  upIn.onchange=async e=>{
+    const files=[...e.target.files];if(!files.length)return
+    upBtn.disabled=true;upStatus.textContent='Uploading…'
+    for(const f of files){
+      try{
+        const fd=new FormData();fd.append('file',f)
+        const r=await fetch('/api/files/upload',{method:'POST',headers:{'x-token':S.token},body:fd})
+        const j=await r.json();if(j.error)throw new Error(j.error)
+        _fileLibCache.unshift(j)
+      }catch(err){console.error(err)}
+    }
+    upBtn.disabled=false;upStatus.textContent='';e.target.value='';renderPickGrid()
+  }
+  subhead.appendChild(pickSearch);subhead.appendChild(upBtn);subhead.appendChild(upIn);subhead.appendChild(upStatus)
+  const pickGrid=document.createElement('div')
+  pickGrid.style.cssText='flex:1;overflow-y:auto;padding:16px 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px'
+  function renderPickGrid(){
+    const q=pickSearch.value.toLowerCase().trim()
+    const items=q?_fileLibCache.filter(f=>(f.originalName||f.filename||'').toLowerCase().includes(q)||fileTypeLabel(f.mimeType,f.originalName).toLowerCase().includes(q)):_fileLibCache
+    pickGrid.innerHTML=''
+    if(!items.length){pickGrid.style.display='block';pickGrid.innerHTML='<p style="font-size:13px;color:var(--g400);padding:16px 0">'+(q?'No files match your search.':'No files uploaded yet — use Upload New.')+'</p>';return}
+    pickGrid.style.display='grid'
+    items.forEach(file=>{
+      const isImg=/^image\//i.test(file.mimeType)
+      const label=fileTypeLabel(file.mimeType,file.originalName||file.filename)
+      const color=fileTypeColor(label)
+      const item=document.createElement('div')
+      item.style.cssText='border:2px solid var(--g200);border-radius:8px;overflow:hidden;cursor:pointer;transition:border-color .15s'
+      item.onmouseenter=()=>item.style.borderColor='var(--navy)'
+      item.onmouseleave=()=>item.style.borderColor='var(--g200)'
+      const prev=document.createElement('div');prev.style.cssText='height:90px;background:var(--g50);display:flex;align-items:center;justify-content:center;overflow:hidden'
+      if(isImg){const img=document.createElement('img');img.src=file.url;img.style.cssText='width:100%;height:100%;object-fit:cover';prev.appendChild(img)}
+      else{prev.innerHTML=`<span style="font-family:Anton,sans-serif;font-size:20px;color:${color}">${label}</span>`}
+      const nm=document.createElement('div');nm.style.cssText='padding:6px 8px;font-size:11px;font-weight:600;color:var(--g700);overflow:hidden;text-overflow:ellipsis;white-space:nowrap';nm.title=file.originalName||file.filename;nm.textContent=file.originalName||file.filename
+      item.appendChild(prev);item.appendChild(nm)
+      item.onclick=()=>{ov.remove();onSelect(file)}
+      pickGrid.appendChild(item)
+    })
+  }
+  pickSearch.addEventListener('input',renderPickGrid)
+  box.appendChild(head);box.appendChild(subhead);box.appendChild(pickGrid)
+  ov.appendChild(box);document.body.appendChild(ov)
+  if(_fileLibCache.length){renderPickGrid()}
+  else{pickGrid.innerHTML='<p style="font-size:13px;color:var(--g400);padding:16px 0">Loading…</p>';pickGrid.style.display='block';api('GET','/api/files').then(data=>{_fileLibCache=data||[];renderPickGrid()}).catch(()=>{pickGrid.innerHTML='<p style="font-size:13px;color:var(--red400)">Failed to load.</p>'})}
 }
 
 async function updateMsgBadge(){

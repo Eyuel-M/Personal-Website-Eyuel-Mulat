@@ -311,9 +311,32 @@ export function createApiApp() {
     },
   })
 
+  const fileLibStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      const dir = path.join(UPLOADS_DIR, 'files')
+      fs.mkdirSync(dir, { recursive: true })
+      cb(null, dir)
+    },
+    filename: (req, file, cb) => {
+      const ext = path.extname(file.originalname).toLowerCase()
+      const name = path.basename(file.originalname, ext)
+        .replace(/[^a-z0-9]/gi, '-').toLowerCase().slice(0, 50)
+      cb(null, `${name}-${Date.now()}${ext}`)
+    }
+  })
+  const fileLibUpload = multer({ storage: fileLibStorage, limits: { fileSize: 200 * 1024 * 1024 } })
+
   function auth(req, res, next) {
     if (req.headers['x-token'] === makeToken(getAccount().password)) return next()
     res.status(401).json({ error: 'Unauthorized' })
+  }
+
+  function readFileMeta() {
+    try { return JSON.parse(fs.readFileSync(path.join(CONTENT_DIR, 'files.json'), 'utf8')) } catch { return [] }
+  }
+  function saveFileMeta(data) {
+    fs.mkdirSync(CONTENT_DIR, { recursive: true })
+    fs.writeFileSync(path.join(CONTENT_DIR, 'files.json'), JSON.stringify(data, null, 2))
   }
 
   // ── Routes ────────────────────────────────────────────────────────────────
@@ -470,6 +493,38 @@ app.get('/api/preview/:page', (req, res) => {
 app.post('/api/upload', auth, upload.single('file'), (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No file uploaded' })
   res.json({ url: `/public/uploads/${req.file.filename}` })
+})
+
+app.get('/api/files', auth, (req, res) => {
+  res.json(readFileMeta())
+})
+
+app.post('/api/files/upload', auth, fileLibUpload.single('file'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No file uploaded' })
+  const entry = {
+    id: Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+    originalName: req.file.originalname,
+    filename: req.file.filename,
+    url: `/public/uploads/files/${req.file.filename}`,
+    size: req.file.size,
+    mimeType: req.file.mimetype || 'application/octet-stream',
+    uploadedAt: new Date().toISOString()
+  }
+  const meta = readFileMeta()
+  meta.unshift(entry)
+  saveFileMeta(meta)
+  res.json(entry)
+})
+
+app.delete('/api/files/:id', auth, (req, res) => {
+  const meta = readFileMeta()
+  const idx = meta.findIndex(f => f.id === req.params.id)
+  if (idx === -1) return res.status(404).json({ error: 'Not found' })
+  const entry = meta[idx]
+  try { fs.unlinkSync(path.join(UPLOADS_DIR, 'files', entry.filename)) } catch {}
+  meta.splice(idx, 1)
+  saveFileMeta(meta)
+  res.json({ ok: true })
 })
 
 // Create new project page
