@@ -900,6 +900,13 @@ function mkRT(block,onChange){
   if(block.html)ed.innerHTML=block.html
   function sync(){block.html=ed.innerHTML;onChange(block)}
   ed.oninput=sync
+  // Force <p> on Enter (Chrome uses <div> by default which is less semantic)
+  ed.addEventListener('keydown',e=>{
+    if(e.key==='Enter'&&!e.shiftKey){
+      e.preventDefault()
+      document.execCommand('insertParagraph')
+    }
+  })
   const hint=document.createElement('p');hint.style.cssText='font-size:10px;color:var(--g400);margin-top:4px';hint.textContent='Select text, then apply formatting from toolbar.'
   wrap.appendChild(bar);wrap.appendChild(ed);wrap.appendChild(hint)
   wrap.appendChild(mkMS(block,onChange))

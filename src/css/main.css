@@ -392,7 +392,54 @@
 .upload-zone:hover      { border-color: #FF4F00; }
 .upload-zone.has-file   { border-color: #FF4F00; border-style: solid; background: rgba(255, 79, 0, 0.03); }
 
-/* ─── Insight / portfolio post: links in body copy ───────────────────────── */
+/* ─── Rich-text body typography (insights, portfolio, terms) ─────────────── */
+/* Paragraphs and divs created by the rich text editor (Enter key) */
+[data-editable-type="html"] p,
+[data-editable-type="html"] > div,
+.prose-article p,
+.prose-article > div {
+  margin-bottom: 1.6em;
+  line-height: 1.8;
+}
+[data-editable-type="html"] p:last-child,
+[data-editable-type="html"] > div:last-child,
+.prose-article p:last-child,
+.prose-article > div:last-child { margin-bottom: 0; }
+
+/* Headings */
+[data-editable-type="html"] h1,
+[data-editable-type="html"] h2,
+[data-editable-type="html"] h3,
+[data-editable-type="html"] h4,
+.prose-article h1,
+.prose-article h2,
+.prose-article h3,
+.prose-article h4 {
+  font-family: Anton, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+  line-height: 1.1;
+  margin-top: 2em;
+  margin-bottom: 0.6em;
+}
+[data-editable-type="html"] h1, .prose-article h1 { font-size: clamp(2rem,   4vw, 3rem); }
+[data-editable-type="html"] h2, .prose-article h2 { font-size: clamp(1.5rem, 3vw, 2.2rem); }
+[data-editable-type="html"] h3, .prose-article h3 { font-size: clamp(1.2rem, 2.5vw, 1.6rem); }
+[data-editable-type="html"] h4, .prose-article h4 { font-size: 1rem; }
+
+/* Lists */
+[data-editable-type="html"] ul,
+[data-editable-type="html"] ol,
+.prose-article ul,
+.prose-article ol { padding-left: 1.5em; margin-bottom: 1.6em; }
+[data-editable-type="html"] li,
+.prose-article li { margin-bottom: 0.5em; line-height: 1.75; }
+
+/* Inline */
+[data-editable-type="html"] strong, .prose-article strong { font-weight: 700; }
+[data-editable-type="html"] em,     .prose-article em     { font-style: italic; }
+
+/* Links in body copy */
 .prose-article a,
 [data-editable-type="html"] a {
   text-decoration: underline;
