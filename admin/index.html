@@ -708,10 +708,38 @@ function mkInput(label,key,obj,hint='',type='text'){
   const i=document.createElement('input');i.className='fi';i.type=type;i.value=obj[key]||''
   i.dataset.key=key;i.oninput=i.onchange=()=>obj[key]=i.value;d.appendChild(i);return d
 }
-function mkTextarea(label,key,obj,rows=3,hint=''){
+function mkTextarea(label,key,obj,rows=3,hint='',allowFiles=false){
   const d=mkField(label,hint)
   const ta=document.createElement('textarea');ta.className='fta';ta.rows=rows;ta.value=obj[key]||''
-  ta.oninput=()=>obj[key]=ta.value;d.appendChild(ta);return d
+  ta.oninput=()=>obj[key]=ta.value
+  if(allowFiles){
+    const bar=document.createElement('div');bar.style.cssText='display:flex;gap:4px;margin-bottom:4px'
+    const fb=document.createElement('button');fb.type='button';fb.className='rt-btn';fb.textContent='Files'
+    fb.onclick=()=>{
+      const start=ta.selectionStart,end=ta.selectionEnd
+      openFilePicker(
+        file=>{
+          let ins
+          if(/\.(jpg|jpeg|png|gif|webp|svg)$/i.test(file.originalName))
+            ins=`<img src="${file.url}" alt="${file.originalName}">`
+          else
+            ins=`<a href="/api/files/${file.id}/download">${file.originalName}</a>`
+          const before=ta.value.slice(0,start),after=ta.value.slice(end)
+          ta.value=before+ins+after;obj[key]=ta.value
+          ta.selectionStart=ta.selectionEnd=start+ins.length;ta.focus()
+        },
+        file=>{
+          const sel=ta.value.slice(start,end)
+          const link=`<a href="/api/files/${file.id}/download">${sel||file.originalName}</a>`
+          const before=ta.value.slice(0,start),after=ta.value.slice(end)
+          ta.value=before+link+after;obj[key]=ta.value
+          ta.selectionStart=ta.selectionEnd=start+link.length;ta.focus()
+        }
+      )
+    }
+    bar.appendChild(fb);d.appendChild(bar)
+  }
+  d.appendChild(ta);return d
 }
 function mkSC(title,...children){
   const div=document.createElement('div');div.className='sc'
@@ -1227,11 +1255,11 @@ function renderAbout(){
   if(!Array.isArray(S.data.archivedProcessItems))S.data.archivedProcessItems=[]
   c.appendChild(mkSC('Hero',
     mkInput('Eyebrow Label','about-hero-label',S.data,'Small caps label above the heading — e.g. "Creative Director"'),
-    mkTextarea('Heading','about-h1',S.data,3,'Supports HTML — use &lt;br&gt; for line breaks, &lt;span class="text-accent"&gt;…&lt;/span&gt; for orange, &lt;span class="text-on-surface/25"&gt;…&lt;/span&gt; for muted.'),
-    mkTextarea('Intro Paragraph','about-intro',S.data,3)))
+    mkTextarea('Heading','about-h1',S.data,3,'Supports HTML — use &lt;br&gt; for line breaks, &lt;span class="text-accent"&gt;…&lt;/span&gt; for orange, &lt;span class="text-on-surface/25"&gt;…&lt;/span&gt; for muted.',true),
+    mkTextarea('Intro Paragraph','about-intro',S.data,3,'',true)))
   c.appendChild(mkSC('Header Image',mkIU({label:'Wide Photo',hint:'21:9 — full-width image below the hero',value:S.data['about-img']||'',onChange:v=>S.data['about-img']=v,aspect:'21/9'})))
   c.appendChild(mkSC('Quote Breaker',
-    mkTextarea('Quote Text','about-quote-text',S.data,4,'Supports HTML — use &lt;span class="text-accent"&gt;…&lt;/span&gt; for orange, &lt;br&gt; for line breaks'),
+    mkTextarea('Quote Text','about-quote-text',S.data,4,'Supports HTML — use &lt;span class="text-accent"&gt;…&lt;/span&gt; for orange, &lt;br&gt; for line breaks',true),
     mkInput('Attribution','about-quote-attr',S.data,'Line shown below the quote — e.g. "— Eyuel Mulat"'),
     mkIU({label:'Portrait Photo',hint:'3:4 portrait shown beside the quote (optional — section looks great without it too)',value:S.data['about-quote-img']||'',onChange:v=>S.data['about-quote-img']=v,aspect:'3/4'})))
   function mkDynList(container,arr,archived,rowLabel,singularLabel,mkFields,newItem){
@@ -1405,7 +1433,7 @@ function renderContact(){
     mkInput('Eyebrow Text','contact-h1',S.data,'Small caps label above the main heading — e.g. "Get in Touch"'),
     mkInput('Email Address','contact-email',S.data,'','email'),
     mkInput('Phone','contact-phone',S.data),
-    mkTextarea('Side Description','contact-subtitle',S.data,3,'Short paragraph shown in the left column beside the form.')
+    mkTextarea('Side Description','contact-subtitle',S.data,3,'Short paragraph shown in the left column beside the form.',true)
   ))
   const svcsCard=document.createElement('div');svcsCard.className='sc';svcsCard.innerHTML='<div class="sc-h"><h3>Services Checklist</h3></div>'
   const sb=document.createElement('div');sb.className='sc-b'
@@ -1471,7 +1499,7 @@ function renderFooter(){
   c.appendChild(mkSC('Copyright',mkInput('Copyright Text','copyright',S.data)))
   c.appendChild(mkSC('Call to Action',
     mkInput('Label Text','ctaLabel',S.data,'Small text above the heading'),
-    mkTextarea('Heading','ctaHeading',S.data,3,'Supports HTML — use &lt;br&gt; for line breaks, &lt;span class="text-accent"&gt;…&lt;/span&gt; for orange accent color.'),
+    mkTextarea('Heading','ctaHeading',S.data,3,'Supports HTML — use &lt;br&gt; for line breaks, &lt;span class="text-accent"&gt;…&lt;/span&gt; for orange accent color.',true),
     mkG2(
       mkInput('Button Text','ctaBtn',S.data),
       mkInput('Button Link','ctaHref',S.data,'e.g. /contact.html','url')
