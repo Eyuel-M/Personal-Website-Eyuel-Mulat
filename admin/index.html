@@ -1172,6 +1172,9 @@ function renderAbout(){
   if(S.data['about-h1']===undefined)S.data['about-h1']='Making <span class="text-on-surface/25">brands</span><br>that <span class="text-accent">endure.</span>'
   if(S.data['about-intro']===undefined)S.data['about-intro']="I'm a creative director and brand strategist working at the intersection of visual identity and strategic thinking. Every project is an opportunity to build something that lasts."
   if(S.data['about-img']===undefined)S.data['about-img']=''
+  if(S.data['about-quote-text']===undefined)S.data['about-quote-text']='Design is not decoration.<br>It is the architecture<br><span class="text-accent">of meaning.</span>'
+  if(S.data['about-quote-attr']===undefined)S.data['about-quote-attr']='— Eyuel Mulat'
+  if(S.data['about-quote-img']===undefined)S.data['about-quote-img']=''
   if(!Array.isArray(S.data.philosophyItems))S.data.philosophyItems=[{title:'Listen before designing',desc:"Understanding the problem space deeply before reaching for solutions. The best visual systems emerge from genuine understanding of a brand's truth — not from decoration applied over uncertainty."},{title:'Build systems, not assets',desc:"Every visual decision exists within a framework. Scalable identity systems outlast individual deliverables — they adapt to every touchpoint with consistency, from digital to print to environment."},{title:'Precision over decoration',desc:"Remove everything that doesn't earn its place. Architectural restraint isn't minimalism by default — it's intentionality at every scale, knowing when to add and when to hold back."}]
   if(!Array.isArray(S.data.archivedPhilosophyItems))S.data.archivedPhilosophyItems=[]
   if(!Array.isArray(S.data.serviceItems))S.data.serviceItems=[{title:'Brand Strategy',desc:'Positioning audits, competitive landscapes, brand architecture, and the narrative frameworks that guide every visual and verbal decision.'},{title:'Visual Identity',desc:"Logo systems, color palettes, typeface selection, and the full visual language that makes a brand instantly recognisable across every touchpoint."},{title:'Creative Direction',desc:"Art directing photo shoots, campaign visuals, and cross-channel brand moments — ensuring every image and execution is consistent with the brand's core idea."},{title:'Typography',desc:'Type system design, custom lettering, and hierarchical scales that carry meaning and voice — from display headlines to dense body copy.'},{title:'Digital Systems',desc:'Design systems, component libraries, and UI frameworks that translate brand logic into scalable digital products with precision and consistency.'},{title:'Editorial Design',desc:'Annual reports, brand books, and publication design — structured grid layouts that give written content the authority and clarity it deserves.'}]
@@ -1183,6 +1186,10 @@ function renderAbout(){
     mkTextarea('Heading','about-h1',S.data,3,'Supports HTML — use &lt;br&gt; for line breaks, &lt;span class="text-accent"&gt;…&lt;/span&gt; for orange, &lt;span class="text-on-surface/25"&gt;…&lt;/span&gt; for muted.'),
     mkTextarea('Intro Paragraph','about-intro',S.data,3)))
   c.appendChild(mkSC('Header Image',mkIU({label:'Wide Photo',hint:'21:9 — full-width image below the hero',value:S.data['about-img']||'',onChange:v=>S.data['about-img']=v,aspect:'21/9'})))
+  c.appendChild(mkSC('Quote Breaker',
+    mkTextarea('Quote Text','about-quote-text',S.data,4,'Supports HTML — use &lt;span class="text-accent"&gt;…&lt;/span&gt; for orange, &lt;br&gt; for line breaks'),
+    mkInput('Attribution','about-quote-attr',S.data,'Line shown below the quote — e.g. "— Eyuel Mulat"'),
+    mkIU({label:'Portrait Photo',hint:'3:4 portrait shown beside the quote (optional — section looks great without it too)',value:S.data['about-quote-img']||'',onChange:v=>S.data['about-quote-img']=v,aspect:'3/4'})))
   function mkDynList(container,arr,archived,rowLabel,singularLabel,mkFields,newItem){
     function render(){
       container.innerHTML=''
