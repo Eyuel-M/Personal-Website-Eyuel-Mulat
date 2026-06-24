@@ -1230,7 +1230,7 @@ ${nextSection}
 ${ctaHTML()}
 ${footerHTML()}
   <script type="module" src="/src/js/main.js"></script>
-  <script type="module" src="/src/js/content-loader.js?v=4"></script>
+  <script type="module" src="/src/js/content-loader.js?v=5"></script>
   <script type="module" src="/src/js/analytics-sdk.js"></script>
   <script src="/src/js/cookie-consent.js"></script>
   <script>if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{})</script>
@@ -1300,7 +1300,7 @@ ${nextSection}
 ${ctaHTML()}
 ${footerHTML()}
   <script type="module" src="/src/js/main.js"></script>
-  <script type="module" src="/src/js/content-loader.js?v=4"></script>
+  <script type="module" src="/src/js/content-loader.js?v=5"></script>
   <script type="module" src="/src/js/analytics-sdk.js"></script>
   <script src="/src/js/cookie-consent.js"></script>
   <script>if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{})</script>

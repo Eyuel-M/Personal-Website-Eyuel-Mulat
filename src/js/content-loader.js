@@ -104,7 +104,7 @@ function applyPageData(data) {
       } else if (block.type === 'grid2' || block.type === 'grid2x2') {
         const maxCells = block.type === 'grid2' ? 2 : 4
         const grid = document.createElement('div')
-        grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:32px'
+        grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));column-gap:4px;row-gap:32px'
         const cells = block.cells || (block.images || []).map(u => ({ type: 'image', url: u }))
         cells.slice(0, maxCells).forEach(cell => {
           const wrapper = document.createElement('div')
