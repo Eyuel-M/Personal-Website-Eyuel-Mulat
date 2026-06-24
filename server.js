@@ -954,12 +954,12 @@ app.post('/api/insight', auth, (req, res) => {
 
   // ── Sitemap & Robots ───────────────────────────────────────────────────────
   app.get('/robots.txt', (req, res) => {
-    const origin = process.env.SITE_URL || `https://eyuelmulat.com`
+    const origin = process.env.SITE_URL || `https://www.eyuelmulat.com`
     res.setHeader('Content-Type', 'text/plain; charset=utf-8')
     res.send(`User-agent: *\nDisallow: /admin/\nDisallow: /api/\n\nSitemap: ${origin}/sitemap.xml\n`)
   })
   app.get('/sitemap.xml', (req, res) => {
-    const origin = process.env.SITE_URL || `https://eyuelmulat.com`
+    const origin = process.env.SITE_URL || `https://www.eyuelmulat.com`
     const staticPages = ['/', '/about.html', '/work.html', '/insights.html', '/contact.html', '/terms.html']
     const urls = staticPages.map(p => `  <url><loc>${origin}${p}</loc><changefreq>weekly</changefreq></url>`)
     try {
@@ -1089,17 +1089,32 @@ function getSiteSettings() {
   catch { return {} }
 }
 
-function headHTML(title, description = '') {
+function headHTML(title, description = '', opts = {}) {
   const site = getSiteSettings()
   const esc = s => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+  const origin = (process.env.SITE_URL || 'https://www.eyuelmulat.com').replace(/\/$/, '')
   const favicon = site.favicon ? `\n  <link rel="icon" href="${site.favicon}"/>` : ''
-  const ogTitle = `\n  <meta property="og:title" content="${esc(site.siteTitle || (title + ' — Eyuel Mulat'))}"/>`
-  const ogDesc = (site.metaDescription || description) ? `\n  <meta property="og:description" content="${esc(site.metaDescription || description)}"/>` : ''
-  const ogImage = site.ogImage ? `\n  <meta property="og:image" content="${site.ogImage}"/>` : ''
+  const pageTitle = esc(site.siteTitle || (title + ' — Eyuel Mulat'))
+  const pageDesc  = esc(description || site.metaDescription || '')
+  const pageImage = esc(opts.image || site.ogImage || `${origin}/og-image.jpg`)
+  const pageUrl   = opts.url ? `${origin}${opts.url}` : origin
+  const pageType  = opts.type || 'website'
   return `  <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>${title} — Eyuel Mulat</title>
-  ${description ? `<meta name="description" content="${esc(description)}"/>` : ''}${favicon}${ogTitle}${ogDesc}${ogImage}
+  ${description ? `<meta name="description" content="${pageDesc}"/>` : ''}
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
+  <link rel="canonical" href="${esc(pageUrl)}"/>
+  <meta property="og:type" content="${pageType}"/>
+  <meta property="og:url" content="${esc(pageUrl)}"/>
+  <meta property="og:title" content="${pageTitle}"/>
+  ${description ? `<meta property="og:description" content="${pageDesc}"/>` : ''}
+  <meta property="og:image" content="${pageImage}"/>
+  <meta property="og:site_name" content="Eyuel Mulat"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="${pageTitle}"/>
+  ${description ? `<meta name="twitter:description" content="${pageDesc}"/>` : ''}
+  <meta name="twitter:image" content="${pageImage}"/>${favicon}
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;600;700&display=block" rel="stylesheet"/>
@@ -1142,7 +1157,7 @@ function buildProjectPage({ slug, title, category, year, client, scope, descript
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
-${headHTML(title)}
+${headHTML(title, description || '', { url: `/work/${slug}.html`, image: thumbnail || img1 || '', type: 'website' })}
 </head>
 <body class="bg-background text-on-surface grain-overlay min-h-screen">
 ${navHTML()}
@@ -1254,7 +1269,7 @@ function buildInsightPage({ slug, title, category, date, excerpt, body, image },
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
-${headHTML(title)}
+${headHTML(title, excerpt || '', { url: `/insights/${slug}.html`, image: image || '', type: 'article' })}
 </head>
 <body class="bg-background text-on-surface grain-overlay min-h-screen">
 ${navHTML()}
