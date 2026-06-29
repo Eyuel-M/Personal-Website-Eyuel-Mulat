@@ -93,7 +93,7 @@ async function fetchInbox(acct) {
   const visible = messages.filter(m => !deletedSet.has(String(m.uid)))
   visible.forEach(m => { m.read = readSet.has(m.uid) })
   _inboxCache = { msgs: visible, at: Date.now() }
-  return messages
+  return visible
 }
 function makeToken (pw) {
   return 'em-' + Buffer.from(pw + ':eyuelmulat').toString('base64')
@@ -868,14 +868,14 @@ app.post('/api/insight', auth, (req, res) => {
   app.delete('/api/messages/inbox/:uid', auth, (req, res) => {
     const uid = req.params.uid
     markUidsDeleted([uid])
-    if (_inboxCache) { _inboxCache.msgs = _inboxCache.msgs.filter(m => m.uid !== uid) }
+    if (_inboxCache) { _inboxCache.msgs = _inboxCache.msgs.filter(m => String(m.uid) !== String(uid)) }
     res.json({ ok: true })
   })
   app.post('/api/messages/inbox/delete-bulk', auth, (req, res) => {
     const uids = Array.isArray(req.body.uids) ? req.body.uids : []
     if (!uids.length) return res.status(400).json({ error: 'No uids provided' })
     markUidsDeleted(uids)
-    if (_inboxCache) { _inboxCache.msgs = _inboxCache.msgs.filter(m => !uids.includes(m.uid)) }
+    if (_inboxCache) { const del=new Set(uids.map(String)); _inboxCache.msgs = _inboxCache.msgs.filter(m => !del.has(String(m.uid))) }
     res.json({ ok: true })
   })
   app.get('/api/messages/sent', auth, (req, res) => { res.json(readSent()) })
