@@ -192,6 +192,18 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 .gal-row input{flex:1;font-family:monospace;font-size:12px;border:1px solid var(--g200);border-radius:6px;padding:6px 10px;outline:none}
 .gal-row input:focus{border-color:var(--navy50)}
 .sp4>*+*{margin-top:16px}.sp5>*+*{margin-top:20px}
+/* Custom checkbox */
+.cb-box{width:16px;height:16px;border:1.5px solid var(--g300);border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background .15s,border-color .15s;background:#fff;user-select:none}
+.cb-box[data-state=on],.cb-box[data-state=mix]{background:var(--navy);border-color:var(--navy)}
+.cb-box .cb-chk{opacity:0;transform:scale(.6);transition:opacity .15s,transform .15s}
+.cb-box[data-state=on] .cb-chk{opacity:1;transform:scale(1)}
+.cb-box .cb-dash{opacity:0;transition:opacity .12s}
+.cb-box[data-state=mix] .cb-dash{opacity:1}
+/* Msg multi-select toolbar */
+.msg-tb{display:flex;align-items:center;gap:10px;padding:2px 0;margin-bottom:8px}
+.msg-tb-lbl{font-size:12px;color:var(--g500);flex:1}
+.msg-del-btn{display:none;align-items:center;gap:5px;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--red400,#ef4444);background:none;border:none;cursor:pointer;padding:0;transition:opacity .12s}
+.msg-del-btn:hover{opacity:.7}
 </style>
 </head>
 <body>
@@ -1919,22 +1931,24 @@ function renderMessages(){
 
     // ── Multi-select toolbar ─────────────────────────────────────────────────
     const selected=new Set()
-    const toolbar=document.createElement('div')
-    toolbar.style.cssText='display:flex;align-items:center;gap:10px;padding:6px 10px;margin-bottom:8px;background:var(--g50);border:1px solid var(--g100);border-radius:6px'
-    const selAllCb=document.createElement('input');selAllCb.type='checkbox';selAllCb.style.cssText='width:15px;height:15px;accent-color:var(--navy);cursor:pointer;flex-shrink:0'
-    const selLabel=document.createElement('span');selLabel.style.cssText='font-size:12px;color:var(--g500);flex:1'
-    selLabel.textContent='Select all'
-    const bulkDelBtn=document.createElement('button');bulkDelBtn.className='bd';bulkDelBtn.textContent='Delete Selected'
-    bulkDelBtn.style.cssText='display:none;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#fff;background:#e53935;border:none;border-radius:4px;padding:4px 12px;cursor:pointer'
+    function mkCb(state){
+      const b=document.createElement('div');b.className='cb-box';b.dataset.state=state||'off'
+      b.innerHTML='<svg width="10" height="8" viewBox="0 0 10 8" fill="none" class="cb-chk"><polyline points="1,5 4,7 9,1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><svg width="8" height="2" viewBox="0 0 8 2" fill="none" class="cb-dash"><line x1="0" y1="1" x2="8" y2="1" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>'
+      return b
+    }
+    const toolbar=document.createElement('div');toolbar.className='msg-tb'
+    const selAllCb=mkCb()
+    const selLabel=document.createElement('span');selLabel.className='msg-tb-lbl';selLabel.textContent='Select all'
+    const bulkDelBtn=document.createElement('button');bulkDelBtn.className='msg-del-btn'
+    bulkDelBtn.innerHTML='<svg width="11" height="12" viewBox="0 0 11 12" fill="none"><path d="M1 2.5h9M3.5 2.5V1.5h4v1M2 2.5l.6 7.5a.8.8 0 00.8.5h4.2a.8.8 0 00.8-.5L9 2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Delete</span>'
     toolbar.appendChild(selAllCb);toolbar.appendChild(selLabel);toolbar.appendChild(bulkDelBtn)
     msgList.appendChild(toolbar)
 
     function updateToolbar(){
       const n=selected.size
-      selLabel.textContent=n===0?`Select all`:`${n} selected`
-      bulkDelBtn.style.display=n>0?'':'none'
-      selAllCb.checked=n===items.length
-      selAllCb.indeterminate=n>0&&n<items.length
+      selLabel.textContent=n===0?'Select all':`${n} selected`
+      bulkDelBtn.style.display=n>0?'flex':'none'
+      selAllCb.dataset.state=n===0?'off':n===items.length?'on':'mix'
     }
 
     async function deleteMsg(msg){
@@ -1945,7 +1959,7 @@ function renderMessages(){
 
     bulkDelBtn.onclick=async()=>{
       if(!confirm(`Delete ${selected.size} message${selected.size!==1?'s':''}?`))return
-      bulkDelBtn.disabled=true;bulkDelBtn.textContent='Deleting…'
+      bulkDelBtn.disabled=true;bulkDelBtn.querySelector('span').textContent='Deleting…'
       const uids=[...selected]
       if(isInbox){
         await api('POST','/api/messages/inbox/delete-bulk',{uids}).catch(async()=>{
@@ -1960,10 +1974,14 @@ function renderMessages(){
       loadTab(tab)
     }
 
-    selAllCb.onchange=()=>{
-      if(selAllCb.checked)items.forEach(m=>selected.add(m.uid||m.id))
+    selAllCb.onclick=()=>{
+      const toOn=selAllCb.dataset.state!=='on'
+      if(toOn)items.forEach(m=>selected.add(m.uid||m.id))
       else selected.clear()
-      msgList.querySelectorAll('input[type=checkbox][data-msg-cb]').forEach(cb=>{cb.checked=selAllCb.checked})
+      msgList.querySelectorAll('.cb-box[data-msg-cb]').forEach(c=>{
+        c.dataset.state=toOn?'on':'off'
+        const card=c.closest('.pc');if(card)card.style.background=toOn?'var(--navy05,#f0f4ff)':''
+      })
       updateToolbar()
     }
 
@@ -1974,13 +1992,14 @@ function renderMessages(){
       const head=document.createElement('div');head.className='pc-h';head.style.cursor='pointer'
 
       // Checkbox
-      const cb=document.createElement('input');cb.type='checkbox';cb.setAttribute('data-msg-cb','1')
-      cb.style.cssText='width:15px;height:15px;accent-color:var(--navy);cursor:pointer;flex-shrink:0;margin-right:6px'
-      cb.onclick=e=>e.stopPropagation()
-      cb.onchange=()=>{
-        if(cb.checked)selected.add(msgId); else selected.delete(msgId)
+      const cb=mkCb();cb.setAttribute('data-msg-cb','1');cb.style.marginRight='6px'
+      cb.onclick=e=>{
+        e.stopPropagation()
+        const on=cb.dataset.state!=='on'
+        cb.dataset.state=on?'on':'off'
+        if(on)selected.add(msgId); else selected.delete(msgId)
         updateToolbar()
-        card.style.background=cb.checked?'var(--navy05,#f0f4ff)':''
+        card.style.background=on?'var(--navy05,#f0f4ff)':''
       }
 
       const hl=document.createElement('div');hl.className='pc-hl'
