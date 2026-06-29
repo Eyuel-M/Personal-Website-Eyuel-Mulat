@@ -1916,10 +1916,73 @@ function renderMessages(){
     const isInbox=tab==='inbox'
     const isSent=tab==='sent'
     const isDraft=tab==='drafts'
+
+    // ── Multi-select toolbar ─────────────────────────────────────────────────
+    const selected=new Set()
+    const toolbar=document.createElement('div')
+    toolbar.style.cssText='display:flex;align-items:center;gap:10px;padding:6px 10px;margin-bottom:8px;background:var(--g50);border:1px solid var(--g100);border-radius:6px'
+    const selAllCb=document.createElement('input');selAllCb.type='checkbox';selAllCb.style.cssText='width:15px;height:15px;accent-color:var(--navy);cursor:pointer;flex-shrink:0'
+    const selLabel=document.createElement('span');selLabel.style.cssText='font-size:12px;color:var(--g500);flex:1'
+    selLabel.textContent='Select all'
+    const bulkDelBtn=document.createElement('button');bulkDelBtn.className='bd';bulkDelBtn.textContent='Delete Selected'
+    bulkDelBtn.style.cssText='display:none;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#fff;background:#e53935;border:none;border-radius:4px;padding:4px 12px;cursor:pointer'
+    toolbar.appendChild(selAllCb);toolbar.appendChild(selLabel);toolbar.appendChild(bulkDelBtn)
+    msgList.appendChild(toolbar)
+
+    function updateToolbar(){
+      const n=selected.size
+      selLabel.textContent=n===0?`Select all`:`${n} selected`
+      bulkDelBtn.style.display=n>0?'':'none'
+      selAllCb.checked=n===items.length
+      selAllCb.indeterminate=n>0&&n<items.length
+    }
+
+    async function deleteMsg(msg){
+      if(isDraft)   await api('DELETE',`/api/messages/draft/${msg.id}`)
+      else if(isSent) await api('DELETE',`/api/messages/sent/${msg.id}`)
+      else            await api('DELETE',`/api/messages/inbox/${msg.uid}`)
+    }
+
+    bulkDelBtn.onclick=async()=>{
+      if(!confirm(`Delete ${selected.size} message${selected.size!==1?'s':''}?`))return
+      bulkDelBtn.disabled=true;bulkDelBtn.textContent='Deleting…'
+      const uids=[...selected]
+      if(isInbox){
+        await api('POST','/api/messages/inbox/delete-bulk',{uids}).catch(async()=>{
+          for(const uid of uids)await api('DELETE',`/api/messages/inbox/${uid}`).catch(()=>{})
+        })
+      } else {
+        for(const id of uids){
+          const msg=items.find(m=>(m.uid||m.id)===id)
+          if(msg)await deleteMsg(msg).catch(()=>{})
+        }
+      }
+      loadTab(tab)
+    }
+
+    selAllCb.onchange=()=>{
+      if(selAllCb.checked)items.forEach(m=>selected.add(m.uid||m.id))
+      else selected.clear()
+      msgList.querySelectorAll('input[type=checkbox][data-msg-cb]').forEach(cb=>{cb.checked=selAllCb.checked})
+      updateToolbar()
+    }
+
     items.forEach(msg=>{
+      const msgId=msg.uid||msg.id
       const card=document.createElement('div');card.className='pc';card.style.marginBottom='8px'
       if(isInbox&&!msg.read)card.style.borderLeft='3px solid var(--navy)'
       const head=document.createElement('div');head.className='pc-h';head.style.cursor='pointer'
+
+      // Checkbox
+      const cb=document.createElement('input');cb.type='checkbox';cb.setAttribute('data-msg-cb','1')
+      cb.style.cssText='width:15px;height:15px;accent-color:var(--navy);cursor:pointer;flex-shrink:0;margin-right:6px'
+      cb.onclick=e=>e.stopPropagation()
+      cb.onchange=()=>{
+        if(cb.checked)selected.add(msgId); else selected.delete(msgId)
+        updateToolbar()
+        card.style.background=cb.checked?'var(--navy05,#f0f4ff)':''
+      }
+
       const hl=document.createElement('div');hl.className='pc-hl'
 
       // From / To label
@@ -1943,13 +2006,11 @@ function renderMessages(){
       delBtn.onclick=async e=>{
         e.stopPropagation()
         if(!confirm('Delete this message?'))return
-        if(isDraft)await api('DELETE',`/api/messages/draft/${msg.id}`)
-        else if(isSent)await api('DELETE',`/api/messages/sent/${msg.id}`)
-        else{await api('PATCH',`/api/messages/inbox/${msg.uid}/read`,{})}
+        await deleteMsg(msg)
         loadTab(tab)
       }
       acts.appendChild(delBtn)
-      head.appendChild(hl);head.appendChild(acts)
+      head.appendChild(cb);head.appendChild(hl);head.appendChild(acts)
 
       // Expandable body
       const body=document.createElement('div');body.className='pc-b';body.style.display='none'
