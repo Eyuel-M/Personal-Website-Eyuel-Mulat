@@ -301,6 +301,13 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 .qt-svc-drag:active{cursor:grabbing}
 .qt-svc-item.dragging{opacity:.35}
 .qt-svc-item.drag-over{outline:2px dashed var(--qt-accent);outline-offset:-2px}
+.qt-desc-cell{display:flex;align-items:center;gap:3px;min-width:0}
+.qt-desc-cell input{flex:1;min-width:0}
+.qt-irow-drag{cursor:grab;color:rgba(0,0,0,.18);flex-shrink:0;display:flex;align-items:center;user-select:none;padding-right:2px}
+.qt-irow-drag:hover{color:rgba(0,0,0,.4)}
+.qt-irow-drag:active{cursor:grabbing}
+.qt-irow.dragging{opacity:.35}
+.qt-irow.drag-over{outline:2px dashed var(--qt-accent);outline-offset:-2px}
 html.authed #login{display:none!important}
 .qt-bottom-group{break-inside:avoid;page-break-inside:avoid}
 .qt-totals{break-inside:avoid;page-break-inside:avoid}
@@ -324,7 +331,7 @@ html.authed #login{display:none!important}
 @page{margin:0;size:A4}
 @media print{
   html,body{height:auto!important;overflow:visible!important;background:#F6F1E5!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  #sb,#topbar,.qt-type-toggle,.qt-svc-panel,.qt-add-item,.qt-irow-del,.qt-back-row,.qt-add-note,.qt-note-del{display:none!important}
+  #sb,#topbar,.qt-type-toggle,.qt-svc-panel,.qt-add-item,.qt-irow-del,.qt-irow-drag,.qt-back-row,.qt-add-note,.qt-note-del{display:none!important}
   #app{display:block!important;height:auto!important;overflow:visible!important;background:#F6F1E5!important}
   #main{display:block!important;height:auto!important;overflow:visible!important;background:#F6F1E5!important}
   .qt-shell{display:block!important}
@@ -3543,11 +3550,18 @@ function renderQItems(inv){
     box.innerHTML='<div style="padding:14px 0;color:rgba(0,0,0,.4);font-size:12px;font-style:italic">No line items yet — use the service catalog or click + Add line item</div>'
     return
   }
+  const DRAG_HANDLE=`<span class="qt-irow-drag" title="Drag to reorder"><svg width="10" height="14" viewBox="0 0 10 14" fill="currentColor"><circle cx="2.5" cy="2.5" r="1.5"/><circle cx="7.5" cy="2.5" r="1.5"/><circle cx="2.5" cy="7" r="1.5"/><circle cx="7.5" cy="7" r="1.5"/><circle cx="2.5" cy="11.5" r="1.5"/><circle cx="7.5" cy="11.5" r="1.5"/></svg></span>`
+  let dragSrcIdx=null
   inv.items.forEach((it,i)=>{
     const tot=(+it.qty||0)*(+it.price||0)
-    const row=document.createElement('div');row.className='qt-irow'
-    row.innerHTML=`<input value="${esc(it.desc||'')}" placeholder="Description" data-d/><div class="qt-qty"><input type="number" value="${it.qty||1}" data-q/></div><div class="qt-price"><input type="number" value="${it.price||0}" data-p/></div><div class="qt-net" data-t>${qFmt(tot)}</div><button class="qt-irow-del" data-r>✕</button>`
+    const row=document.createElement('div');row.className='qt-irow';row.draggable=true
+    row.innerHTML=`<div class="qt-desc-cell">${DRAG_HANDLE}<input value="${esc(it.desc||'')}" placeholder="Description" data-d/></div><div class="qt-qty"><input type="number" value="${it.qty||1}" data-q/></div><div class="qt-price"><input type="number" value="${it.price||0}" data-p/></div><div class="qt-net" data-t>${qFmt(tot)}</div><button class="qt-irow-del" data-r>✕</button>`
     box.appendChild(row)
+    row.addEventListener('dragstart',e=>{dragSrcIdx=i;row.classList.add('dragging');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',String(i))})
+    row.addEventListener('dragend',()=>{row.classList.remove('dragging');box.querySelectorAll('.qt-irow').forEach(r=>r.classList.remove('drag-over'))})
+    row.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='move';box.querySelectorAll('.qt-irow').forEach(r=>r.classList.remove('drag-over'));row.classList.add('drag-over')})
+    row.addEventListener('dragleave',()=>row.classList.remove('drag-over'))
+    row.addEventListener('drop',e=>{e.preventDefault();row.classList.remove('drag-over');const src=parseInt(e.dataTransfer.getData('text/plain'));if(isNaN(src)||src===i)return;const [moved]=inv.items.splice(src,1);inv.items.splice(i,0,moved);qFlush();renderQItems(inv);qRecalc()})
     const hasNote=it.note!==null&&it.note!==undefined
     if(hasNote){
       const nr=document.createElement('div');nr.className='qt-note-row'
