@@ -878,6 +878,28 @@ app.post('/api/insight', auth, (req, res) => {
     if (_inboxCache) { const del=new Set(uids.map(String)); _inboxCache.msgs = _inboxCache.msgs.filter(m => !del.has(String(m.uid))) }
     res.json({ ok: true })
   })
+  // ── Invoices / Quotes ───────────────────────────────────────────────────
+  const INVOICES_FILE = () => path.join(CONTENT_DIR, 'invoices.json')
+  function readInvState() {
+    const f = INVOICES_FILE()
+    return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f)) : {
+      invoices: [], counter: 1, defaults: {},
+      services: [
+        { name: 'Brand Identity', price: 85000 },
+        { name: 'Logo Design', price: 45000 },
+        { name: 'Brand Strategy', price: 60000 },
+        { name: 'Print Design', price: 30000 },
+      ]
+    }
+  }
+  app.get('/api/invoices', auth, (req, res) => res.json(readInvState()))
+  app.put('/api/invoices', auth, (req, res) => {
+    const d = req.body
+    if (!d || typeof d !== 'object') return res.status(400).json({ error: 'Invalid' })
+    fs.writeFileSync(INVOICES_FILE(), JSON.stringify(d, null, 2))
+    res.json({ ok: true })
+  })
+
   app.get('/api/messages/sent', auth, (req, res) => { res.json(readSent()) })
   app.delete('/api/messages/sent/:id', auth, (req, res) => {
     const list = readSent().filter(x => String(x.id) !== String(req.params.id))
