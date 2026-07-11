@@ -3425,7 +3425,7 @@ function renderQPaper(paper,inv){
   <div class="qt-logo-wrap">
     <div id="qtLogoBox">${logoHtml}</div>
     <div class="qt-top-contact">
-      <input class="qt-inp right" id="qiAddr" value="${esc(inv.fromAddr||'')}" placeholder="Your address"/>
+      <textarea class="qt-ta right" id="qiAddr" rows="1" placeholder="Your address" style="min-height:0">${esc(inv.fromAddr||'')}</textarea>
       <input class="qt-inp right" id="qiEmail" value="${esc(inv.fromEmail||'')}" placeholder="Your email"/>
       <input class="qt-inp right" id="qiWeb" value="${esc(inv.fromWebsite||'')}" placeholder="Your website"/>
       <input class="qt-inp right" id="qiPhone" value="${esc(inv.fromPhone||'')}" placeholder="Your phone"/>
