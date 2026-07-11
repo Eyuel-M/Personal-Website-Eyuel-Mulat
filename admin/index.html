@@ -3225,6 +3225,8 @@ async function renderAnalytics(){
 }
 
 // ── Quote / Invoice system ────────────────────────────────────────────────
+// Global esc for quote templates (local esc in renderEnquiries/renderMessages shadows it safely)
+function esc(s){return(s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 let QS=null  // loaded state: {invoices, services, counter, defaults}
 let QView='list'
 let QId=null
@@ -3318,7 +3320,7 @@ function renderQEditor(){
 function renderQCatalog(panel,inv){
   panel.innerHTML='<h3>Service Catalog</h3><div id="qtSvcList"></div><button class="qt-svc-new" id="qtSvcNew">+ Add service</button><p style="font-size:11px;color:var(--g400);margin-top:8px">Click <b>+</b> to add a service as a line item.</p>'
   const list=panel.querySelector('#qtSvcList')
-  QS.services.forEach((svc,i)=>{
+  ;(QS.services||[]).forEach((svc,i)=>{
     const item=document.createElement('div');item.className='qt-svc-item'
     item.innerHTML=`<input class="qt-svc-name" value="${esc(svc.name)}" placeholder="Service name"/><input class="qt-svc-price" type="number" value="${svc.price||0}"/><button class="qt-svc-add" title="Add to invoice">+</button><button class="qt-svc-del" title="Delete">✕</button>`
     list.appendChild(item)
