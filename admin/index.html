@@ -296,6 +296,12 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 .qt-svc-desc{width:100%;background:transparent;border:none;border-top:1px solid rgba(0,0,0,.06);font-family:inherit;font-size:11px;color:rgba(0,0,0,.55);font-style:italic;padding:4px 4px 2px;resize:none;overflow:hidden;min-height:0;border-radius:0 0 6px 6px;margin-top:2px}
 .qt-svc-desc:focus{outline:none;background:rgba(255,255,255,.8);border-color:var(--qt-accent)}
 .qt-svc-desc::placeholder{color:rgba(0,0,0,.3)}
+.qt-svc-drag{cursor:grab;color:var(--g300);padding:0 4px 0 0;flex-shrink:0;display:flex;align-items:center;user-select:none;touch-action:none}
+.qt-svc-drag:hover{color:var(--g500)}
+.qt-svc-drag:active{cursor:grabbing}
+.qt-svc-item.dragging{opacity:.35}
+.qt-svc-item.drag-over{outline:2px dashed var(--qt-accent);outline-offset:-2px}
+html.authed #login{display:none!important}
 .qt-bottom-group{break-inside:avoid;page-break-inside:avoid}
 .qt-totals{break-inside:avoid;page-break-inside:avoid}
 .qt-prepared{break-inside:avoid;page-break-inside:avoid}
@@ -335,6 +341,7 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 </style>
 </head>
 <body>
+<script>if(localStorage.getItem('em_token'))document.documentElement.className='authed'</script>
 
 <!-- Login — multi-panel (0=sign-in, 1=forgot, 2=enter code, 3=new password, 4=done) -->
 <div id="login">
@@ -3386,9 +3393,19 @@ function renderQCatalog(panel,inv){
   })
   const list=panel.querySelector('#qtSvcList')
   ;(QS.services||[]).forEach((svc,i)=>{
-    const item=document.createElement('div');item.className='qt-svc-item'
-    item.innerHTML=`<div class="qt-svc-item-top"><input class="qt-svc-name" value="${esc(svc.name)}" placeholder="Service name"/><button class="qt-svc-del" title="Delete">✕</button></div><textarea class="qt-svc-desc" rows="1" placeholder="Optional description (shows on invoice)…">${esc(svc.desc||'')}</textarea><div class="qt-svc-item-bot"><input class="qt-svc-price" type="number" value="${svc.price||0}" placeholder="0"/><button class="qt-svc-add" title="Add to invoice">+</button></div>`
+    const item=document.createElement('div');item.className='qt-svc-item';item.draggable=true
+    item.innerHTML=`<div class="qt-svc-item-top"><span class="qt-svc-drag" title="Drag to reorder"><svg width="10" height="14" viewBox="0 0 10 14" fill="currentColor"><circle cx="2" cy="2" r="1.5"/><circle cx="8" cy="2" r="1.5"/><circle cx="2" cy="7" r="1.5"/><circle cx="8" cy="7" r="1.5"/><circle cx="2" cy="12" r="1.5"/><circle cx="8" cy="12" r="1.5"/></svg></span><input class="qt-svc-name" value="${esc(svc.name)}" placeholder="Service name"/><button class="qt-svc-del" title="Delete">✕</button></div><textarea class="qt-svc-desc" rows="1" placeholder="Optional description (shows on invoice)…">${esc(svc.desc||'')}</textarea><div class="qt-svc-item-bot"><input class="qt-svc-price" type="number" value="${svc.price||0}" placeholder="0"/><button class="qt-svc-add" title="Add to invoice">+</button></div>`
     list.appendChild(item)
+    item.addEventListener('dragstart',e=>{e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',String(i));setTimeout(()=>item.classList.add('dragging'),0)})
+    item.addEventListener('dragend',()=>item.classList.remove('dragging'))
+    item.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='move';item.classList.add('drag-over')})
+    item.addEventListener('dragleave',()=>item.classList.remove('drag-over'))
+    item.addEventListener('drop',e=>{
+      e.preventDefault();item.classList.remove('drag-over')
+      const from=parseInt(e.dataTransfer.getData('text/plain'));if(isNaN(from)||from===i)return
+      const[moved]=QS.services.splice(from,1);QS.services.splice(i,0,moved)
+      qFlush();renderQCatalog(panel,inv)
+    })
     item.querySelector('.qt-svc-name').addEventListener('input',e=>{QS.services[i].name=e.target.value;qPersist()})
     item.querySelector('.qt-svc-price').addEventListener('input',e=>{QS.services[i].price=parseFloat(e.target.value)||0;qPersist()})
     const descTa=item.querySelector('.qt-svc-desc')
