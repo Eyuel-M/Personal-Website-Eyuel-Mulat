@@ -610,10 +610,9 @@ document.getElementById('logout-btn').onclick=()=>{
   showPanel(0)
 }
 const PREVIEW_URLS={site:'/',navigation:'/',hero:'/',slideshow:'/',about:'/about.html',services:'/',portfolio:'/work.html',insights:'/insights.html',contact:'/contact.html',clients:'/',footer:'/'}
-document.getElementById('preview-btn').onclick=previewSection
 async function previewSection(){
   const id=S.section
-  const btn=document.getElementById('preview-btn')
+  const btn=document.getElementById('preview-btn');if(!btn)return
   const origHTML=btn.innerHTML;btn.disabled=true;btn.textContent='Preparing…'
   try{
     if(id==='slideshow')await api('PUT','/api/preview/slideshow',S.data)
