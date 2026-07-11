@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Content Manager — Eyuel Mulat</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -13,7 +14,8 @@
   --amber50:#FFFBEB;--amber100:#FEF3C7;--amber200:#FDE68A;--amber500:#F59E0B;--amber800:#92400E;
   --red50:#FEF2F2;--red400:#F87171;--red600:#DC2626;
   --green50:#F0FDF4;--green700:#15803D;
-  --sw:256px
+  --sw:256px;
+  --qt-accent:#FF4F00
 }
 html,body{height:100%;background:var(--g100);color:var(--g900);font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
 ::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--g300);border-radius:3px}
@@ -221,12 +223,12 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 .qt-svc-del:hover{color:var(--red600)}
 .qt-svc-new{background:#fff;border:1px dashed var(--g300);padding:7px 12px;border-radius:8px;font-size:12px;cursor:pointer;width:100%;color:var(--g400);margin-top:6px;font-family:inherit;text-align:left}
 .qt-svc-new:hover{color:var(--navy);border-color:var(--navy)}
-.qt-paper{background:#F6F1E5;border-radius:14px;padding:56px 64px;color:#15171F;position:relative}
+.qt-paper{background:#F6F1E5;border-radius:14px;padding:56px 64px;color:#15171F;position:relative;font-family:'Hanken Grotesk',sans-serif}
 .qt-type-toggle{display:flex;gap:4px;margin-bottom:10px}
 .qt-type-btn{padding:4px 10px;border-radius:6px;border:1.5px solid var(--g200);background:var(--g100);color:var(--g400);font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;transition:all .15s;line-height:1.4;font-family:inherit}
 .qt-type-btn.on{background:var(--navy);border-color:var(--navy);color:#fff}
 .qt-type-btn:not(.on):hover{border-color:var(--navy);color:var(--navy)}
-.qt-title{font-size:52px;font-weight:900;letter-spacing:-2px;color:var(--navy);line-height:1;margin-bottom:16px}
+.qt-title{font-size:52px;font-family:Anton,sans-serif;letter-spacing:0;color:var(--navy);line-height:1;margin-bottom:16px}
 .qt-paper-head{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:24px;align-items:start}
 .qt-head-left{display:flex;flex-direction:column;gap:3px}
 .qt-logo-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
@@ -280,11 +282,30 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 .qt-list-card:hover{background:var(--g50)}
 .qt-list-num{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--navy);background:var(--navy10);padding:3px 8px;border-radius:5px;white-space:nowrap;flex-shrink:0}
 .qt-list-total{font-size:14px;font-weight:700;color:var(--navy);white-space:nowrap}
+/* ── Invoice accent overrides ── */
+.qt-type-btn.on{background:var(--qt-accent)!important;border-color:var(--qt-accent)!important}
+.qt-type-btn:not(.on):hover{border-color:var(--qt-accent)!important;color:var(--qt-accent)!important}
+.qt-svc-add{background:var(--qt-accent)!important}
+.qt-svc-new:hover{color:var(--qt-accent)!important;border-color:var(--qt-accent)!important}
+.qt-title,.qt-stitle,.qt-logo-placeholder,.qt-list-total{color:var(--qt-accent)!important}
+.qt-ihead{color:var(--qt-accent)!important;border-bottom-color:var(--qt-accent)!important}
+.qt-total-row.grand .qt-tlbl,.qt-total-row.grand .qt-tval{color:var(--qt-accent)!important}
+.qt-hr{background:var(--qt-accent)!important}
+.qt-inp:focus,.qt-ta:focus,.qt-irow input:focus,.qt-total-row input:focus,.qt-prepared input:focus{border-color:var(--qt-accent)!important}
+.qt-add-item{border-color:var(--qt-accent)!important;color:var(--qt-accent)!important}
+.qt-add-item:hover{background:rgba(255,79,0,.06)!important}
+.qt-irow{border-bottom-color:rgba(255,79,0,.12)!important}
+.qt-prepared{border-top-color:rgba(255,79,0,.12)!important}
+.qt-prepared input{border-bottom-color:rgba(255,79,0,.18)!important}
+.qt-list-num{color:var(--qt-accent)!important;background:rgba(255,79,0,.1)!important}
+@page{margin:0;size:A4}
 @media print{
   #sb,#topbar,.qt-type-toggle,.qt-svc-panel,.qt-add-item,.qt-irow-del,.qt-back-row{display:none!important}
-  #app{display:block!important}
+  #app{display:block!important;background:#F6F1E5!important}
   .qt-shell{display:block!important}
-  .qt-paper{padding:40px 56px!important;background:#F6F1E5!important;box-shadow:none!important;border-radius:0!important}
+  #editor{padding:0!important;overflow:visible!important}
+  .ei{max-width:none!important}
+  .qt-paper{padding:40px 56px!important;background:#F6F1E5!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;box-shadow:none!important;border-radius:0!important}
   .qt-irow input,.qt-inp,.qt-ta,.qt-total-row input{border:none!important;background:transparent!important}
   .qt-ta{overflow:visible!important;white-space:pre-wrap!important}
 }
@@ -3278,8 +3299,8 @@ function createNewQuote(){
     id:'Q'+Date.now(),type:'invoice',
     number:'EM-'+yr+'-'+String(QS.counter||1).padStart(3,'0'),
     date:new Date().toISOString().slice(0,10),
-    fromAddr:QS.defaults.fromAddr||'',fromEmail:QS.defaults.fromEmail||'',
-    fromWebsite:QS.defaults.fromWebsite||'',fromPhone:QS.defaults.fromPhone||'',
+    fromAddr:QS.defaults.fromAddr||'Grace city mall, Megenagna',fromEmail:QS.defaults.fromEmail||'hello@eyuelmulat.com',
+    fromWebsite:QS.defaults.fromWebsite||'www.eyuelmulat.com',fromPhone:QS.defaults.fromPhone||'0953553856',
     toName:'',toCompany:'',toAddr:'',
     items:[],tax:15,discount:0,
     payment:QS.defaults.payment||'',paymentTerms:QS.defaults.paymentTerms||'',
@@ -3320,13 +3341,23 @@ function renderQEditor(){
     await qFlush();QView='list';renderQList()
   }
   document.getElementById('qtPrint').onclick=()=>{
-    document.getElementById('qtPaper').querySelectorAll('textarea').forEach(ta=>{ta.style.height='auto';ta.style.height=ta.scrollHeight+'px';ta.style.overflow='visible'})
+    const p=document.getElementById('qtPaper')
+    p.querySelectorAll('input').forEach(inp=>inp.setAttribute('value',inp.value))
+    p.querySelectorAll('textarea').forEach(ta=>{ta.style.height='auto';ta.style.height=ta.scrollHeight+'px';ta.style.overflow='visible';ta.textContent=ta.value})
     window.print()
   }
 }
 
 function renderQCatalog(panel,inv){
-  panel.innerHTML='<h3>Service Catalog</h3><div id="qtSvcList"></div><button class="qt-svc-new" id="qtSvcNew">+ Add service</button><p style="font-size:11px;color:var(--g400);margin-top:8px">Click <b>+</b> to add a service as a line item.</p>'
+  const logoDefault=QS.defaults.logoUrl||(S.data&&S.data.logoImage)||''
+  panel.innerHTML=`<h3>Invoice Logo</h3><div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--g100)"><input id="qtLogoUrl" type="url" value="${esc(logoDefault)}" placeholder="https://your-logo.png" style="width:100%;border:1px solid var(--g200);border-radius:6px;padding:6px 9px;font-size:11px;font-family:inherit;color:var(--g800);outline:none;background:#fff"/><p style="font-size:10px;color:var(--g400);margin-top:5px">Paste image URL — saves for all invoices</p></div><h3>Service Catalog</h3><div id="qtSvcList"></div><button class="qt-svc-new" id="qtSvcNew">+ Add service</button><p style="font-size:11px;color:var(--g400);margin-top:8px">Click <b>+</b> to add a service as a line item.</p>`
+  panel.querySelector('#qtLogoUrl').addEventListener('input',e=>{
+    QS.defaults.logoUrl=e.target.value;inv.logoUrl=e.target.value
+    const box=document.getElementById('qtLogoBox');if(!box)return
+    const lUrl=e.target.value||(S.data&&S.data.logoImage)||''
+    box.innerHTML=lUrl?`<img class="qt-logo-img" src="${esc(lUrl)}" alt="Logo"/>`:`<div class="qt-logo-placeholder">${esc((S.data&&S.data.logoText)||'EYUEL MULAT')}</div>`
+    qPersist()
+  })
   const list=panel.querySelector('#qtSvcList')
   ;(QS.services||[]).forEach((svc,i)=>{
     const item=document.createElement('div');item.className='qt-svc-item'
@@ -3349,7 +3380,7 @@ function renderQCatalog(panel,inv){
 }
 
 function renderQPaper(paper,inv){
-  const logoUrl=inv.logoUrl||(S.data&&S.data.logoImage)||''
+  const logoUrl=inv.logoUrl||QS.defaults.logoUrl||(S.data&&S.data.logoImage)||''
   const logoHtml=logoUrl
     ?`<img class="qt-logo-img" src="${esc(logoUrl)}" alt="Logo"/>`
     :`<div class="qt-logo-placeholder">${esc((S.data&&S.data.logoText)||'EYUEL MULAT')}</div>`
@@ -3365,7 +3396,7 @@ function renderQPaper(paper,inv){
     <input class="qt-inp fw" id="qiNum" value="${esc(inv.number||'')}" placeholder="EM-2025-001"/>
   </div>
   <div class="qt-logo-wrap">
-    ${logoHtml}
+    <div id="qtLogoBox">${logoHtml}</div>
     <div class="qt-top-contact">
       <input class="qt-inp right" id="qiAddr" value="${esc(inv.fromAddr||'')}" placeholder="Your address"/>
       <input class="qt-inp right" id="qiEmail" value="${esc(inv.fromEmail||'')}" placeholder="Your email"/>

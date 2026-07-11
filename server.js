@@ -883,7 +883,14 @@ app.post('/api/insight', auth, (req, res) => {
   function readInvState() {
     const f = INVOICES_FILE()
     return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f)) : {
-      invoices: [], counter: 1, defaults: {},
+      invoices: [], counter: 1,
+      defaults: {
+        fromAddr: 'Grace city mall, Megenagna',
+        fromEmail: 'hello@eyuelmulat.com',
+        fromWebsite: 'www.eyuelmulat.com',
+        fromPhone: '0953553856',
+        preparedBy: 'Eyuel Mulat'
+      },
       services: [
         { name: 'Brand Identity', price: 85000 },
         { name: 'Logo Design', price: 45000 },
