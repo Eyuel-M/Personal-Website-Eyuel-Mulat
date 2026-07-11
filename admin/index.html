@@ -3313,9 +3313,14 @@ function openQuote(id){QId=id;QView='editor';renderQEditor()}
 
 function createNewQuote(){
   const yr=new Date().getFullYear()
+  const pfx='EM-'+yr+'-'
+  const maxN=QS.invoices.reduce((m,inv)=>{
+    if(inv.number&&inv.number.startsWith(pfx)){const n=parseInt(inv.number.slice(pfx.length))||0;return Math.max(m,n)}
+    return m
+  },0)
   const inv={
     id:'Q'+Date.now(),type:'invoice',
-    number:'EM-'+yr+'-'+String(QS.counter||1).padStart(3,'0'),
+    number:pfx+String(maxN+1).padStart(3,'0'),
     date:new Date().toISOString().slice(0,10),
     fromAddr:QS.defaults.fromAddr||'Grace city mall, Megenagna',fromEmail:QS.defaults.fromEmail||'hello@eyuelmulat.com',
     fromWebsite:QS.defaults.fromWebsite||'www.eyuelmulat.com',fromPhone:QS.defaults.fromPhone||'0953553856',
@@ -3326,7 +3331,7 @@ function createNewQuote(){
     logoUrl:(S.data&&S.data.logoImage)||'',
     createdAt:Date.now()
   }
-  QS.invoices.push(inv);QS.counter=(QS.counter||1)+1
+  QS.invoices.push(inv)
   qFlush();openQuote(inv.id)
 }
 
