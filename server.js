@@ -889,7 +889,8 @@ app.post('/api/insight', auth, (req, res) => {
         fromEmail: 'hello@eyuelmulat.com',
         fromWebsite: 'www.eyuelmulat.com',
         fromPhone: '0953553856',
-        preparedBy: 'Eyuel Mulat'
+        preparedBy: 'Eyuel Mulat',
+        payment: 'Commercial Bank of Ethiopia\nAccount: 1000220534816'
       },
       services: [
         { name: 'Brand Identity', price: 85000 },

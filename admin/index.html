@@ -229,11 +229,11 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 .qt-type-btn.on{background:var(--navy);border-color:var(--navy);color:#fff}
 .qt-type-btn:not(.on):hover{border-color:var(--navy);color:var(--navy)}
 .qt-title{font-size:52px;font-family:Anton,sans-serif;letter-spacing:0;color:var(--navy);line-height:1;margin-bottom:16px}
-.qt-paper-head{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:24px;align-items:start}
+.qt-paper-head{display:grid;grid-template-columns:1fr 1.35fr;gap:32px;margin-bottom:24px}
 .qt-head-left{display:flex;flex-direction:column;gap:3px}
-.qt-logo-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
-.qt-logo-img{max-height:56px;max-width:180px;object-fit:contain;display:block;margin-bottom:4px}
-.qt-logo-placeholder{font-size:15px;font-weight:800;letter-spacing:.04em;color:var(--navy);text-align:right;margin-bottom:4px}
+.qt-logo-wrap{display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between}
+.qt-logo-img{max-height:80px;max-width:240px;object-fit:contain;display:block}
+.qt-logo-placeholder{font-size:17px;font-weight:800;letter-spacing:.04em;color:var(--navy);text-align:right}
 .qt-top-contact{display:flex;flex-direction:column;align-items:flex-end;gap:1px}
 .qt-inp{background:transparent;border:1px solid transparent;color:#15171F;font-family:inherit;font-size:13px;width:100%;padding:3px 6px;border-radius:4px;transition:border-color .1s,background .1s}
 .qt-inp:hover{background:rgba(0,0,0,.03)}
@@ -282,6 +282,21 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 .qt-list-card:hover{background:var(--g50)}
 .qt-list-num{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--navy);background:var(--navy10);padding:3px 8px;border-radius:5px;white-space:nowrap;flex-shrink:0}
 .qt-list-total{font-size:14px;font-weight:700;color:var(--navy);white-space:nowrap}
+/* Note rows & service descriptions */
+.qt-note-row{display:grid;grid-template-columns:2.4fr .8fr 1.1fr 1.2fr 22px;gap:10px;padding:2px 0 8px;border-bottom:1px solid rgba(255,79,0,.08)}
+.qt-note-cell{display:flex;align-items:flex-start;gap:3px;grid-column:1;padding-left:4px}
+.qt-note-ta{flex:1;background:transparent;border:1px solid transparent;font-family:'Hanken Grotesk',inherit;font-size:12px;color:rgba(0,0,0,.6);font-style:italic;line-height:1.4;padding:2px 5px;border-radius:4px;resize:none;overflow:hidden;min-height:20px}
+.qt-note-ta:hover{background:rgba(0,0,0,.03)}
+.qt-note-ta:focus{outline:none;border-color:var(--qt-accent);background:#fff}
+.qt-note-ta::placeholder{color:rgba(0,0,0,.3)}
+.qt-note-del{background:transparent;border:none;cursor:pointer;color:rgba(0,0,0,.2);font-size:10px;padding:3px 2px;flex-shrink:0;margin-top:3px}
+.qt-note-del:hover{color:var(--qt-accent)}
+.qt-add-note{background:transparent;border:none;cursor:pointer;color:rgba(255,79,0,.45);font-size:11px;font-family:'Hanken Grotesk',inherit;padding:1px 0 7px 4px;text-align:left;letter-spacing:.3px;display:block}
+.qt-add-note:hover{color:var(--qt-accent)}
+.qt-svc-desc{width:100%;background:transparent;border:none;border-top:1px solid rgba(0,0,0,.06);font-family:inherit;font-size:11px;color:rgba(0,0,0,.55);font-style:italic;padding:4px 4px 2px;resize:none;overflow:hidden;min-height:0;border-radius:0 0 6px 6px;margin-top:2px}
+.qt-svc-desc:focus{outline:none;background:rgba(255,255,255,.8);border-color:var(--qt-accent)}
+.qt-svc-desc::placeholder{color:rgba(0,0,0,.3)}
+.qt-bottom-group{break-inside:avoid;page-break-inside:avoid}
 /* ── Invoice accent overrides ── */
 .qt-type-btn.on{background:var(--qt-accent)!important;border-color:var(--qt-accent)!important}
 .qt-type-btn:not(.on):hover{border-color:var(--qt-accent)!important;color:var(--qt-accent)!important}
@@ -300,14 +315,17 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 .qt-list-num{color:var(--qt-accent)!important;background:rgba(255,79,0,.1)!important}
 @page{margin:0;size:A4}
 @media print{
-  #sb,#topbar,.qt-type-toggle,.qt-svc-panel,.qt-add-item,.qt-irow-del,.qt-back-row{display:none!important}
+  html,body{background:#F6F1E5!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #sb,#topbar,.qt-type-toggle,.qt-svc-panel,.qt-add-item,.qt-irow-del,.qt-back-row,.qt-add-note,.qt-note-del{display:none!important}
   #app{display:block!important;background:#F6F1E5!important}
+  #main{background:#F6F1E5!important;overflow:visible!important}
   .qt-shell{display:block!important}
-  #editor{padding:0!important;overflow:visible!important}
-  .ei{max-width:none!important}
-  .qt-paper{padding:40px 56px!important;background:#F6F1E5!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;box-shadow:none!important;border-radius:0!important}
-  .qt-irow input,.qt-inp,.qt-ta,.qt-total-row input{border:none!important;background:transparent!important}
-  .qt-ta{overflow:visible!important;white-space:pre-wrap!important}
+  #editor{padding:0!important;overflow:visible!important;background:#F6F1E5!important}
+  .ei{max-width:none!important;background:#F6F1E5!important}
+  .qt-paper{padding:40px 56px!important;min-height:100vh;background:#F6F1E5!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;box-shadow:none!important;border-radius:0!important;width:100%!important}
+  .qt-irow input,.qt-inp,.qt-ta,.qt-total-row input,.qt-note-ta{border:none!important;background:transparent!important}
+  .qt-ta,.qt-note-ta{overflow:visible!important;white-space:pre-wrap!important}
+  .qt-note-row{grid-template-columns:2.4fr .8fr 1.1fr 1.2fr!important}
 }
 </style>
 </head>
@@ -3303,7 +3321,7 @@ function createNewQuote(){
     fromWebsite:QS.defaults.fromWebsite||'www.eyuelmulat.com',fromPhone:QS.defaults.fromPhone||'0953553856',
     toName:'',toCompany:'',toAddr:'',
     items:[],tax:15,discount:0,
-    payment:QS.defaults.payment||'',paymentTerms:QS.defaults.paymentTerms||'',
+    payment:QS.defaults.payment||'Commercial Bank of Ethiopia\nAccount: 1000220534816',paymentTerms:QS.defaults.paymentTerms||'',
     preparedBy:QS.defaults.preparedBy||'Eyuel Mulat',transaction:'',
     logoUrl:(S.data&&S.data.logoImage)||'',
     createdAt:Date.now()
@@ -3361,13 +3379,17 @@ function renderQCatalog(panel,inv){
   const list=panel.querySelector('#qtSvcList')
   ;(QS.services||[]).forEach((svc,i)=>{
     const item=document.createElement('div');item.className='qt-svc-item'
-    item.innerHTML=`<div class="qt-svc-item-top"><input class="qt-svc-name" value="${esc(svc.name)}" placeholder="Service name"/><button class="qt-svc-del" title="Delete">✕</button></div><div class="qt-svc-item-bot"><input class="qt-svc-price" type="number" value="${svc.price||0}" placeholder="0"/><button class="qt-svc-add" title="Add to invoice">+</button></div>`
+    item.innerHTML=`<div class="qt-svc-item-top"><input class="qt-svc-name" value="${esc(svc.name)}" placeholder="Service name"/><button class="qt-svc-del" title="Delete">✕</button></div><textarea class="qt-svc-desc" rows="1" placeholder="Optional description (shows on invoice)…">${esc(svc.desc||'')}</textarea><div class="qt-svc-item-bot"><input class="qt-svc-price" type="number" value="${svc.price||0}" placeholder="0"/><button class="qt-svc-add" title="Add to invoice">+</button></div>`
     list.appendChild(item)
     item.querySelector('.qt-svc-name').addEventListener('input',e=>{QS.services[i].name=e.target.value;qPersist()})
     item.querySelector('.qt-svc-price').addEventListener('input',e=>{QS.services[i].price=parseFloat(e.target.value)||0;qPersist()})
+    const descTa=item.querySelector('.qt-svc-desc')
+    const growDesc=()=>{descTa.style.height='auto';descTa.style.height=descTa.scrollHeight+'px'}
+    descTa.addEventListener('input',e=>{QS.services[i].desc=e.target.value;growDesc();qPersist()});growDesc()
     item.querySelector('.qt-svc-add').addEventListener('click',()=>{
       const qi=QS.invoices.find(x=>x.id===QId);if(!qi)return
-      qi.items.push({desc:svc.name,qty:1,price:+svc.price||0})
+      const note=svc.desc&&svc.desc.trim()?svc.desc:null
+      qi.items.push({desc:svc.name,qty:1,price:+svc.price||0,note})
       qFlush();renderQItems(qi);qRecalc()
     })
     item.querySelector('.qt-svc-del').addEventListener('click',()=>{
@@ -3423,6 +3445,7 @@ function renderQPaper(paper,inv){
 </div>
 <div id="qtItemsBox"></div>
 <button class="qt-add-item" id="qtAddItem">+ Add line item</button>
+<div class="qt-bottom-group">
 <input class="qt-inp" style="color:rgba(0,0,0,.5);font-size:12px;font-style:italic;margin-top:14px" id="qiTxn" value="${esc(inv.transaction||'')}" placeholder="Transaction / reference information"/>
 <hr class="qt-hr"/>
 <div class="qt-totals">
@@ -3435,7 +3458,7 @@ function renderQPaper(paper,inv){
 <div class="qt-pair">
   <div class="qt-block">
     <div class="qt-stitle">Bank Details</div>
-    <textarea class="qt-ta" id="qiBank" rows="5" placeholder="Bank Name&#10;Account: ...&#10;SWIFT: ...&#10;Currency: ETB">${esc(inv.payment||'')}</textarea>
+    <textarea class="qt-ta" id="qiBank" rows="2" placeholder="Bank Name&#10;Account: ...">${esc(inv.payment||'')}</textarea>
   </div>
   <div class="qt-block right">
     <div class="qt-stitle">Payment Terms</div>
@@ -3445,6 +3468,7 @@ function renderQPaper(paper,inv){
 <div class="qt-prepared">
   <span class="qt-stitle">Prepared by</span>
   <input id="qiBy" value="${esc(inv.preparedBy||'')}" placeholder="Your name"/>
+</div>
 </div>`
 
   // Type toggle
@@ -3480,7 +3504,7 @@ function renderQPaper(paper,inv){
 
   // Add line item
   document.getElementById('qtAddItem').onclick=()=>{
-    inv.items.push({desc:'',qty:1,price:0})
+    inv.items.push({desc:'',qty:1,price:0,note:null})
     qFlush();renderQItems(inv);qRecalc()
   }
 
@@ -3499,6 +3523,20 @@ function renderQItems(inv){
     const row=document.createElement('div');row.className='qt-irow'
     row.innerHTML=`<input value="${esc(it.desc||'')}" placeholder="Description" data-d/><div class="qt-qty"><input type="number" value="${it.qty||1}" data-q/></div><div class="qt-price"><input type="number" value="${it.price||0}" data-p/></div><div class="qt-net" data-t>${qFmt(tot)}</div><button class="qt-irow-del" data-r>✕</button>`
     box.appendChild(row)
+    const hasNote=it.note!==null&&it.note!==undefined
+    if(hasNote){
+      const nr=document.createElement('div');nr.className='qt-note-row'
+      nr.innerHTML=`<div class="qt-note-cell"><textarea class="qt-note-ta" placeholder="Item description…">${esc(it.note||'')}</textarea><button class="qt-note-del" title="Remove description">✕</button></div>`
+      box.appendChild(nr)
+      const ta=nr.querySelector('.qt-note-ta')
+      const grow=()=>{ta.style.height='auto';ta.style.height=ta.scrollHeight+'px'}
+      ta.addEventListener('input',()=>{it.note=ta.value;grow();qPersist()});grow()
+      nr.querySelector('.qt-note-del').addEventListener('click',()=>{it.note=null;qFlush();renderQItems(inv);qRecalc()})
+    }else{
+      const ab=document.createElement('button');ab.className='qt-add-note';ab.textContent='+ add description'
+      box.appendChild(ab)
+      ab.addEventListener('click',()=>{it.note='';qFlush();renderQItems(inv);qRecalc();setTimeout(()=>{const all=box.querySelectorAll('.qt-note-ta');if(all.length)all[all.length-1].focus()},0)})
+    }
     row.querySelector('[data-d]').addEventListener('input',e=>{it.desc=e.target.value;qPersist()})
     row.querySelector('[data-q]').addEventListener('input',e=>{it.qty=parseFloat(e.target.value)||0;row.querySelector('[data-t]').textContent=qFmt((+it.qty)*(+it.price||0));qRecalc();qPersist()})
     row.querySelector('[data-p]').addEventListener('input',e=>{it.price=parseFloat(e.target.value)||0;row.querySelector('[data-t]').textContent=qFmt((+it.qty||0)*(+it.price));qRecalc();qPersist()})
